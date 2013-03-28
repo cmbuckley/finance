@@ -13,13 +13,17 @@
     var payments = sel('[id^=lblPD]:not(:empty), [id^=lblDD]:not(:empty)');
     for (var payment in payments) {
         if (payments.propertyIsEnumerable(payment)) {
-            file.push({
-                d: date,
-                p: getPaymode(payments[payment].innerText),
-                m: payments[payment].innerText,
-                a: getAmount(payments[payment]),
-                c: getCategory(payments[payment].innerText)
-            });
+            var amount = getAmount(payments[payment]);
+
+            if (amount != 0) {
+                file.push({
+                    d: date,
+                    p: getPaymode(payments[payment].innerText),
+                    m: payments[payment].innerText,
+                    a: amount,
+                    c: getCategory(payments[payment].innerText)
+                });
+            }
         }
     }
 
@@ -41,7 +45,7 @@
             'NI':            'Bills:National Insurance',
             'SAYE 2012 3YR': 'Income:Transfer',
             'STUDENT LOAN':  'Income:Student Loan',
-        }[text];
+        }[text] || '';
     }
 
     var formatters = {
