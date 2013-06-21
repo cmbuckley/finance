@@ -39,12 +39,10 @@
 
     function getCategory(text) {
         return {
-            'BASIC PAY':     'Income:Pay Slip',
-            'SMART PENSION': 'Bills:Pension',
-            'TAX':           'Bills:Income Tax',
-            'NI':            'Bills:National Insurance',
-            'SAYE 2012 3YR': 'Income:Transfer',
-            'STUDENT LOAN':  'Income:Student Loan',
+            'BASIC PAY':     'Salary:Gross Pay',
+            'SMART PENSION': 'Retirement:Pension',
+            'TAX':           'Taxes:Income Tax',
+            'NI':            'Insurance:NI'
         }[text] || '';
     }
 
