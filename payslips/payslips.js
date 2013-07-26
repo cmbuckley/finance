@@ -104,6 +104,7 @@
     function getCategory(text) {
         return {
             'BASIC PAY':     'Salary:Gross Pay',
+            'BONUS':         'Salary:Bonus',
             'SMART PENSION': 'Retirement:Pension',
             'TAX':           'Taxes:Income Tax',
             'NI':            'Insurance:NI'
