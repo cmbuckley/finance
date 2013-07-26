@@ -111,10 +111,16 @@
         }[text] || '';
     }
 
+    var output = formatters[type](file);
+    var test = id('test-output');
 
-    var a = doc.createElement('a');
-    a.download = date + '.' + type;
-    a.href = 'data:text/' + type + ';base64,' + btoa(formatters[type](file));
-    doc.body.appendChild(a);
-    a.click();
+    if (test) {
+        test.innerText = output;
+    } else {
+        var a = doc.createElement('a');
+        a.download = date + '.' + type;
+        a.href = 'data:text/' + type + ';base64,' + btoa(output);
+        doc.body.appendChild(a);
+        a.click();
+    }
 })(document);
