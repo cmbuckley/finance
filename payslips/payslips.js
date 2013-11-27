@@ -116,6 +116,7 @@
 
         return {
             'BASIC PAY':     'Salary:Gross Pay',
+            'CALL OUT':      'Salary:Gross Pay',
             'BONUS':         'Salary:Bonus',
             'SMART PENSION': 'Retirement:Pension',
             'TAX':           'Taxes:Income Tax',
