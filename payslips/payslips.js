@@ -73,6 +73,7 @@
     var file = [];
     var type = 'qif';
     var payments = sel('[id^=lblPD]:not(:empty), [id^=lblDD]:not(:empty)');
+    var lblPattern = /(lbl.)D(\d+)/;
 
     for (var payment in payments) {
         if (payments.propertyIsEnumerable(payment)) {
@@ -82,7 +83,7 @@
                 file.push({
                     d: date,
                     p: getPaymode(payments[payment].innerText),
-                    m: payments[payment].innerText,
+                    m: getDescription(payments[payment]),
                     a: amount,
                     c: getCategory(payments[payment].innerText)
                 });
@@ -90,8 +91,15 @@
         }
     }
 
+    function getDescription(element) {
+        return [
+            element.innerText,
+            (id(element.id.replace(lblPattern, '$1H$2')) || {}).innerText
+        ].filter(Boolean).join(': ');
+    }
+
     function getAmount(element) {
-        var label = id(element.id.replace(/(lbl.)D(\d+)/, '$1A$2'));
+        var label = id(element.id.replace(lblPattern, '$1A$2'));
         return {'P': 100, 'D': -100}[element.id[3]] * label.innerText.replace(',', '');
     }
 
@@ -102,6 +110,10 @@
     }
 
     function getCategory(text) {
+        if (text.indexOf('O/T HRS') > -1) {
+            return 'Salary:Overtime';
+        }
+
         return {
             'BASIC PAY':     'Salary:Gross Pay',
             'BONUS':         'Salary:Bonus',
