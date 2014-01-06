@@ -131,7 +131,7 @@
         test.innerText = output;
     } else {
         var a = doc.createElement('a');
-        a.download = date + '.' + type;
+        a.download = 'payslips-' + date + '.' + type;
         a.href = 'data:text/' + type + ';base64,' + btoa(output);
         doc.body.appendChild(a);
         a.click();
