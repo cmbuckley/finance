@@ -14,44 +14,29 @@
             }).join('\n');
         },
         qif: function (rows) {
+            var name = 'Payslips';
+            var type = 'Bank';
             var transfers = {
                 'SAYE 2012 3YR': 'ShareSave'
             };
 
-            function _account(records, name, type) {
-                type = type || 'Bank';
-                var head = [
-                    '!Account',
-                    'N' + name,
-                    'T' + type,
-                    '^',
-                    '!Type:' + type
-                ].join('\n');
+            var head = [
+                '!Account',
+                'N' + name,
+                'T' + type,
+                '^',
+                '!Type:' + type
+            ];
 
-                return [head].concat(records.map(function (record) {
-                    var category = record.l || (transfers[record.m] ? '[' + transfers[record.m] + ']' : record.c);
-                    return ['D' + record.d, 'T' + (record.a / 100).toFixed(2), 'M' + record.m, 'L' + category, '^'].join('\n');
-                })).join('\n');
-            }
-
-            function _transfers(records, from, to, type) {
-                return _account(records.map(function (record) {
-                    if (transfers[record.m] !== to) {
-                        return false;
-                    }
-
-                    record.l = '[' + from + ']';
-                    record.a *= -1;
-                    return record;
-                }).filter(function (record) {
-                    return (record !== false);
-                }), to, type);
-            }
-
-            return [
-                _account(rows, 'Payslips'),
-                _transfers(rows, 'Payslips', 'ShareSave')
-            ].join('\n');
+            return rows.reduce(function (data, row) {
+                return data.concat([
+                    'D' + row.d,
+                    'T' + (row.a / 100).toFixed(2),
+                    'M' + row.m,
+                    'L' + (transfers[row.m] ? '[' + transfers[row.m] + ']' : row.c),
+                    '^'
+                ]);
+            }, head).join('\n');
         }
     };
 
