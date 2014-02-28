@@ -100,12 +100,13 @@
         }
 
         return {
-            'BASIC PAY':     'Salary:Gross Pay',
-            'CALL OUT':      'Salary:Gross Pay',
-            'BONUS':         'Salary:Bonus',
-            'SMART PENSION': 'Retirement:Pension',
-            'TAX':           'Taxes:Income Tax',
-            'NI':            'Insurance:NI'
+            'BASIC PAY':      'Salary:Gross Pay',
+            'CALL OUT':       'Salary:Gross Pay',
+            'BONUS':          'Salary:Bonus',
+            'REFER A FRIEND': 'Salary:Bonus',
+            'SMART PENSION':  'Retirement:Pension',
+            'TAX':            'Taxes:Income Tax',
+            'NI':             'Insurance:NI'
         }[text] || '';
     }
 
