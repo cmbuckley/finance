@@ -17,7 +17,8 @@
             var name = 'Payslips';
             var type = 'Bank';
             var transfers = {
-                'SAYE 2012 3YR': 'ShareSave'
+                'SAYE 2012 3YR': 'ShareSave',
+                'SMART PENSION': 'Pension'
             };
 
             var head = [
@@ -60,21 +61,19 @@
     var payments = sel('[id^=lblPD]:not(:empty), [id^=lblDD]:not(:empty)');
     var lblPattern = /(lbl.)D(\d+)/;
 
-    for (var payment in payments) {
-        if (payments.propertyIsEnumerable(payment)) {
-            var amount = getAmount(payments[payment]);
+    [].forEach.call(payments, function (payment) {
+        var amount = getAmount(payment);
 
-            if (amount != 0) {
-                file.push({
-                    d: date,
-                    p: getPaymode(payments[payment].innerText),
-                    m: getDescription(payments[payment]),
-                    a: amount,
-                    c: getCategory(payments[payment].innerText)
-                });
-            }
+        if (amount != 0) {
+            file.push({
+                d: date,
+                p: getPaymode(payment.innerText),
+                m: getDescription(payment),
+                a: amount,
+                c: getCategory(payment.innerText)
+            });
         }
-    }
+    });
 
     function getDescription(element) {
         return [
