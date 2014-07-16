@@ -1,18 +1,10 @@
 (function (doc) {
     function _each(array, callback) {
-        for (var i in array) {
-            if (array.propertyIsEnumerable(i)) {
-                callback(array[i], i);
-            }
-        }
+        Array.prototype.forEach.call(array, callback);
     }
 
     function _map(array, callback) {
-        var map = [];
-        _each(array, function (el, i) {
-            map.push(callback(el, i));
-        });
-        return map;
+        return Array.prototype.map.call(array, callback);
     }
 
     function _date(el) {
@@ -217,7 +209,7 @@
         }, head) + foot;
     }
 
-    function _onComplete(rows) {
+    function _download(rows) {
         var a = doc.createElement('a');
         a.download = 'betting.ofx';
         a.href = 'data:text/ofx;base64,' + btoa(_ofx(rows));
@@ -229,7 +221,7 @@
     var envelope = sel('bet365Envelope');
 
     if (envelope.length) {
-        _onComplete([_getTransaction(envelope[0])]);
+        _download([_getTransaction(envelope[0])]);
     }
     else {
         var rows = sel('.betResultsRow');
@@ -242,7 +234,7 @@
                 file.push(_getTransaction(el));
 
                 if (file.length == rows.length) {
-                    _onComplete(file);
+                    _download(file);
                 }
             });
         });
