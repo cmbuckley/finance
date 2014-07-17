@@ -41,8 +41,10 @@
         };
     }
 
-    function _isAccumulator(soFar, selection) {
-        return (soFar && (selection.market == 'Full Time Result'));
+    function _isAccumulator(selections) {
+        return selections.reduce(function (soFar, selection) {
+            return (soFar && (selection.market == 'Full Time Result'));
+        }, true);
     }
 
     function _getDescription(data) {
@@ -89,14 +91,14 @@
         else {
             description = data.stake.type;
 
-            if (data.selections.reduce(_isAccumulator, true)) {
+            if (_isAccumulator(data.selections)) {
                 description += ' (' + data.selections.map(function (selection) {
                     return selection.selection;
                 }).join(', ') + ')';
             }
 
             description += '\n' + data.selections.map(function (selection) {
-                var text = selection.event;
+                var text = selection.selection;
 
                 if (selection.date != data.date) {
                    text += ' (' + selection.date + ')';
