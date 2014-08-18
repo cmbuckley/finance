@@ -19,6 +19,8 @@ BEGIN {
         }
 
         print "M" m
+    } else if (substr($0, 1, 1) == "D") {
+        print "D" substr($0, 5, 2) "/" substr($0, 2, 2) "/" substr($0, 8)
     } else {
         print
     }
