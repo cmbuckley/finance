@@ -2,30 +2,36 @@
 dl { width: 20em; }
 dt { float: left; margin-right: 2em; }
 dd { text-align: right; }
+textarea { border: 5px solid; }
+.pass { border-color: green; }
+.fail { border-color: red; }
 </style>
 <p id=lblHeading1>Test for the 27 June 2013.</p>
 <dl>
     <dt id=lblPD1>BASIC PAY</dt>
     <dd id=lblPA1>1,234.56</dd>
 
-    <dt id=lblPD2>BONUS</dt>
-    <dd id=lblPA2>5,432.10</dd>
+    <dt id=lblPD2>BASIC ARREARS</dt>
+    <dd id=lblPA2>111.11</dd>
 
-    <dt id=lblPD2>REFER A FRIEND</dt>
-    <dd id=lblPA2>1,000.00</dd>
+    <dt id=lblPD3>BONUS</dt>
+    <dd id=lblPA3>5,432.10</dd>
 
-    <dt id=lblPD3>O/T HRS @ 1.50</dt>
-    <dt id=lblPH3>6.00</dt>
-    <dd id=lblPA3>234.56</dd>
+    <dt id=lblPD4>REFER A FRIEND</dt>
+    <dd id=lblPA4>1,000.00</dd>
 
-    <dt id=lblPD4>SMART PENSION</dt>
-    <dd id=lblPA4>-98.76</dd>
+    <dt id=lblPD5>O/T HRS @ 1.50</dt>
+    <dt id=lblPH5>6.00</dt>
+    <dd id=lblPA5>234.56</dd>
 
-    <dt id=lblPD5>OTHER</dt>
-    <dd id=lblPA5>0.00</dd>
+    <dt id=lblPD6>SMART PENSION</dt>
+    <dd id=lblPA6>-98.76</dd>
 
-    <dt id=lblPD6>CALL OUT</dt>
-    <dd id=lblPA6>123.45</dd>
+    <dt id=lblPD7>OTHER</dt>
+    <dd id=lblPA7>0.00</dd>
+
+    <dt id=lblPD8>CALL OUT</dt>
+    <dd id=lblPA8>123.45</dd>
 
     <dt id=lblDD1>TAX</dt>
     <dd id=lblDA1>567.89</dd>
@@ -37,4 +43,62 @@ dd { text-align: right; }
     <dd id=lblDA3>100.00</dd>
 </dl>
 
-<textarea id="test-output"></textarea>
+<script type="text/plain" id="expected-output">
+!Account
+NPayslips
+TBank
+^
+!Type:Bank
+D27-06-2013
+T1234.56
+MBASIC PAY
+LSalary:Gross Pay
+^
+D27-06-2013
+T111.11
+MBASIC ARREARS
+LSalary:Gross Pay
+^
+D27-06-2013
+T5432.10
+MBONUS
+LSalary:Bonus
+^
+D27-06-2013
+T1000.00
+MREFER A FRIEND
+LSalary:Bonus
+^
+D27-06-2013
+T234.56
+MO/T HRS @ 1.50: 6.00
+LSalary:Overtime
+^
+D27-06-2013
+T-98.76
+MSMART PENSION
+L[Pension]
+^
+D27-06-2013
+T123.45
+MCALL OUT
+LSalary:Gross Pay
+^
+D27-06-2013
+T-567.89
+MTAX
+LTaxes:Income Tax
+^
+D27-06-2013
+T-333.33
+MNI
+LInsurance:NI
+^
+D27-06-2013
+T-100.00
+MSAYE 2012 3YR
+L[ShareSave]
+^
+</script>
+<textarea rows="20" cols="100" id="test-output"></textarea>
+<script src="payslips.js"></script>

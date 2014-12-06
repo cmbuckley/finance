@@ -100,6 +100,7 @@
 
         return {
             'BASIC PAY':      'Salary:Gross Pay',
+            'BASIC ARREARS':  'Salary:Gross Pay',
             'CALL OUT':       'Salary:Gross Pay',
             'BONUS':          'Salary:Bonus',
             'REFER A FRIEND': 'Salary:Bonus',
@@ -114,6 +115,8 @@
 
     if (test) {
         test.innerText = output;
+        var expected = id('expected-output').textContent.trim();
+        test.classList.add(output.trim() == expected ? 'pass' : 'fail');
     } else {
         var a = doc.createElement('a');
         a.download = 'payslips-' + date + '.' + type;
