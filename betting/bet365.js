@@ -221,12 +221,12 @@
 
     var sel = doc.querySelectorAll.bind(doc);
     var envelope = sel('bet365Envelope');
+    var rows = sel('.betResultsRow');
 
     if (envelope.length) {
         _download([_getTransaction(envelope[0])]);
     }
-    else {
-        var rows = sel('.betResultsRow');
+    else if (rows) {
         var file = [];
 
         _each(rows, function (row) {
@@ -240,5 +240,10 @@
                 }
             });
         });
+    }
+    else if (typeof exports == 'object') {
+        module.exports = {
+            getDescription: _getDescription
+        };
     }
 })(document);
