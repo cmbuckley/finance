@@ -230,7 +230,7 @@
         var file = [];
 
         _each(rows, function (row) {
-            var url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsttId=2&bsId=' + row.id.replace(/_.*$/, '');
+            var url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsttId=0&dsId=0&bsId=' + row.id.replace(/_.*$/, '');
 
             _get(url, function (el) {
                 file.push(_getTransaction(el));
