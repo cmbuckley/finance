@@ -17,7 +17,7 @@
             var name = 'Payslips';
             var type = 'Bank';
             var transfers = {
-                'SAYE 2012 3YR': 'ShareSave',
+                'SAYE 2012 3YR': 'Sharesave',
                 'SMART PENSION': 'Pension'
             };
 
