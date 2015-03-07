@@ -205,6 +205,7 @@
                 '   <DTPOSTED>' + row.d.split('-').reverse().join('') + '</DTPOSTED>\n' +
                 '   <TRNAMT>' + (row.a / 100).toFixed(2) + '</TRNAMT>\n' +
                 '   <FITID>' + row.n + '</FITID>\n' +
+                '   <CHECKNUM>' + row.n + '</CHECKNUM>\n' +
                 '   <NAME>' + 'bet365' + '</NAME>\n' +
                 '   <MEMO>' + row.m + '</MEMO>\n' +
                 '</STMTTRN>\n';
