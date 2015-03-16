@@ -6,9 +6,11 @@ BEGIN {
     as["SKY UK LIMITED"] = "Payslips"
     as["PAYPAL"] = "PayPal"
     as["^404401 [0-9]{4}3752"] = "HSBC ISA"
+    as["^404401 [0-9]{4}6458"] = "Online Saver"
+    as["^404401 [0-9]{4}5471"] = "Current Account"
 }
 {
-    if (substr($0, 1, 1) == "P") {
+    if (substr($0, 1, 1) ~ "[MP]") {
         m = substr($0, 2)
 
         for (a in as) {
