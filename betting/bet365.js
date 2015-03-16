@@ -16,6 +16,7 @@
     }
 
     function _get(url, callback) {
+        console.info('Making Ajax call:', url);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
 
@@ -31,6 +32,7 @@
 
     function _getTransaction(el) {
         var data = _getData(el);
+        console.debug('Data parsed:', data);
 
         return {
             d: data.date,
@@ -124,6 +126,7 @@
         }
 
         bet = _text(el.querySelector(betSelector));
+        console.debug('Parsing stake/returns:', bet.replace(/\s+/g, ' '));
         betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns:\D+([\d\.]+)/);
 
         if (~bet.indexOf('Unit Stake')) {
