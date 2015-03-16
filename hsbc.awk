@@ -10,7 +10,9 @@ BEGIN {
     as["^404401 [0-9]{4}5471"] = "Current Account"
 }
 {
-    if (substr($0, 1, 1) ~ "[MP]") {
+    x = substr($0, 1, 1)
+
+    if (x ~ "[MP]") {
         m = substr($0, 2)
 
         for (a in as) {
@@ -21,9 +23,9 @@ BEGIN {
         }
 
         print "M" m
-    } else if (substr($0, 1, 1) == "D") {
+    } else if (x == "D") {
         print "D" substr($0, 5, 2) "/" substr($0, 2, 2) "/" substr($0, 8)
-    } else {
+    } else if (x != "L") {
         print
     }
 }
