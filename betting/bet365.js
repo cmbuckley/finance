@@ -127,7 +127,7 @@
 
         bet = _text(el.querySelector(betSelector));
         console.debug('Parsing stake/returns:', bet.replace(/\s+/g, ' '));
-        betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns:\D+([\d\.]+)/);
+        betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns:\D*([\d\.]*)/);
 
         if (~bet.indexOf('Unit Stake')) {
             type = 'E/W Single';
