@@ -198,6 +198,10 @@
             var transactions = [],
                 app = this;
 
+            if (!this.handler.getElements) {
+                throw new Error(this.name + ' handler must define getElements method');
+            }
+
             this.handler.getElements(function (elements) {
                 utils.each(elements, function (element) {
                     var data = app.getData(element);
@@ -216,7 +220,7 @@
                 isAccumulator;
 
             if (/Single/.test(data.stake.type)) {
-                selection = data.selections[0];
+                selection = data.selections[0] || {};
                 description = selection.selection;
 
                 if (!~['Win and Each Way', 'Correct Score'].indexOf(selection.market)) {
@@ -235,19 +239,21 @@
                     }
                 }
 
+                // @todo bv
                 if (data.stake.type == 'E/W Single') {
                     description += ' (E/W)';
                 }
 
                 description += eventSeparator + selection.event;
 
-                if (selection.date != data.date) {
+                if (selection.date && selection.date != data.date) {
                     description += ' (' + selection.date + ')';
                 }
 
                 description += '\n' + selection.odds + ' - ' + selection.result;
 
                 if (selection.result == 'Placed') {
+                    // @todo bv, split out eachWay
                     description += ' (' + selection.eachWay + ')';
                 }
             }
@@ -264,9 +270,9 @@
                 }
 
                 description += '\n' + data.selections.map(function (selection) {
-                    var text = selection.selection;
+                    var text = selection.selection; // @todo maybe use market here?
 
-                    if (selection.date != data.date) {
+                    if (selection.date && selection.date != data.date) {
                        text += ' (' + selection.date + ')';
                     }
 
@@ -279,18 +285,24 @@
         },
 
         getData: function (element) {
+            ['getTransactionId', 'getTransactionDate', 'getStake', 'getSelections'].forEach(function (method) {
+                if (!this.handler[method]) {
+                    throw new Error(this.name + ' handler must define ' + method + ' method');
+                }
+            }.bind(this));
+
             return {
                 id:         this.handler.getTransactionId(element),
                 date:       this.handler.getTransactionDate(element),
-                stake:      this.handler.getStake(element),
-                selections: this.handler.getSelections(element),
+                stake:      this.handler.getStake(element) || {},
+                selections: this.handler.getSelections(element) || [],
             };
         },
 
         getTransaction: function (data) {
             return {
                 date:     data.date,
-                amount:   data.stake.returns - data.stake.stake,
+                amount:   data.stake.returns - data.stake.stake || 0,
                 memo:     this.getDescription(data),
                 category: 'Leisure:Betting',
                 payee:    this.handler.name || this.name,
