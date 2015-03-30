@@ -177,6 +177,69 @@
                 return utils.text(el).replace(/^[\s\S]*(\d\d)\/(\d\d)\/(\d{4})[\s\S]*$/m, '$1-$2-$3');
             },
         },
+
+        betvictor: {
+            name: 'BetVictor',
+
+            getElements: function (callback) {
+                callback(utils.$('#account_history .transaction_block'));
+            },
+
+            getTransactionId: function (el) {
+                return utils.text(el.querySelector('.bet_title')).replace(/^\D*(\d+)$/, '$1');
+            },
+
+            getTransactionDate: function (el) {
+                return utils.text(el.querySelector('.headertext')).split(' ')[0].replace(/^[\s\S]*(\d\d)\/(\d\d)\/(\d{4})[\s\S]*$/m, '$1-$2-$3');
+            },
+
+            getStake: function (el) {
+                return {
+                    // @todo "Double" vs "Doubles" etc, "Each Way Single"
+                    type:    utils.text(el.querySelector('.headertext')).match(/GBP [\d\.]+ ([^:]+):/)[1],
+                    stake:   utils.text(el.querySelector('.bet_title_last')).match(/£ ([\d\.]+)/)[1] * 100,
+                    returns: utils.text(el.querySelector('.returns')).match(/£([\d\.]+)/)[1] * 100
+                };
+            },
+
+            getSelections: function (el) {
+                return utils.map(el.querySelectorAll('.transaction_data tr:not(.titles):not(.bet_type)'), function (row) {
+                    var cells = row.querySelectorAll('td'),
+                        eachWay = utils.text(cells[3]),
+                        race = utils.map(el.querySelectorAll('.race'), utils.text),
+                        event = race[0],
+                        market = utils.text(el.querySelector('.race.details')).replace(/\s+/g,' ');
+
+                    if (race[0].match(/\d{2}:\d{2}/)) {
+                        // @todo caps, 17:05 vs 5.05
+                        event = race[0] + ' ' + race[1];
+                    }
+
+                    if (/To Win Match|Match Betting/.test(market)) {
+                        market = 'Full Time Result';
+                    }
+
+                    return {
+                        selection: utils.text(cells[1]),
+                        event:     event,
+                        market:    market,
+                        date:      '', // @todo check for date
+                        eachWay:   (eachWay == 'Win only' ? false : eachWay),
+                        odds:      utils.text(cells[2]),
+                        result:    utils.text(cells[4])
+                    };
+                });
+            },
+        },
+
+        /*skeleton: {
+            name: 'Skeleton',
+            getElements: function () {},
+            getTransactionId: function () {},
+            getTransactionDate: function () {},
+            getStake: function () {},
+            getSelections: function () {},
+        },*/
     };
 
     // application
@@ -223,7 +286,10 @@
                 selection = data.selections[0] || {};
                 description = selection.selection;
 
-                if (!~['Win and Each Way', 'Correct Score'].indexOf(selection.market)) {
+                // types of market that shouldn't be included in the description
+                // 365, 365, bv
+                if (!~['Win and Each Way', 'Correct Score', 'Horse Racing Outright - Race'].indexOf(selection.market)) {
+                    // @todo explain why / examples
                     if ((selection.market == 'Match Correct Score') ||
                         (selection.market == 'Next Goal' && /goal/i.test(selection.selection))
                     ) {
@@ -260,7 +326,7 @@
             else {
                 description = data.stake.type;
                 isAccumulator = data.selections.reduce(function (soFar, selection) {
-                    return (soFar && (selection.market == 'Full Time Result'));
+                    return (soFar && (~['Full Time Result', 'Match Betting - 3 Way'].indexOf(selection.market)));
                 }, true);
 
                 if (isAccumulator) {
