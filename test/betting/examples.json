@@ -1,0 +1,55 @@
+[{
+    "name": "horse racing outright",
+    "data": {
+        "id": "1",
+        "date": "01-05-2000",
+        "stake": {
+            "type": "Singles",
+            "stake": 10,
+            "returns": 70
+        },
+        "selections": [{
+            "selection": "Winning Horse",
+            "event": "1.00 Racecourse",
+            "market": "Win and Each Way",
+            "eachWay": false,
+            "odds": "6/1",
+            "result": "Won"
+        }]
+    },
+    "transaction": {
+        "date": "01-05-2000",
+        "amount": 60,
+        "memo": "Winning Horse - 1.00 Racecourse\n6/1 - Won",
+        "category": "Leisure:Betting",
+        "payee": "bet365",
+        "id": "1"
+    }
+}, {
+    "name": "horse racing each way",
+    "data": {
+        "id": "1",
+        "date": "01-05-2000",
+        "stake": {
+            "type": "E/W Single",
+            "stake": 10,
+            "returns": 15
+        },
+        "selections": [{
+            "selection": "Winning Horse",
+            "event": "1.00 Racecourse",
+            "market": "Win and Each Way",
+            "eachWay": "3 Places, 1/5 Odds",
+            "odds": "6/1",
+            "result": "Placed"
+        }]
+    },
+    "transaction": {
+        "date": "01-05-2000",
+        "amount": 5,
+        "memo": "Winning Horse (E/W) - 1.00 Racecourse\n6/1 - Placed (3 Places, 1/5 Odds)",
+        "category": "Leisure:Betting",
+        "payee": "bet365",
+        "id": "1"
+    }
+}]

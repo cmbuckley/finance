@@ -1,7 +1,7 @@
-(function (doc) {
+(function (exports) {
     // utility functions
     var utils = {
-        $: doc.querySelectorAll.bind(doc),
+        $: exports.document.querySelectorAll.bind(exports.document),
 
         each: function (array, callback) {
             Array.prototype.forEach.call(array, callback);
@@ -33,12 +33,12 @@
         download: function (name, format, rows) {
             format = format || 'ofx';
 
-            var a = doc.createElement('a'),
+            var a = exports.document.createElement('a'),
                 output = outputters[format](rows);
 
             a.download = [name, format].join('.');
-            a.href = 'data:text/' + format + ';base64,' + btoa(output);
-            doc.body.appendChild(a);
+            a.href = 'data:text/' + format + ';base64,' + exports.btoa(output);
+            exports.document.body.appendChild(a);
             a.click();
         }
     };
@@ -245,6 +245,10 @@
 
     // application
     function App(name) {
+        if (!handlers[name]) {
+            throw new Error('Invalid handler: ' + name);
+        }
+
         this.handler = handlers[name];
         this.name = name;
 
@@ -378,14 +382,17 @@
         }
     };
 
-    // find appropriate handler
-    if (!Object.keys(handlers).some(function (handlerName) {
-        if (window.location.hostname.match(new RegExp(handlerName))) {
-            new App(handlerName).download();
-            return true;
-        }
-    })) {
-        console.warn('No handler for ' + window.location.hostname);
-    }
+    exports.App = App;
 
-})(document);
+    // find appropriate handler
+    if (exports.location) {
+        if (!Object.keys(handlers).some(function (handlerName) {
+            if (window.location.hostname.match(new RegExp(handlerName))) {
+                new App(handlerName).download();
+                return true;
+            }
+        })) {
+            console.warn('No handler for ' + window.location.hostname);
+        }
+    }
+})(this);
