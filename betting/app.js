@@ -378,13 +378,11 @@
     };
 
     // find appropriate handler
-    if (Object.keys(handlers).every(function (handlerName) {
+    if (!Object.keys(handlers).some(function (handlerName) {
         if (window.location.hostname.match(new RegExp(handlerName))) {
             new App(handlerName).download();
-            return false;
+            return true;
         }
-
-        return true;
     })) {
         console.warn('No handler for ' + window.location.hostname);
     }
