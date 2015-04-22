@@ -3,12 +3,12 @@
     var utils = {
         $: exports.document.querySelectorAll.bind(exports.document),
 
-        each: function (array, callback) {
-            Array.prototype.forEach.call(array, callback);
+        each: function (array, callback, context) {
+            Array.prototype.forEach.call(array, callback, context);
         },
 
-        map: function (array, callback) {
-            return Array.prototype.map.call(array, callback);
+        map: function (array, callback, context) {
+            return Array.prototype.map.call(array, callback, context);
         },
 
         text: function (el, html) {
@@ -171,7 +171,7 @@
                         odds:      utils.text(cells[5]),
                         result:    utils.text(cells[6])
                     };
-                }.bind(this)).filter(Boolean);
+                }, this).filter(Boolean);
             },
 
             _getDate: function (el) {
@@ -267,7 +267,7 @@
             },
 
             getTransactionDate: function (el) {
-                return this._getDate(el.querySelector('.date .main-title'));
+                return this._getDate(el.querySelector('.bet-id-container'));
             },
 
             getStake: function (el) {
@@ -301,12 +301,12 @@
                         selection: data[1] || utils.text(child.querySelector('.description .bolded:not(.main-title)')),
                         event:     description[0].trim(),
                         market:    data[0] || child.querySelector('.description').innerHTML.replace(/[\s\S]*> - ([^<]*)<[\s\S]*/, '$1'),
-                        date:      '', // @todo check for date
+                        date:      els.length ? '' : this._getDate(child.querySelector('.date .main-title')),
                         eachWay:   false,
                         odds:      utils.text(child.querySelector('.odds')),
                         result:    utils.text(child.querySelector('.status')),
                     };
-                });
+                }, this);
             },
 
             _getDate: function (el) {
@@ -365,7 +365,7 @@
                 });
 
                 callback(transactions);
-            })
+            });
         },
 
         getDescription: function (data) {
@@ -447,7 +447,7 @@
                 if (!this.handler[method]) {
                     throw new Error(this.name + ' handler must define ' + method + ' method');
                 }
-            }.bind(this));
+            }, this);
 
             return {
                 id:         this.handler.getTransactionId(element),
