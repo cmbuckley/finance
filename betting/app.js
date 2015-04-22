@@ -233,6 +233,92 @@
             },
         },
 
+        betfair: {
+            name: 'Betfair Limited',
+
+            getElements: function (callback) {
+                var elements = [],
+                    rows = utils.$('#my-bets-table .js-market-group-parent'),
+                    current;
+
+                utils.each(rows, function (row) {
+                    var element = row.cloneNode(true);
+
+                    if (~element.className.indexOf('child-of')) {
+                        current.querySelector('.children').appendChild(element);
+                    }
+                    else {
+                        elements.push(element);
+
+                        if (~element.className.indexOf('expandable-row')) {
+                            var wrapper = exports.document.createElement('div');
+                            wrapper.classList.add('children');
+                            element.appendChild(wrapper);
+                            current = element;
+                        }
+                    }
+                });
+
+                callback(elements);
+            },
+
+            getTransactionId: function (el) {
+                return utils.text(el.querySelector('.bet-id-container')).match(/O\/\d+\/\d+/)[0];
+            },
+
+            getTransactionDate: function (el) {
+                return this._getDate(el.querySelector('.date .main-title'));
+            },
+
+            getStake: function (el) {
+                var type = 'Single';
+
+                if (~el.className.indexOf('expandable-row')) {
+                    type = utils.text(el.querySelector('.description .main-title')).replace(/\(.*\)/, '').trim();
+                }
+
+                return {
+                    type:    type,
+                    stake:   utils.text(el.querySelector('.stake')) * 100,
+                    returns: utils.text(el.querySelector('.return')) * 100,
+                };
+            },
+
+            getSelections: function (el) {
+                var els = el.querySelectorAll('.children > tr');
+
+                return utils.map(els.length ? els : [el], function (child) {
+                    var description = child.querySelector('.description .main-title').innerHTML.split(/<br[^>]*>/),
+                        data = [];
+
+                    if (description[1]) {
+                        data = description[1].split('-').map(function (str) {
+                            return str.trim().replace(/<[^>]+>/g, '');
+                        });
+                    }
+
+                    return {
+                        selection: data[1] || utils.text(child.querySelector('.description .bolded:not(.main-title)')),
+                        event:     description[0].trim(),
+                        market:    data[0] || child.querySelector('.description').innerHTML.replace(/[\s\S]*> - ([^<]*)<[\s\S]*/, '$1'),
+                        date:      '', // @todo check for date
+                        eachWay:   false,
+                        odds:      utils.text(child.querySelector('.odds')),
+                        result:    utils.text(child.querySelector('.status')),
+                    };
+                });
+            },
+
+            _getDate: function (el) {
+                var yearPrefix = new Date().getFullYear().toString().substr(0, 2),
+                    months = ['_','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+                return utils.text(el).replace(/.*(\d{2})-(\w{3})-(\d{2}).*/, function (_, d, m, y) {
+                    return d + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + yearPrefix + y;
+                });
+            },
+        },
+
         /*skeleton: {
             name: 'Skeleton',
             getElements: function (callback) {},
@@ -294,7 +380,7 @@
 
                 // types of market that shouldn't be included in the description
                 // 365, 365, bv
-                if (!~['Win and Each Way', 'Correct Score', 'Horse Racing Outright - Race'].indexOf(selection.market)) {
+                if (!~['Win', 'Win and Each Way', 'Correct Score', 'Horse Racing Outright - Race'].indexOf(selection.market)) {
                     // @todo explain why / examples
                     if ((selection.market == 'Match Correct Score') ||
                         (selection.market == 'Next Goal' && /goal/i.test(selection.selection))
@@ -332,7 +418,7 @@
             else {
                 description = data.stake.type;
                 isAccumulator = data.selections.reduce(function (soFar, selection) {
-                    return (soFar && (~['Full Time Result', 'Match Betting - 3 Way'].indexOf(selection.market)));
+                    return (soFar && (~['Full Time Result', 'Match Betting - 3 Way', 'Match Result'].indexOf(selection.market)));
                 }, true);
 
                 if (isAccumulator) {
