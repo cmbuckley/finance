@@ -235,11 +235,11 @@
 
         /*skeleton: {
             name: 'Skeleton',
-            getElements: function () {},
-            getTransactionId: function () {},
-            getTransactionDate: function () {},
-            getStake: function () {},
-            getSelections: function () {},
+            getElements: function (callback) {},
+            getTransactionId: function (el) {},
+            getTransactionDate: function (el) {},
+            getStake: function (el) {},
+            getSelections: function (el) {},
         },*/
     };
 
@@ -255,6 +255,7 @@
         console.info('Using ' + this.name + ' handler');
     }
 
+    App.utils = utils;
     App.prototype = {
         download: function () {
             this.getTransactions(function (transactions) {
