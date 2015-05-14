@@ -101,7 +101,8 @@
                     var elements = [];
 
                     utils.each(rows, function (row) {
-                        var url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsttId=0&dsId=0&bsId=' + row.id.replace(/_.*$/, '');
+                        var d = row.querySelector('.transLink').getAttribute('onclick').match(/'([^']+)'/)[1].split('#'),
+                            url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsId=' + d[0] + '&bsttId=' + d[1] + '&dsId=' + d[2] + '&ht=' + d[3];
 
                         utils.ajax(url, function (el) {
                             elements.push(el);
