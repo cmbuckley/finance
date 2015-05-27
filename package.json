@@ -1,6 +1,8 @@
 {
   "name": "betting",
+  "description": "Betting site account history downloader",
   "version": "0.0.1",
+  "private": true,
   "author": "Chris Buckley <chris@cmbuckley.co.uk>",
   "engines": {
     "node": ">= 0.8.x"
