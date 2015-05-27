@@ -15,7 +15,7 @@
             return el[html ? 'innerHTML' : 'textContent'].trim().replace(/  +/, ' ');
         },
 
-        ajax: function (url, callback) {
+        ajax: function (url, callback, contentType) {
             console.info('Making Ajax call:', url);
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url);
@@ -23,7 +23,7 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var parser = new DOMParser();
-                    callback(parser.parseFromString(xhr.responseText, 'text/xml'));
+                    callback(parser.parseFromString(xhr.responseText, contentType || 'text/xml'));
                 }
             };
 
