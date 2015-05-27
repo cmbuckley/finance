@@ -58,7 +58,7 @@
                 '!Type:' + type
             ];
 
-            return rows.reduce(function (data, row) {
+            return rows.reduceRight(function (data, row) {
                 return data.concat([
                     'D' + row.date,
                     'T' + (row.amount / 100).toFixed(2),
@@ -74,7 +74,7 @@
             var head = '<OFX>\n<BANKMSGSRSV1>\n<STMTTRNRS>\n<STMTRS>\n<CURDEF>GBP</CURDEF>\n<BANKACCTFROM>\n<BANKID></BANKID>\n<ACCTID>Betting</ACCTID>\n<ACCTTYPE></ACCTTYPE>\n</BANKACCTFROM>\n<BANKTRANLIST>\n',
                 foot = '</BANKTRANLIST>\n<LEDGERBAL>\n<BALAMT></BALAMT>\n<DTASOF></DTASOF>\n</LEDGERBAL>\n</STMTRS>\n</STMTTRNRS>\n</BANKMSGSRSV1>\n</OFX>\n';
 
-            return rows.reduce(function (data, row) {
+            return rows.reduceRight(function (data, row) {
                 return data +
                     '<STMTTRN>\n' +
                     '   <DTPOSTED>' + row.date.split('-').reverse().join('') + '</DTPOSTED>\n' +
@@ -489,7 +489,7 @@
             }
             else {
                 description = data.stake.type;
-                isAccumulator = data.selections.reduce(function (soFar, selection) {
+                isAccumulator = data.selections.reduceRight(function (soFar, selection) {
                     return (soFar && (~['Full Time Result', 'Match Betting - 3 Way', 'Match Result'].indexOf(selection.market)));
                 }, true);
 
