@@ -8,7 +8,8 @@
         },
 
         map: function (array, callback, context) {
-            return Array.prototype.map.call(array, callback, context);
+            // paddypower uses Prototype, which overrides native Array prototype
+            return (Prototype ? Array.from(array).map(callback, context) : Array.prototype.map.call(array, callback, context));
         },
 
         text: function (el, html) {
@@ -319,6 +320,75 @@
             },
         },
 
+        paddypower: {
+            name: 'Paddy Power',
+            getElements: function (callback) {
+                var links = utils.$('#history .settled a[onclick]'),
+                    elements = [];
+
+                utils.each(links, function (link) {
+                    var url = link.getAttribute('onclick').match(/^popup\('([^']+)'/)[1];
+
+                    utils.ajax(url, function (el) {
+                        elements.push(el);
+
+                        if (elements.length == links.length) {
+                            callback(elements);
+                        }
+                    }, 'text/html');
+                });
+            },
+
+            getTransactionId: function (el) {
+                return utils.text(el.querySelector('#ma-header h2')).split(':')[1].trim();
+            },
+
+            getTransactionDate: function (el) {
+                return this._getDate(utils.text(el.querySelector('.bet-receipt-item td[align="right"]')));
+            },
+
+            getStake: function (el) {
+                var data = el.querySelectorAll('.bet-receipt-item td');
+
+                return {
+                    type:    'Single',
+                    stake:   utils.text(data[19]).replace('£', '') * 100,
+                    returns: utils.text(data[47]).replace('£', '') * 100,
+                };
+            },
+
+            getSelections: function (el) {
+                return utils.map(el.querySelectorAll('.bet-receipt-item:nth-child(2) tr'), function (row) {
+                    var table = row.querySelector('table');
+
+                    if (!table) {
+                        return false;
+                    }
+
+                    var data = utils.map(table.querySelectorAll('td'), utils.text),
+                        selection = data[5].split('@');
+
+                    return {
+                        selection: selection[0].trim(),
+                        event:     data[2],
+                        market:    data[4],
+                        date:      this._getDate(data[3]),
+                        eachWay:   false,
+                        odds:      selection[1].trim(),
+                        result:    {Win: 'Won', Lose: 'Lost'}[utils.text(row.querySelector('.ma-br-select-result'))],
+                    };
+                }, this).filter(Boolean);
+            },
+
+            _getDate: function (str) {
+                var months = ['_','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+                return str.replace(/(\d+)\w+ of (\w{3}) (\d{4}).*/, function (_, d, m, y) {
+                    return ('0' + d).substr(-2) + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + y;
+                });
+            }
+        },
+
         /*skeleton: {
             name: 'Skeleton',
             getElements: function (callback) {},
@@ -358,6 +428,8 @@
             }
 
             this.handler.getElements(function (elements) {
+                console.info('Found', elements.length, 'transaction(s)');
+
                 utils.each(elements, function (element) {
                     var data = app.getData(element);
                     console.debug('Data parsed:', data);
