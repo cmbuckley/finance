@@ -383,9 +383,10 @@
 
                     var data = this._getData(el),
                         selection = data.extra[data.extra.length - 3].split('@'),
-                        event = data.extra[5].replace(/^(\d\d:\d\d).*$/, function (_, time) {
-                            return time + ' ' + data.extra[4];
-                        });
+                        event = data.extra[5].replace(/^(\d\d):(\d\d).*$/, function (_, h, m) {
+                            return (h > 12 ? h - 12 : h) + '.' + m
+                                + ' ' + data.extra[4][0] + data.extra[4].substr(1).toLowerCase();
+                        })
 
                     return {
                         selection: selection[0].trim(),
