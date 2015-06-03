@@ -9,7 +9,7 @@
 
         map: function (array, callback, context) {
             // paddypower uses Prototype, which overrides native Array prototype
-            return (Prototype ? Array.from(array).map(callback, context) : Array.prototype.map.call(array, callback, context));
+            return (exports.Prototype ? Array.from(array).map(callback, context) : Array.prototype.map.call(array, callback, context));
         },
 
         text: function (el, html) {
@@ -323,20 +323,35 @@
         paddypower: {
             name: 'Paddy Power',
             getElements: function (callback) {
-                var links = utils.$('#history .settled a[onclick]'),
-                    elements = [];
+                var wrapper = exports.document.getElementById('wrapper');
 
-                utils.each(links, function (link) {
-                    var url = link.getAttribute('onclick').match(/^popup\('([^']+)'/)[1];
+                if (wrapper.querySelector('.bet-receipt-item')) {
+                    callback([wrapper]);
+                }
+                else {
+                    var links = utils.$('#history .settled a[onclick]'),
+                        total = links.length,
+                        urls = [],
+                        elements = [];
 
-                    utils.ajax(url, function (el) {
-                        elements.push(el);
+                    utils.each(links, function (link) {
+                        var url = link.getAttribute('onclick').match(/^popup\('([^']+)'/)[1];
 
-                        if (elements.length == links.length) {
-                            callback(elements);
+                        if (~urls.indexOf(url)) {
+                            total--;
                         }
-                    }, 'text/html');
-                });
+                        else {
+                            urls.push(url);
+                            utils.ajax(url, function (el) {
+                                elements.push(el);
+
+                                if (elements.length == total) {
+                                    callback(elements);
+                                }
+                            }, 'text/html');
+                        }
+                    });
+                }
             },
 
             getTransactionId: function (el) {
@@ -344,16 +359,17 @@
             },
 
             getTransactionDate: function (el) {
-                return this._getDate(utils.text(el.querySelector('.bet-receipt-item td[align="right"]')));
+                return this._getDate(this._getData(el)['Bet placed at']);
             },
 
             getStake: function (el) {
-                var data = el.querySelectorAll('.bet-receipt-item td');
+                var data = this._getData(el);
 
                 return {
                     type:    'Single',
-                    stake:   utils.text(data[19]).replace('£', '') * 100,
-                    returns: utils.text(data[47]).replace('£', '') * 100,
+                    stake:   data['Total amount paid'].replace('£', '') * 100,
+                    freebet: data['Freebets Redeemed'].replace('£', '') * 100,
+                    returns: data['Total Returns'].replace('£', '') * 100,
                 };
             },
 
@@ -365,19 +381,53 @@
                         return false;
                     }
 
-                    var data = utils.map(table.querySelectorAll('td'), utils.text),
-                        selection = data[5].split('@');
+                    var data = this._getData(el),
+                        selection = data.extra[data.extra.length - 3].split('@'),
+                        event = data.extra[5].replace(/^(\d\d:\d\d).*$/, function (_, time) {
+                            return time + ' ' + data.extra[4];
+                        });
 
                     return {
                         selection: selection[0].trim(),
-                        event:     data[2],
-                        market:    data[4],
-                        date:      this._getDate(data[3]),
-                        eachWay:   false,
-                        odds:      selection[1].trim(),
-                        result:    {Win: 'Won', Lose: 'Lost'}[utils.text(row.querySelector('.ma-br-select-result'))],
+                        event:     event,
+                        market:    data.extra[7],
+                        date:      this._getDate(data.extra[6]),
+                        eachWay:   !!~data['Bet type'].indexOf('Each-Way'),
+                        odds:      selection[1].trim().match(/\d+\/\d+/)[0],
+                        result:    {Win: 'Won', Lose: 'Lost'}[data.extra[data.extra.length - 2]],
                     };
                 }, this).filter(Boolean);
+            },
+
+            _getData: function (el) {
+                var data = {extra: []},
+                    details = false,
+                    key;
+
+                utils.each(el.querySelectorAll('.bet-receipt-item td:not([rowspan])'), function (row) {
+                    var text = utils.text(row);
+
+                    if (text) {
+                        if (text == 'Bet placed at') {
+                            details = true;
+                        }
+
+                        if (details) {
+                            if (key) {
+                                data[key] = text;
+                                key = undefined;
+                            }
+                            else {
+                                key = text;
+                            }
+                        }
+                        else {
+                            data.extra.push(text);
+                        }
+                    }
+                });
+
+                return data;
             },
 
             _getDate: function (str) {
@@ -452,7 +502,7 @@
 
                 // types of market that shouldn't be included in the description
                 // 365, 365, bv
-                if (!~['Win', 'Win and Each Way', 'Correct Score', 'Horse Racing Outright - Race'].indexOf(selection.market)) {
+                if (!~['Win', 'Win and Each Way', 'Win or E/W', 'Correct Score', 'Horse Racing Outright - Race'].indexOf(selection.market)) {
                     // @todo explain why / examples
                     if ((selection.market == 'Match Correct Score') ||
                         (selection.market == 'Next Goal' && /goal/i.test(selection.selection))
