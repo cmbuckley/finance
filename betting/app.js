@@ -440,6 +440,73 @@
             }
         },
 
+        skybet: {
+            name: 'Sky Bet',
+            getElements: function (callback) {
+                callback(document.getElementById('SkyBetAccount').contentWindow.document.querySelectorAll('li.transaction'));
+            },
+
+            getTransactionId: function (el) {
+                return this._getData(el.querySelector('.bet-slip-footer'))['Bet reciept ID'];
+            },
+
+            getTransactionDate: function (el) {
+                return this._getDate(utils.text(el.querySelector('.bet-time-date')));
+            },
+
+            getStake: function (el) {
+                var data = this._getData(el.querySelector('.bet-slip-footer'));
+
+                return {
+                    type: data['Bet type'],
+                    stake: this._getAmount(data['Total stake']),
+                    freebet: this._getAmount(data['Freebet used']),
+                    returns: this._getAmount(data['Returns']),
+                };
+            },
+
+            getSelections: function (el) {
+                return utils.map(el.querySelectorAll('.bet-selection'), function (row) {
+                    var selection = utils.text(row.querySelector('.four-six h3')).split('@'),
+                        event = utils.text(row.querySelector('.four-six h3 + span')).split(/(?:\s+-\s+|\s{2,})/).filter(Boolean),
+                        oddsNow = row.querySelector('.bog-odds-now'),
+                        data = this._getData(row);
+
+                    return {
+                        selection: selection[0].trim().replace(/[\n\s]+EW$/, ' (E/W)'),
+                        event:     event[1].trim(),
+                        market:    event[0].trim(),
+                        date:      this._getDate(data['Event date']),
+                        eachWay:   (data['EW terms'] ? data['EW terms'].match(/\(each way ([^)]+)\)/)[1] : false),
+                        odds:      oddsNow ? utils.text(oddsNow) : selection[1].trim(),
+                        result:    data['Resulted'].split('-')[1].trim(),
+                    };
+                }, this);
+            },
+
+            _getData: function (el) {
+                var data = [];
+
+                utils.each(el.querySelectorAll('.hlist li'), function (detail) {
+                    data[utils.text(detail.querySelector('.two-six')).replace(':', '')] = utils.text(detail.querySelector('.three-six'));
+                });
+
+                return data;
+            },
+
+            _getDate: function (str) {
+                var months = ['_','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+                return str.replace(/\d+:\d+ (\d+)\w+ (\w{3}) (\d{4}).*/, function (_, d, m, y) {
+                    return ('0' + d).substr(-2) + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + y;
+                });
+            },
+
+            _getAmount: function (str) {
+                return (str || '0.00').match(/\d+\.\d+/)[0] * 100;
+            },
+        },
+
         /*skeleton: {
             name: 'Skeleton',
             getElements: function (callback) {},
