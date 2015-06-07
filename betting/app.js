@@ -432,9 +432,10 @@
             },
 
             _getDate: function (str) {
-                var months = ['_','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                var months = ['_','January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
 
-                return str.replace(/(\d+)\w+ of (\w{3}) (\d{4}).*/, function (_, d, m, y) {
+                return str.replace(/(\d+)\w+ of (\w+) (\d{4}).*/, function (_, d, m, y) {
                     return ('0' + d).substr(-2) + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + y;
                 });
             }
