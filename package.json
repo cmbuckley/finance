@@ -8,7 +8,11 @@
     "node": ">= 0.8.x"
   },
   "scripts": {
-    "test": "mocha --recursive test"
+    "test": "mocha --recursive test",
+    "download": "PHANTOMJS_EXECUTABLE=node_modules/casperjs/node_modules/.bin/phantomjs casperjs src/download.js"
+  },
+  "dependencies": {
+    "casperjs": "~1.1.0-beta3"
   },
   "devDependencies": {
     "mocha": "~2.2.1",
