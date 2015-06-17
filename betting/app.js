@@ -16,6 +16,12 @@
             return el[html ? 'innerHTML' : 'textContent'].trim().replace(/  +/, ' ');
         },
 
+        titleCase: function (str) {
+            return str.replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+                return $1.toUpperCase();
+            });
+        },
+
         ajax: function (url, callback, contentType) {
             console.info('Making Ajax call:', url);
             var xhr = new XMLHttpRequest();
@@ -385,7 +391,7 @@
                         selection = data.extra[data.extra.length - 3].split('@'),
                         event = data.extra[5].replace(/^(\d\d):(\d\d).*$/, function (_, h, m) {
                             return (h > 12 ? h - 12 : h) + '.' + m
-                                + ' ' + data.extra[4][0] + data.extra[4].substr(1).toLowerCase();
+                                + ' ' + utils.titleCase(data.extra[4].toLowerCase());
                         })
 
                     return {
