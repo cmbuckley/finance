@@ -367,7 +367,7 @@
 
                 return {
                     type:    'Single',
-                    stake:   data['Total amount paid'].replace('£', '') * 100,
+                    stake:   data['Total Stake'].replace('£', '') * 100,
                     freebet: data['Freebets Redeemed'].replace('£', '') * 100,
                     returns: data['Total Returns'].replace('£', '') * 100,
                 };
@@ -651,7 +651,7 @@
         getTransaction: function (data) {
             return {
                 date:     data.date,
-                amount:   data.stake.returns - data.stake.stake || 0,
+                amount:   (data.stake.returns + (data.stake.freebet || 0) - data.stake.stake) || 0,
                 memo:     this.getDescription(data),
                 category: 'Leisure:Betting',
                 payee:    this.handler.name || this.name,
