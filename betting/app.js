@@ -450,7 +450,10 @@
         skybet: {
             name: 'Sky Bet',
             getElements: function (callback) {
-                callback(document.getElementById('SkyBetAccount').contentWindow.document.querySelectorAll('li.transaction'));
+                SkySSO.sba.ui.open('https://www.skybet.com/secure/identity/m/history/betting/skybet?settled=Y', function () {
+                    var accountWindow = exports.document.getElementById('SkyBetAccount').contentWindow;
+                    callback(accountWindow.document.querySelectorAll('li.transaction'));
+                }, true);
             },
 
             getTransactionId: function (el) {
