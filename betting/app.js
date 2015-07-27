@@ -109,7 +109,7 @@
 
                     utils.each(rows, function (row) {
                         var d = row.querySelector('.transLink').getAttribute('onclick').match(/'([^']+)'/)[1].split('#'),
-                            url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsId=' + d[0] + '&bsttId=' + d[1] + '&dsId=' + d[2] + '&ht=' + d[3];
+                            url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsId=' + d[0] + '&bsttId=' + d[1] + '&dsId=' + d[2] + '&ht=' + d[3] + '&bash=' + d[4] + '&strConf=' + d[5]; // bet365 BetHistoryResults js
 
                         utils.ajax(url, function (el) {
                             elements.push(el);
