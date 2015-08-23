@@ -488,7 +488,7 @@
                         market:    event[0].trim(),
                         date:      this._getDate(data['Event date']),
                         eachWay:   (data['EW terms'] ? data['EW terms'].match(/\(each way ([^)]+)\)/)[1] : false),
-                        odds:      oddsNow ? utils.text(oddsNow) : selection[1].trim(),
+                        odds:      oddsNow ? utils.text(oddsNow) : (selection[1] || '').trim(),
                         result:    data['Resulted'].split('-')[1].trim(),
                     };
                 }, this);
@@ -608,7 +608,7 @@
                     description += ' (' + selection.date + ')';
                 }
 
-                description += '\n' + selection.odds + ' - ' + selection.result;
+                description += '\n' + (selection.odds ? selection.odds + ' - ' : '') + selection.result;
 
                 if (selection.result == 'Placed') {
                     // @todo bv, split out eachWay
