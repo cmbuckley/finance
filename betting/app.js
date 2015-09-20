@@ -625,7 +625,7 @@
             else {
                 description = data.stake.type;
                 isAccumulator = data.selections.reduceRight(function (soFar, selection) {
-                    return (soFar && (~['Full Time Result', 'Match Betting - 3 Way', 'Match Result'].indexOf(selection.market)));
+                    return (soFar && (~['Full Time Result', 'Match Betting - 3 Way', 'Match Result', 'Draw No Bet'].indexOf(selection.market)));
                 }, true);
 
                 if (isAccumulator) {
