@@ -450,10 +450,17 @@
         skybet: {
             name: 'Sky Bet',
             getElements: function (callback) {
-                SkySSO.sba.ui.open('https://www.skybet.com/secure/identity/m/history/betting/skybet?settled=Y', function () {
+                function _getElements() {
                     var accountWindow = exports.document.getElementById('SkyBetAccount').contentWindow;
                     callback(accountWindow.document.querySelectorAll('li.transaction'));
-                }, true);
+                }
+
+                if (SkySSO.sba.ui.isOpen) {
+                    _getElements();
+                }
+                else {
+                    SkySSO.sba.ui.open('https://www.skybet.com/secure/identity/m/history/betting/skybet?settled=Y', _getElements, true);
+                }
             },
 
             getTransactionId: function (el) {
@@ -483,7 +490,7 @@
                         data = this._getData(row);
 
                     return {
-                        selection: selection[0].trim().replace(/[\n\s]+EW$/, ' (E/W)'),
+                        selection: selection[0].trim().replace(/\s{2,}/g, ' - ').replace(/ \(Was.*Now.*\)/i, '').replace(/[\n\s]+EW$/, ' (E/W)'),
                         event:     event[1].trim(),
                         market:    event[0].trim(),
                         date:      this._getDate(data['Event date']),
@@ -574,9 +581,9 @@
                 selection,
                 isAccumulator;
 
-            if (/Single/.test(data.stake.type)) {
+            if (/Single|Forecast/.test(data.stake.type)) {
                 selection = data.selections[0] || {};
-                description = selection.selection;
+                description = (/Forecast/.test(data.stake.type) ? data.stake.type + ' (' + selection.selection + ')' : selection.selection);
 
                 // types of market that shouldn't be included in the description
                 // 365, 365, bv
@@ -634,7 +641,7 @@
                        text += ' (' + selection.date + ')';
                     }
 
-                    text += ' - ' + selection.odds + ' - ' + selection.result;
+                    text += ' - ' + (selection.odds ? selection.odds + ' - ' : '') + selection.result;
                     return text;
                 }).join('\n');
             }
