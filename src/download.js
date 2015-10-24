@@ -1,8 +1,17 @@
 var Casper  = require('casper'),
     casper  = Casper.create(),
     utils   = require('utils'),
-    fs      = require('fs');
+    cu      = require('clientutils').create(utils.mergeObjects({}, casper.options)),
+    fs      = require('fs'),
     details = JSON.parse(fs.read('config/download.json'));
+
+function getLink(text, selector) {
+    return Casper.selectXPath('//' + (selector || 'a') + '[contains(text(), "' + text + '")]');
+}
+
+function getContents(url, method) {
+    return cu.decode(casper.base64encode(url, method));
+}
 
 casper.start('http://www.hsbc.co.uk/1/2/personal/pib-home', function () {
     this.echo('Logging in to HSBC');
@@ -56,8 +65,8 @@ casper.then(function () {
     }, true);
 });
 
-// download transactions (need xpath for trailing whitespace)
-casper.thenClick(Casper.selectXPath('//a[contains(text(), "Download transactions")]'));
+// download transactions (need xpath because of trailing whitespace)
+casper.thenClick(getLink('Download transactions'));
 
 casper.then(function () {
     this.echo('Selecting format');
@@ -68,7 +77,7 @@ casper.then(function () {
 
 casper.then(function () {
     this.echo('Downloading file');
-    this.download(this.getElementAttribute('.containerMain form', 'action'), 'test.ofx', 'POST');
+    var file = getContents(this.getElementAttribute('.containerMain form', 'action'), 'POST');
 });
 
 casper.run();
