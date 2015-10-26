@@ -9,4 +9,7 @@ test: mocha
 mocha: install
 	npm test
 
-.PHONY: install clean test mocha
+download: install
+	npm run download -- --from=$(from) --to=$(to)
+
+.PHONY: install clean test mocha download
