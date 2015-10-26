@@ -3,7 +3,49 @@ var Casper  = require('casper'),
     utils   = require('utils'),
     cu      = require('clientutils').create(utils.mergeObjects({}, casper.options)),
     fs      = require('fs'),
-    details = JSON.parse(fs.read('config/download.json'));
+    options = utils.mergeObjects(JSON.parse(fs.read('config/download.json')), casper.cli.options),
+    accounts;
+
+accounts = {
+    'Cash':            /^CASH/,
+    'Credit Card':     'HSBC CREDIT CARD',
+    'Current Account': /^404401 [0-9]{4}5471/,
+    'HSBC ISA':        /^404401 [0-9]{4}3752|BUCKLEY C   \*LYA/,
+    'Mortgage':        /MTG 400188[0-9]{4}9172/,
+    'PayPal':          'PAYPAL',
+    'Payslips':        'SKY UK LIMITED'
+};
+
+if (options.test) {
+    save(options.filename, fs.read(options.test));
+    casper.exit();
+}
+
+function save(filename, contents) {
+    fs.write(filename, contents.split('\n').map(function (line) {
+        var memo, account, output = '';
+
+        if (line[0] == 'P' || line[0] == 'M') {
+            memo = line.substr(1);
+
+            for (acct in accounts) {
+                if (accounts[acct].test && accounts[acct].test(memo) || accounts[acct] == memo) {
+                    output = 'L[' + acct + ']\n';
+                }
+            }
+
+            output += 'M' + memo;
+        }
+        else if (line[0] == 'D') {
+            output = 'D' + line.substr(1).split('/').reverse().join('/');
+        }
+        else if (line[0] != 'L') {
+            output = line;
+        }
+
+        return output;
+    }).filter(Boolean).join('\n'));
+}
 
 function getLink(text, selector) {
     return Casper.selectXPath('//' + (selector || 'a') + '[contains(text(), "' + text + '")]');
@@ -15,7 +57,7 @@ function getContents(url, method) {
 
 casper.start('http://www.hsbc.co.uk/1/2/personal/pib-home', function () {
     this.echo('Logging in to HSBC');
-    this.fill('#logonForm', {userid: details.userid}, true);
+    this.fill('#logonForm', {userid: options.credentials.userid}, true);
 });
 
 casper.then(function () {
@@ -32,14 +74,14 @@ casper.then(function () {
 
 casper.then(function () {
     var values = {
-        memorableAnswer: details.memorableAnswer,
+        memorableAnswer: options.credentials.memorableAnswer,
         password:        '',
     };
 
     // build form values. build password field manually to avoid onsubmit javascript
     this.getElementsAttribute('input[type="password"][name^="pass"]:not([disabled])', 'id').forEach(function (field) {
         var pos = +field.substr(-1);
-        values.password += values[field] = details.password.substr(pos + (pos > 6 ? details.password.length - 9 : -1), 1);
+        values.password += values[field] = options.credentials.password.substr(pos + (pos > 6 ? options.credentials.password.length - 9 : -1), 1);
     });
 
     this.fill('form', values, true);
@@ -52,16 +94,19 @@ casper.then(function () {
 });
 
 casper.then(function () {
-    this.echo('Selecting dates: 2015-08-10 - 2015-08-31');
+    var from = new Date(options.from),
+        to   = (options.to ? new Date(options.to) : new Date());
+
+    this.echo('Selecting dates: ' + options.from + ' - ' + (options.to || 'today'));
 
     // all javascript form submission does here is validate the form
     this.fill('.containerMain form', {
-        fromDateDay: '10',
-        fromDateMonth: '8',
-        fromDateYear: '2015',
-        toDateDay: '31',
-        toDateMonth: '8',
-        toDateYear: '2015'
+        fromDateDay:   from.getDate(),
+        fromDateMonth: from.getMonth() + 1,
+        fromDateYear:  from.getFullYear(),
+        toDateDay:     to.getDate(),
+        toDateMonth:   to.getMonth() + 1,
+        toDateYear:    to.getFullYear()
     }, true);
 });
 
@@ -69,15 +114,15 @@ casper.then(function () {
 casper.thenClick(getLink('Download transactions'));
 
 casper.then(function () {
-    this.echo('Selecting format');
+    this.echo('Selecting QIF format');
     this.fill('.containerMain form', {
-        downloadType: 'M_OFXMainstream'
+        downloadType: 'M_QIF'
     }, true);
 });
 
 casper.then(function () {
     this.echo('Downloading file');
-    var file = getContents(this.getElementAttribute('.containerMain form', 'action'), 'POST');
+    save(options.filename, getContents(this.getElementAttribute('.containerMain form', 'action'), 'POST'));
 });
 
 casper.run();
