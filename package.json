@@ -11,6 +11,9 @@
     "test": "mocha --recursive test",
     "download": "PHANTOMJS_EXECUTABLE=node_modules/casperjs/node_modules/.bin/phantomjs casperjs src/download.js"
   },
+  "engines": {
+    "npm": ">2.0.0"
+  },
   "dependencies": {
     "casperjs": "~1.1.0-beta3"
   },
