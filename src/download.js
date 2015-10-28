@@ -85,6 +85,8 @@ casper.then(function () {
         password:        '',
     };
 
+    this.echo('Entering password');
+
     // build form values. build password field manually to avoid onsubmit javascript
     this.getElementsAttribute('input[type="password"][name^="pass"]:not([disabled])', 'id').forEach(function (field) {
         var pos = +field.substr(-1);
@@ -94,9 +96,15 @@ casper.then(function () {
     this.fill('form', values, true);
 });
 
+// click to expand and include the mortgage
+casper.then(function () {
+    this.echo('Listing all accounts');
+    this.clickLabel('Loans and Mortgages');
+});
+
 casper.then(function () {
     // loop over the accounts (we'll just use the index here)
-    this.getElementsInfo('form[action$="recent-transaction"]').forEach(function (account, accountIndex) {
+    this.getElementsInfo('form[action$="recent-transaction"]').forEach(function (account, accountIndex, accounts) {
         // needed if we've previously been on a download page
         this.then(function () {
             this.clickLabel('My accounts');
@@ -105,7 +113,7 @@ casper.then(function () {
         this.then(function () {
             // re-evaluate element info for this page - form IDs change each time
             account = this.getElementsInfo('form[action$="recent-transaction"]')[accountIndex];
-            this.echo('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (item ' + accountIndex + ')');
+            this.echo('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (' + accountIndex + '/' + accounts.length + ')');
             this.fill('#' + account.attributes.id, {}, true);
         });
 
