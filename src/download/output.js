@@ -1,5 +1,5 @@
-var output = '',
-    accounts = {
+var accounts = [],
+    transfers = {
         'Cash':            /^CASH/,
         'Credit Card':     'HSBC CREDIT CARD',
         'Current Account': /^404401 [0-9]{4}5471/,
@@ -10,10 +10,17 @@ var output = '',
     };
 
 exports.add = function (accountName, transactions) {
-    output += '!Account\nN' + accountName + '\nTBank\n^\n' + transactions;
+    accounts.push({
+        name:         accountName,
+        transactions: transactions
+    });
 };
 
 exports.get = function () {
+    var output = accounts.map(function (account) {
+        return '!Account\nN' + account.name + '\nTBank\n^\n' + account.transactions;
+    }).join('\n');
+
     return output.split('\n').map(function (line) {
         var memo, account, output = '';
 

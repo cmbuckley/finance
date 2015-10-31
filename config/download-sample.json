@@ -1,8 +1,10 @@
 {
   "filename": "download.qif",
-  "credentials": {
-    "userid":          "IB1234567890",
-    "memorableAnswer": "",
-    "password":        ""
+  "hsbc": {
+    "credentials": {
+      "userid":          "IB1234567890",
+      "memorableAnswer": "",
+      "password":        ""
+    }
   }
 }

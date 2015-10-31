@@ -1,5 +1,3 @@
-var output = require('./output');
-
 function login(credentials) {
     casper.thenOpen('http://www.hsbc.co.uk/1/2/personal/pib-home', function () {
         this.echo('Logging in to HSBC');
@@ -38,7 +36,7 @@ function login(credentials) {
     });
 }
 
-function download(from, to) {
+function download(from, to, output) {
     return function (account, accountIndex, accounts) {
         // needed if we've previously been on a download page
         if (accountIndex > 0) {
@@ -99,7 +97,7 @@ function download(from, to) {
     };
 }
 
-exports.download = function (credentials, from, to, done) {
+exports.download = function (credentials, from, to, output) {
     login(credentials);
 
     // click to expand and include the mortgage
@@ -109,12 +107,11 @@ exports.download = function (credentials, from, to, done) {
     });
 
     casper.then(function () {
-        this.getElementsInfo('form[action$="recent-transaction"]').forEach(download(from, to));
+        this.getElementsInfo('form[action$="recent-transaction"]').forEach(download(from, to, output));
     });
 
     casper.then(function () {
         this.echo('Logging out');
         this.clickLabel('Log off');
-        done(output);
     });
 };
