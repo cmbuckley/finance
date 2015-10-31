@@ -6,8 +6,8 @@ var Casper  = require('casper'),
     output  = require('download/output'),
     options = utils.mergeObjects(JSON.parse(fs.read('config/download.json')), casper.cli.options);
 
-casper.getLink = function (text, selector) {
-    return Casper.selectXPath('//' + (selector || 'a') + '[contains(text(), "' + text + '")]');
+casper.getLabelContains = function (text, selector) {
+    return Casper.selectXPath('//' + (selector || '*') + '[contains(text(), "' + text + '")]');
 };
 
 casper.getContents = function (url, method) {

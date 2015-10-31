@@ -70,8 +70,7 @@ function download(from, to, output) {
         });
 
         casper.then(function () {
-            // download transactions (need xpath because of trailing whitespace)
-            var download = casper.getLink('Download transactions');
+            var download = casper.getLabelContains('Download transactions');
 
             // check for link (missing if no transactions)
             if (this.exists(download)) {
