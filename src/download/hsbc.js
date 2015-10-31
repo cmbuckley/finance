@@ -38,13 +38,6 @@ function login(credentials) {
 
 function download(from, to, output) {
     return function (account, accountIndex, accounts) {
-        // needed if we've previously been on a download page
-        if (accountIndex > 0) {
-            casper.then(function () {
-                this.clickLabel('My accounts');
-            });
-        }
-
         casper.then(function () {
             // re-evaluate element info for this page - form IDs change each time
             account = this.getElementsInfo('form[action$="recent-transaction"]')[accountIndex];
@@ -92,6 +85,10 @@ function download(from, to, output) {
             else {
                 this.echo('  No transactions in date range');
             }
+        });
+
+        casper.then(function () {
+            this.clickLabel('My accounts');
         });
     };
 }
