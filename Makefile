@@ -6,10 +6,10 @@ clean:
 
 test: mocha
 
-mocha: install
+mocha:
 	npm test
 
-download: install
+download:
 	npm run download -- --from=$(from) --to=$(to)
 
 .PHONY: install clean test mocha download
