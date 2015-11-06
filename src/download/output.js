@@ -1,4 +1,9 @@
 var accounts = [],
+    names = {
+        'HSBC ADVANCE': 'Current Account',
+        'LOY ISA ADV':  'HSBC ISA',
+        'MORTGAGE':     'Mortgage'
+    },
     transfers = {
         'Cash':            /^CASH/,
         'Credit Card':     'HSBC CREDIT CARD',
@@ -18,7 +23,7 @@ exports.load = function (content) {
 
 exports.add = function (accountName, transactions) {
     accounts.push({
-        name:         accountName,
+        name:         names[accountName] || accountName,
         transactions: transactions
     });
 };
@@ -29,20 +34,20 @@ exports.get = function () {
     }).join('\n');
 
     return output.split('\n').map(function (line) {
-        var memo, account, output = '';
+        var memo, tr, output = '';
 
         if (line[0] == 'P' || line[0] == 'M') {
             memo = line.substr(1);
 
-            for (acct in accounts) {
-                if (accounts[acct].test && accounts[acct].test(memo) || accounts[acct] == memo) {
-                    output = 'L[' + acct + ']\n';
+            for (tr in transfers) {
+                if (transfers[tr].test && transfers[tr].test(memo) || transfers[tr] == memo) {
+                    output = 'L[' + tr + ']\n';
                 }
             }
 
             output += 'M' + memo;
         }
-        else if (line[0] == 'D') {
+        else if (line[0] == 'D' && line[4] == '/') {
             output = 'D' + line.substr(1).split('/').reverse().join('/');
         }
         else if (line[0] != 'L') {
