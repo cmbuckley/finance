@@ -9,6 +9,13 @@ var accounts = [],
         'Payslips':        'SKY UK LIMITED'
     };
 
+exports.load = function (content) {
+    content.split(/!Account\n/).filter(Boolean).map(function (account) {
+        var index = account.indexOf('!');
+        this.add(account.substring(1, index - 9), account.substring(index));
+    }, this);
+};
+
 exports.add = function (accountName, transactions) {
     accounts.push({
         name:         accountName,

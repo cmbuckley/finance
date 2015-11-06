@@ -16,13 +16,20 @@ casper.getContents = function (url, method) {
 
 casper.start();
 
-if (options.hsbc) {
-    casper.then(function () {
-        require('download/hsbc').download(options.hsbc.credentials, options.from, options.to, output);
-    });
+if (options.test) {
+    casper.echo('Loading test file ' + options.test);
+    output.load(fs.read(options.test));
+}
+else {
+    if (options.hsbc) {
+        casper.then(function () {
+            require('download/hsbc').download(options.hsbc.credentials, options.from, options.to, output);
+        });
+    }
 }
 
 casper.then(function () {
+    this.echo('Writing output to ' + options.filename);
     fs.write(options.filename, output.get());
 });
 
