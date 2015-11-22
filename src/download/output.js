@@ -16,8 +16,8 @@ var accounts = [],
 
 exports.load = function (content) {
     content.split(/!Account\n/).filter(Boolean).map(function (account) {
-        var index = account.indexOf('!');
-        this.add(account.substring(1, index - 9), account.substring(index));
+        // first line of header has account name, and line starting with ! is start of body
+        this.add(account.substring(1, account.indexOf('\n')), account.substring(account.indexOf('!')));
     }, this);
 };
 
@@ -47,7 +47,7 @@ exports.get = function () {
 
             output += 'M' + memo;
         }
-        else if (line[0] == 'D' && line[4] == '/') {
+        else if (line[0] == 'D' && line[3] == '/') {
             output = 'D' + line.substr(1).split('/').reverse().join('/');
         }
         else if (line[0] != 'L') {
