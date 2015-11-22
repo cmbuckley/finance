@@ -1,5 +1,7 @@
 var Casper  = require('casper'),
-    casper  = Casper.create(),
+    casper  = Casper.create({
+        waitTimeout: 10000,
+    }),
     utils   = require('utils'),
     cu      = require('clientutils').create(utils.mergeObjects({}, casper.options)),
     fs      = require('fs'),

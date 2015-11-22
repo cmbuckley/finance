@@ -62,7 +62,7 @@ function download(from, to, output) {
             }, true);
         });
 
-        casper.then(function () {
+        casper.waitForUrl(/OnSelectDateThsTransactionsCommand/, function () {
             var download = casper.getLabelContains('Download transactions');
 
             // check for link (missing if no transactions)
@@ -96,8 +96,9 @@ function download(from, to, output) {
 exports.download = function (credentials, from, to, output) {
     login(credentials);
 
-    // click to expand and include the mortgage
-    casper.then(function () {
+    // need to wait for login and token migration
+    casper.waitForUrl(/online-banking/, function () {
+        // click to expand and include the mortgage
         this.echo('Listing all accounts');
         this.clickLabel('Loans and Mortgages');
     });
