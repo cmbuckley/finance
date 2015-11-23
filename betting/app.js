@@ -43,8 +43,15 @@
             var a = exports.document.createElement('a'),
                 output = outputters[format](rows);
 
+            try {
+                a.href = 'data:text/' + format + ';base64,' + exports.btoa(output);
+            } catch (e) {
+                var bad = output.split('\n').filter(RegExp.prototype.test.bind(/[^\x00-\x7F]/)).join('\n');
+                console.error('Output contains invalid characters:\n', bad.replace(/[^\x00-\x7F]/g, '\ufffd'));
+                return false;
+            }
+
             a.download = [name, format].join('.');
-            a.href = 'data:text/' + format + ';base64,' + exports.btoa(unescape(encodeURIComponent(output)));
             exports.document.body.appendChild(a);
             a.click();
         }
