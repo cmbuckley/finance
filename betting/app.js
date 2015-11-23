@@ -664,6 +664,10 @@
                 }).join('\n');
             }
 
+            if (data.stake.freebet) {
+                description += '\n£' + (data.stake.freebet / 100).toFixed(2).replace('.00', '') + ' free bet used';
+            }
+
             return description;
         },
 
