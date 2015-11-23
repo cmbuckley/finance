@@ -44,7 +44,7 @@
                 output = outputters[format](rows);
 
             a.download = [name, format].join('.');
-            a.href = 'data:text/' + format + ';base64,' + exports.btoa(output);
+            a.href = 'data:text/' + format + ';base64,' + exports.btoa(unescape(encodeURIComponent(output)));
             exports.document.body.appendChild(a);
             a.click();
         }
