@@ -10,7 +10,7 @@ var accounts = [],
         'Current Account': /^404401 [0-9]{4}5471/,
         'HSBC ISA':        /^404401 [0-9]{4}3752|BUCKLEY C   \*LYA/,
         'Mortgage':        /MTG 400188[0-9]{4}9172/,
-        'PayPal':          'PAYPAL',
+        'PayPal':          /PAYPAL/,
         'Payslips':        'SKY UK LIMITED'
     };
 
