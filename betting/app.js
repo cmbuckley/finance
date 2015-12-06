@@ -496,6 +496,7 @@
                         event         = utils.text(row.querySelector('.four-six h3 + span')).split(/(?:\s+-\s+|\s{2,})/).filter(Boolean),
                         oddsNow       = row.querySelector('.bog-odds-now'),
                         data          = this._getData(row),
+                        result        = data['Resulted'].split('-')[1],
                         replacements  = {
                             ' (E/W)': /[\n\s]+EW$/,
                             ' - ':    /\s{2,}/g,
@@ -503,9 +504,13 @@
                             '':       / \(Was.*Now.*\)/i,
                         }, r;
 
-                        for (r in replacements) {
-                            selection = selection.replace(replacements[r], r);
-                        }
+                    for (r in replacements) {
+                        selection = selection.replace(replacements[r], r);
+                    }
+
+                    if (!result) {
+                        result = (utils.text(row.querySelector('.bet-status'), true).indexOf('won') ? 'Won' : 'Lost');
+                    }
 
                     return {
                         selection: selection,
@@ -514,7 +519,7 @@
                         date:      this._getDate(data['Event date']),
                         eachWay:   (data['EW terms'] ? data['EW terms'].match(/\(each way ([^)]+)\)/)[1] : false),
                         odds:      oddsNow ? utils.text(oddsNow) : (selectionData[1] || '').trim(),
-                        result:    data['Resulted'].split('-')[1].trim(),
+                        result:    result.trim(),
                     };
                 }, this);
             },
