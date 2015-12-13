@@ -496,7 +496,8 @@
                         event         = utils.text(row.querySelector('.four-six h3 + span')).split(/(?:\s+-\s+|\s{2,})/).filter(Boolean),
                         oddsNow       = row.querySelector('.bog-odds-now'),
                         data          = this._getData(row),
-                        result        = data['Resulted'].split('-')[1],
+                        result        = (~utils.text(row.querySelector('.bet-status'), true).indexOf('won') ? 'Won' : 'Lost'),
+                        resultText    = data['Resulted'].split('-')[1],
                         replacements  = {
                             ' (E/W)': /[\n\s]+EW$/,
                             ' - ':    /\s{2,}/g,
@@ -508,8 +509,8 @@
                         selection = selection.replace(replacements[r], r);
                     }
 
-                    if (!result) {
-                        result = (utils.text(row.querySelector('.bet-status'), true).indexOf('won') ? 'Won' : 'Lost');
+                    if (resultText && result == 'Won') {
+                        result = resultText; // e.g. "Placed 3"
                     }
 
                     return {
