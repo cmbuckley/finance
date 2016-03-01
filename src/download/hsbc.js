@@ -45,7 +45,8 @@ function download(from, to, output) {
             this.fill('#' + account.attributes.id, {}, true);
         });
 
-        casper.then(function () {
+        // wait for the transactions page
+        casper.waitForUrl('recent-transaction', function () {
             var fromDate = new Date(from),
                 toDate   = (to ? new Date(to) : new Date());
 
@@ -87,6 +88,7 @@ function download(from, to, output) {
             }
         });
 
+        // back to the accounts page for the next iteration
         casper.then(function () {
             this.clickLabel('My accounts');
         });
