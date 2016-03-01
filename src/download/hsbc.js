@@ -93,6 +93,17 @@ function download(from, to, output) {
     };
 }
 
+function logout() {
+    var button = this.getLabelContains('Log off');
+    if (this.exists(button)) {
+        this.echo('Logging out');
+        this.click(button);
+    }
+}
+
+// log out on error
+casper.on('error', logout);
+
 exports.download = function (credentials, from, to, output) {
     login(credentials);
 
@@ -107,8 +118,5 @@ exports.download = function (credentials, from, to, output) {
         this.getElementsInfo('form[action$="recent-transaction"]').forEach(download(from, to, output));
     });
 
-    casper.then(function () {
-        this.echo('Logging out');
-        this.clickLabel('Log off');
-    });
+    casper.then(logout);
 };
