@@ -38,7 +38,7 @@
         },
 
         download: function (name, format, rows) {
-            format = format || 'ofx';
+            format = format || 'qif';
 
             var a = exports.document.createElement('a'),
                 output = outputters[format](rows);
