@@ -471,7 +471,7 @@
             },
 
             getTransactionId: function (el) {
-                return this._getData(el.querySelector('.bet-slip-footer'))['Bet reciept ID'];
+                return this._getData(el.querySelector('.bet-slip-footer'))['Bet receipt ID'];
             },
 
             getTransactionDate: function (el) {
