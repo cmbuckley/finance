@@ -74,7 +74,7 @@
     });
 
     function getDescription($cells) {
-        var description = $cells.eq(0).text().replace("'", '').replace('Monthy', 'Monthly'), // typo
+        var description = $cells.eq(0).text().replace("'", ''),
             hours = $cells.eq(2).text() * 1;
 
         return description + (hours > 0 ? ': ' + hours: '');
