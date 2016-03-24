@@ -1,4 +1,4 @@
-(function(doc){
+(function () {
     var formatters = {
         csv: function (rows) {
             return rows.map(function(row) {
@@ -17,8 +17,7 @@
             var name = 'Payslips';
             var type = 'Bank';
             var transfers = {
-                'SAYE 2012 3YR': 'Sharesave',
-                'SMART PENSION': 'Pension'
+                'EE Smart Pension': 'Pension'
             };
 
             var head = [
@@ -41,87 +40,80 @@
         }
     };
 
-    var id = doc.getElementById.bind(doc);
-    var sel = doc.querySelectorAll.bind(doc);
-    var date = id('lblHeading1');
+    var $paymentDate = $('table:not([aria-hidden]) span:contains("Payment Date")');
 
-    if (!date) {
+    if (!$paymentDate.length) {
         return window.formatters = formatters;
     }
 
-    date = date.innerText.replace(
-        /.+the (\d\d) (\w{3}).* (\d{4}).*$/,
-        function(_, d, m, y) {
-            return d + '-' + ("0" + ['_', 'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(m)).substr(-2) + '-' + y;
-        }
-    );
+    var date = $paymentDate.parents('tr')
+                          .closest('div')
+                          .next()
+                          .find('td')
+                          .eq($paymentDate.parents('td').index())
+                          .text().replace(/\//g, '-');
 
     var file = [];
-    var type = 'qif';
-    var payments = sel('[id^=lblPD]:not(:empty), [id^=lblDD]:not(:empty)');
-    var lblPattern = /(lbl.)D(\d+)/;
+    var payments = $('span:contains("Earnings")').parents('div[role=group]').find('div.wd-StitchedGrid .grid-body-row tr');
 
-    [].forEach.call(payments, function (payment) {
-        var amount = getAmount(payment);
+    payments.each(function () {
+        var $cells = $(this).find('td'),
+            isEarnings = ($cells.length == 7),
+            description = getDescription($cells),
+            amount = getAmount($cells, isEarnings);
 
-        if (amount != 0) {
+        if (description && amount != 0) {
             file.push({
                 d: date,
-                p: getPaymode(payment.innerText),
-                m: getDescription(payment),
+                p: 0,
+                m: description,
                 a: amount,
-                c: getCategory(payment.innerText)
+                c: getCategory(description)
             });
         }
     });
 
-    function getDescription(element) {
-        return [
-            element.innerText,
-            (id(element.id.replace(lblPattern, '$1H$2')) || {}).innerText
-        ].filter(Boolean).join(': ');
+    function getDescription($cells) {
+        var description = $cells.eq(0).text().replace("'", '').replace('Monthy', 'Monthly'), // typo
+            hours = $cells.eq(2).text() * 1;
+
+        return description + (hours > 0 ? ': ' + hours: '');
     }
 
-    function getAmount(element) {
-        var label = id(element.id.replace(lblPattern, '$1A$2'));
-        return {'P': 100, 'D': -100}[element.id[3]] * label.innerText.replace(',', '');
-    }
-
-    function getPaymode(text) {
-        return {
-            'SAYE': 5
-        }[text] || 0;
+    function getAmount($element, isEarnings) {
+        var text = $element.eq(isEarnings ? 4 : 1).text();
+        return 100 * text.replace(/[(),]/g, '') * (isEarnings && text.indexOf('(') == -1 ? 1 : -1);
     }
 
     function getCategory(text) {
-        if (text.indexOf('O/T HRS') > -1) {
+        if (text.indexOf('Overtime') > -1) {
             return 'Salary:Overtime';
         }
 
         return {
-            'BASIC PAY':      'Salary:Gross Pay',
-            'BASIC ARREARS':  'Salary:Gross Pay',
-            'CALL OUT':       'Salary:Gross Pay',
-            'BONUS':          'Salary:Bonus',
-            'REFER A FRIEND': 'Salary:Bonus',
-            'SMART PENSION':  'Retirement:Pension',
-            'TAX':            'Taxes:Income Tax',
-            'NI':             'Insurance:NI'
+            'Monthly Salary':       'Salary:Gross Pay',
+            'Call Out':             'Salary:Gross Pay',
+            'Refer a Friend Bonus': 'Salary:Bonus',
+            'Performance Bonus':    'Salary:Bonus',
+            'TABLETS':              'Computing:Hardware',
+            'EE Smart Pension':     'Retirement:Pension',
+            'Income Tax':           'Taxes:Income Tax',
+            'Employee NI':          'Insurance:NI'
         }[text] || '';
     }
 
+    var type = 'qif';
     var output = formatters[type](file);
-    var test = id('test-output');
+    var $test = $('#test-output');
 
-    if (test) {
-        test.innerText = output;
-        var expected = id('expected-output').textContent.trim();
-        test.classList.add(output.trim() == expected ? 'pass' : 'fail');
+    if ($test.length) {
+        $test.text(output);
+        var expected = $('#expected-output').text().trim();
+        $test.addClass(output.trim() == expected ? 'pass' : 'fail');
     } else {
-        var a = doc.createElement('a');
-        a.download = 'payslips-' + date + '.' + type;
-        a.href = 'data:text/' + type + ';base64,' + btoa(output);
-        doc.body.appendChild(a);
-        a.click();
+        $('<a />', {
+            download: 'payslips-' + date + '.' + type,
+            href: 'data:text/' + type + ';base64,' + btoa(output)
+        })[0].click();
     }
-})(document);
+})();

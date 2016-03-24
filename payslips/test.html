@@ -6,42 +6,117 @@ textarea { border: 5px solid; }
 .pass { border-color: green; }
 .fail { border-color: red; }
 </style>
-<p id=lblHeading1>Test for the 27 June 2013.</p>
-<dl>
-    <dt id=lblPD1>BASIC PAY</dt>
-    <dd id=lblPA1>1,234.56</dd>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<div class="date">
+    <div><table>
+        <tr><td></td><td><span>Payment Date</span></td></tr>
+    </table></div>
+    <div><table>
+        <tr><td></td><td><span>27/06/2013</span></td></tr>
+    </table></div>
+</div>
 
-    <dt id=lblPD2>BASIC ARREARS</dt>
-    <dd id=lblPA2>111.11</dd>
-
-    <dt id=lblPD3>BONUS</dt>
-    <dd id=lblPA3>5,432.10</dd>
-
-    <dt id=lblPD4>REFER A FRIEND</dt>
-    <dd id=lblPA4>1,000.00</dd>
-
-    <dt id=lblPD5>O/T HRS @ 1.50</dt>
-    <dt id=lblPH5>6.00</dt>
-    <dd id=lblPA5>234.56</dd>
-
-    <dt id=lblPD6>SMART PENSION</dt>
-    <dd id=lblPA6>-98.76</dd>
-
-    <dt id=lblPD7>OTHER</dt>
-    <dd id=lblPA7>0.00</dd>
-
-    <dt id=lblPD8>CALL OUT</dt>
-    <dd id=lblPA8>123.45</dd>
-
-    <dt id=lblDD1>TAX</dt>
-    <dd id=lblDA1>567.89</dd>
-
-    <dt id=lblDD2>NI</dt>
-    <dd id=lblDA2>333.33</dd>
-
-    <dt id=lblDD3>SAYE 2012 3YR</dt>
-    <dd id=lblDA3>100.00</dd>
-</dl>
+<div role="group">
+    <div class="wd-StitchedGrid"><span>Earnings</span><table>
+        <thead><tr>
+            <th>Description</th>
+            <th>Dates</th>
+            <th>Hours</th>
+            <th>Rate</th>
+            <th>Amount</th>
+            <th>YTD</th>
+        </tr></thead>
+        <tbody class="grid-body-row"><tr>
+            <td>Monthy Salary</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1,234.56</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>Call Out</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>123.45</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>Performance Bonus</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>5,432.10</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>Refer a Friend Bonus</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1,000.00</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>Overtime x 1.5</td>
+            <td></td>
+            <td>10</td>
+            <td></td>
+            <td>234.56</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>TABLET'S</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>(116.50)</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>EE Smart Pension</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>(98.76)</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total: 9,999.99</td>
+            <td></td>
+            <td></td>
+        </tr></tbody>
+    </table></div>
+    <div class="wd-StitchedGrid"><table>
+        <thead><tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>YTD</th>
+        </tr></thead>
+        <tbody class="grid-body-row"><tr>
+            <td>Employee NI</td>
+            <td>333.33</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td>Income Tax</td>
+            <td>567.89</td>
+            <td></td>
+            <td></td>
+        </tr><tr>
+            <td></td>
+            <td>Total: 1,111.11</td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table></div>
+</div>
 
 <script type="text/plain" id="expected-output">
 !Account
@@ -51,53 +126,48 @@ TBank
 !Type:Bank
 D27-06-2013
 T1234.56
-MBASIC PAY
+MMonthly Salary
 LSalary:Gross Pay
 ^
 D27-06-2013
-T111.11
-MBASIC ARREARS
+T123.45
+MCall Out
 LSalary:Gross Pay
 ^
 D27-06-2013
 T5432.10
-MBONUS
+MPerformance Bonus
 LSalary:Bonus
 ^
 D27-06-2013
 T1000.00
-MREFER A FRIEND
+MRefer a Friend Bonus
 LSalary:Bonus
 ^
 D27-06-2013
 T234.56
-MO/T HRS @ 1.50: 6.00
+MOvertime x 1.5: 10
 LSalary:Overtime
 ^
 D27-06-2013
+T-116.50
+MTABLETS
+LComputing:Hardware
+^
+D27-06-2013
 T-98.76
-MSMART PENSION
+MEE Smart Pension
 L[Pension]
 ^
 D27-06-2013
-T123.45
-MCALL OUT
-LSalary:Gross Pay
-^
-D27-06-2013
-T-567.89
-MTAX
-LTaxes:Income Tax
-^
-D27-06-2013
 T-333.33
-MNI
+MEmployee NI
 LInsurance:NI
 ^
 D27-06-2013
-T-100.00
-MSAYE 2012 3YR
-L[ShareSave]
+T-567.89
+MIncome Tax
+LTaxes:Income Tax
 ^
 </script>
 <textarea rows="20" cols="100" id="test-output"></textarea>
