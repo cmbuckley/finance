@@ -3,7 +3,7 @@ BEGIN {
     as["STUDENT LOANS CO"] = "Student Loan"
     as["HSBC CREDIT CARD"] = "Credit Card"
     as["MTG 400188[0-9]{4}9172"] = "Mortgage"
-    as["SKY UK LIMITED"] = "Payslips"
+    as["HESTVIEW"] = "Payslips"
     as["PAYPAL"] = "PayPal"
     as["^404401 [0-9]{4}3752"] = "HSBC ISA"
     as["^404401 [0-9]{4}6458"] = "Online Saver"
