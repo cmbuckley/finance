@@ -16,6 +16,10 @@ casper.getContents = function (url, method) {
     return cu.decode(casper.base64encode(url, method));
 }
 
+casper.on('error', function () {
+    fs.write('casper-debug.html', this.getHTML());
+});
+
 casper.start();
 
 if (options.test) {
