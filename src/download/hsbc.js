@@ -1,7 +1,7 @@
 function login(credentials) {
     casper.thenOpen('http://www.hsbc.co.uk/1/2/personal/pib-home', function () {
         this.echo('Logging in to HSBC');
-        this.fill('#logonForm', {userid: credentials.userid}, true);
+        this.fill('form', {userid: credentials.userid}, true);
     });
 
     // occasional interstitial page
@@ -110,7 +110,7 @@ exports.download = function (credentials, from, to, output) {
     login(credentials);
 
     // need to wait for login and token migration
-    casper.waitForUrl(/online-banking/, function () {
+    casper.waitForUrl(/pib-home/, function () {
         // click to expand and include the mortgage
         this.echo('Listing all accounts');
         this.clickLabel('Loans and Mortgages');
