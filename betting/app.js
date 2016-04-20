@@ -44,7 +44,7 @@
                 output = outputters[format](rows);
 
             try {
-                a.href = 'data:text/' + format + ';base64,' + exports.btoa(output);
+                a.href = 'data:text/' + format + ';charset=utf-8,' + encodeURIComponent(output);
             } catch (e) {
                 var bad = output.split('\n').filter(RegExp.prototype.test.bind(/[^\x00-\x7F]/)).join('\n');
                 console.error('Output contains invalid characters:\n', bad.replace(/[^\x00-\x7F]/g, '\ufffd'));
@@ -84,7 +84,7 @@
         },
 
         ofx: function (rows) {
-            var head = '<OFX>\n<BANKMSGSRSV1>\n<STMTTRNRS>\n<STMTRS>\n<CURDEF>GBP</CURDEF>\n<BANKACCTFROM>\n<BANKID></BANKID>\n<ACCTID>Betting</ACCTID>\n<ACCTTYPE></ACCTTYPE>\n</BANKACCTFROM>\n<BANKTRANLIST>\n',
+            var head = '<?OFX OFXHEADER="200" ENCODING="UTF-8" ?>\n<OFX>\n<BANKMSGSRSV1>\n<STMTTRNRS>\n<STMTRS>\n<CURDEF>GBP</CURDEF>\n<BANKACCTFROM>\n<BANKID></BANKID>\n<ACCTID>Betting</ACCTID>\n<ACCTTYPE></ACCTTYPE>\n</BANKACCTFROM>\n<BANKTRANLIST>\n',
                 foot = '</BANKTRANLIST>\n<LEDGERBAL>\n<BALAMT></BALAMT>\n<DTASOF></DTASOF>\n</LEDGERBAL>\n</STMTRS>\n</STMTTRNRS>\n</BANKMSGSRSV1>\n</OFX>\n';
 
             return rows.reduceRight(function (data, row) {
