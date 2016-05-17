@@ -12,6 +12,10 @@ casper.getLabelContains = function (text, selector) {
     return Casper.selectXPath('//' + (selector || '*') + '[contains(text(), "' + text + '")]');
 };
 
+casper.clickLabelContains = function (text, selector) {
+    return this.click(this.getLabelContains(text, selector));
+}
+
 casper.getContents = function (url, method) {
     return cu.decode(casper.base64encode(url, method));
 }
