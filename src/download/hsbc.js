@@ -36,17 +36,19 @@ function login(credentials) {
     });
 }
 
-function download(from, to, output) {
-    return function (account, accountIndex, accounts) {
+function download(type, from, to, output) {
+    var selector = 'form[action$="' + type + '"]';
+
+    casper.getElementsInfo(selector).forEach(function (account, accountIndex, accounts) {
         casper.then(function () {
             // re-evaluate element info for this page - form IDs change each time
-            account = this.getElementsInfo('form[action$="recent-transaction"]')[accountIndex];
+            account = this.getElementsInfo(selector)[accountIndex];
             this.echo('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (' + (accountIndex + 1) + '/' + accounts.length + ')');
             this.fill('#' + account.attributes.id, {}, true);
         });
 
         // wait for the transactions page
-        casper.waitForUrl('recent-transaction', function () {
+        casper.waitForUrl(type, function () {
             var fromDate = new Date(from),
                 toDate   = (to ? new Date(to) : new Date());
 
@@ -66,7 +68,7 @@ function download(from, to, output) {
                     toDateYear:    toDate.getFullYear()
                 }, true);
 
-                this.waitForUrl(/OnSelectDateThsTransactionsCommand/, function () {
+                this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
                     var download = casper.getLabelContains('Download transactions');
 
                     // check for link (missing if no transactions)
@@ -98,7 +100,7 @@ function download(from, to, output) {
         casper.then(function () {
             this.clickLabel('My accounts');
         });
-    };
+    });
 }
 
 function logout() {
@@ -119,11 +121,11 @@ exports.download = function (credentials, from, to, output) {
     casper.waitForUrl(/pib-home/, function () {
         // click to expand and include the mortgage
         this.echo('Listing all accounts');
-        this.clickLabel('Loans and Mortgages');
+        this.clickLabelContains('Show All');
     });
 
     casper.then(function () {
-        this.getElementsInfo('form[action$="recent-transaction"]').forEach(download(from, to, output));
+        download('recent-transaction', from, to, output);
     });
 
     casper.then(logout);
