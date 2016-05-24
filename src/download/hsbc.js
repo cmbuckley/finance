@@ -36,7 +36,48 @@ function login(credentials) {
     });
 }
 
-function download(type, from, to, output) {
+function download() {
+    var label = casper.getLabelContains('Download transactions');
+
+    // check for link (missing if no transactions)
+    if (casper.exists(label)) {
+        casper.click(label);
+
+        // todo check for recent transactions dropdown
+        casper.then(function () {
+            var formValues = {downloadType: 'M_QIF'};
+            this.echo('  Selecting QIF format');
+
+            // credit card has different form options
+            if (this.exists('#transactionPeriodSelected')) {
+                formValues = {
+                    transactionPeriodSelected: 'CURRENTPERIOD',
+                    formats: 'QIF1'
+                };
+            }
+
+            this.fill('.containerMain form', formValues, true);
+        });
+
+        casper.then(function () {
+            var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
+                name = this.getHTML('.hsbcAccountType').trim();
+
+            if (/\d+/.test(name)) {
+                name = 'Credit Card';
+            }
+
+            this.echo('  Downloading file');
+            this.echo(url);
+            output.add(name, casper.getContents(url, 'POST'));
+        });
+    }
+    else {
+        casper.echo('  No transactions in range');
+    }
+}
+
+function listTransactions(type, from, to, output) {
     var selector = 'form[action$="' + type + '"]';
 
     casper.getElementsInfo(selector).forEach(function (account, accountIndex, accounts) {
@@ -50,48 +91,32 @@ function download(type, from, to, output) {
         // wait for the transactions page
         casper.waitForUrl(type, function () {
             var fromDate = new Date(from),
-                toDate   = (to ? new Date(to) : new Date());
+                toDate   = (to ? new Date(to) : new Date()),
+                formSelector = '.containerMain .extContentHighlightPib form';
 
             if (/no transactions/.test(this.fetchText('#content .hsbcMainContent'))) {
                 this.echo('  No transactions found');
             }
             else {
-                this.echo('  Selecting dates: ' + from + ' - ' + (to || 'today'));
+                if (this.exists(formSelector)) {
+                    this.echo('  Selecting dates: ' + from + ' - ' + (to || 'today'));
 
-                // all javascript form submission does here is validate the form
-                this.fill('.containerMain form', {
-                    fromDateDay:   fromDate.getDate(),
-                    fromDateMonth: fromDate.getMonth() + 1,
-                    fromDateYear:  fromDate.getFullYear(),
-                    toDateDay:     toDate.getDate(),
-                    toDateMonth:   toDate.getMonth() + 1,
-                    toDateYear:    toDate.getFullYear()
-                }, true);
+                    // all javascript form submission does here is validate the form
+                    this.fill(formSelector, {
+                        fromDateDay:   fromDate.getDate(),
+                        fromDateMonth: fromDate.getMonth() + 1,
+                        fromDateYear:  fromDate.getFullYear(),
+                        toDateDay:     toDate.getDate(),
+                        toDateMonth:   toDate.getMonth() + 1,
+                        toDateYear:    toDate.getFullYear()
+                    }, true);
 
-                this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
-                    var download = casper.getLabelContains('Download transactions');
-
-                    // check for link (missing if no transactions)
-                    if (this.exists(download)) {
-                        this.click(download);
-
-                        this.then(function () {
-                            this.echo('  Selecting QIF format');
-                            this.fill('.containerMain form', {
-                                downloadType: 'M_QIF'
-                            }, true);
-                        });
-
-                        this.then(function () {
-                            this.echo('  Downloading file');
-                            var url = this.getElementAttribute('.containerMain form', 'action');
-                            output.add(this.getHTML('.hsbcAccountType'), casper.getContents(url, 'POST'));
-                        });
-                    }
-                    else {
-                        this.echo('  No transactions in date range');
-                    }
-                });
+                    this.waitForUrl('OnSelectDateThsTransactionsCommand', download);
+                }
+                else {
+                    this.echo('  Selecting recent transactions');
+                    download();
+                }
             }
         });
 
@@ -120,13 +145,18 @@ exports.download = function (credentials, from, to, output) {
     // need to wait for login and token migration
     casper.waitForUrl(/pib-home/, function () {
         // click to expand and include the mortgage
-        this.echo('Listing all accounts');
         this.clickLabelContains('Show All');
     });
 
     casper.then(function () {
-        download('recent-transaction', from, to, output);
+        this.echo('Listing regular accounts');
+        listTransactions('recent-transaction', from, to, output);
     });
+
+    casper.then(function () {
+        this.echo('Listing credit card accounts');
+        listTransactions('credit-card-transactions', from, to, output);
+    })
 
     casper.then(logout);
 };

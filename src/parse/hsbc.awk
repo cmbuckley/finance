@@ -7,7 +7,10 @@ BEGIN {
     as["PAYPAL"] = "PayPal"
     as["^404401 [0-9]{4}3752"] = "HSBC ISA"
     as["^404401 [0-9]{4}6458"] = "Online Saver"
+    as["^404401 [0-9]{4}6646"] = "Regular Saver"
     as["^404401 [0-9]{4}5471"] = "Current Account"
+    as["MORTGAGE PAYMENT"] = "Current Account"
+    as["BUCKLEY CM"] = "Current Account"
     as["CAPITA IRG BUCKLE"] = "Sharesave"
     as["BUCKLEY C   *LYA"] = "HSBC ISA"
 }
