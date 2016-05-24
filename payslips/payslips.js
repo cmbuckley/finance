@@ -59,7 +59,7 @@
     payments.each(function () {
         var $cells = $(this).find('td'),
             isEarnings = ($cells.length == 7),
-            description = getDescription($cells),
+            description = getDescription($cells, isEarnings),
             amount = getAmount($cells, isEarnings);
 
         if (description && amount != 0) {
@@ -73,11 +73,11 @@
         }
     });
 
-    function getDescription($cells) {
+    function getDescription($cells, hasHours) {
         var description = $cells.eq(0).text().replace("'", ''),
             hours = $cells.eq(2).text() * 1;
 
-        return description + (hours > 0 ? ': ' + hours: '');
+        return description + (hasHours && hours > 0 ? ': ' + hours: '');
     }
 
     function getAmount($element, isEarnings) {
