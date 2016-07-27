@@ -91,14 +91,15 @@
         }
 
         return {
-            'Monthly Salary':       'Salary:Gross Pay',
-            'Call Out':             'Salary:Gross Pay',
-            'Refer a Friend Bonus': 'Salary:Bonus',
-            'Performance Bonus':    'Salary:Bonus',
-            'TABLETS':              'Computing:Hardware',
-            'EE Smart Pension':     'Retirement:Pension',
-            'Income Tax':           'Taxes:Income Tax',
-            'Employee NI':          'Insurance:NI'
+            'Monthly Salary':            'Salary:Gross Pay',
+            'Call Out':                  'Salary:Gross Pay',
+            'Refer a Friend Bonus':      'Salary:Bonus',
+            'Company Performance Bonus': 'Salary:Bonus',
+            'Commitment Bonus':          'Salary:Bonus',
+            'TABLETS':                   'Computing:Hardware',
+            'EE Smart Pension':          'Retirement:Pension',
+            'Income Tax':                'Taxes:Income Tax',
+            'Employee NI':               'Insurance:NI'
         }[text] || '';
     }
 
