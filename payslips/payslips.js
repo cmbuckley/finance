@@ -107,6 +107,8 @@
     var output = formatters[type](file);
     var $test = $('#test-output');
 
+    console.log('Transactions:', file);
+
     if ($test.length) {
         $test.text(output);
         var expected = $('#expected-output').text().trim();
