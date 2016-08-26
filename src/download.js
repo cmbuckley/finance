@@ -5,7 +5,7 @@ var Casper  = require('casper'),
     utils   = require('utils'),
     cu      = require('clientutils').create(utils.mergeObjects({}, casper.options)),
     fs      = require('fs'),
-    output  = require('download/output'),
+    output  = require('lib/output'),
     options = utils.mergeObjects(JSON.parse(fs.read('config/download.json')), casper.cli.options);
 
 casper.getLabelContains = function (text, selector) {
@@ -37,11 +37,23 @@ if (options.test) {
     output.load(fs.read(options.test));
 }
 else {
-    if (options.hsbc) {
-        casper.then(function () {
-            require('download/hsbc').download(options.hsbc.credentials, options.from, options.to, output);
-        });
+    if (options.which) {
+        options.which = options.which.split(',');
     }
+    else {
+        // get all download adapters
+        options.which = fs.list('src/download').map(function (file) {
+            return (/\.js$/.test(file) ? file.replace('.js', '') : false);
+        }).filter(Boolean);
+    }
+
+    options.which.forEach(function (type) {
+        if (options[type]) {
+            casper.then(function () {
+                require('download/' + type).download(options[type].credentials, options.from, options.to, output);
+            });
+        }
+    });
 }
 
 casper.then(function () {
