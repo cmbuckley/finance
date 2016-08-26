@@ -8,6 +8,11 @@ var Casper  = require('casper'),
     output  = require('lib/output'),
     options = utils.mergeObjects(JSON.parse(fs.read('config/download.json')), casper.cli.options);
 
+if (options.verbose) {
+    casper.options.logLevel = 'debug';
+    casper.options.verbose = true;
+}
+
 casper.getLabelContains = function (text, selector) {
     return Casper.selectXPath('//' + (selector || '*') + '[contains(text(), "' + text + '")]');
 };
