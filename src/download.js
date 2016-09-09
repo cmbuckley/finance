@@ -14,11 +14,17 @@ casper.getLabelContains = function (text, selector) {
 
 casper.clickLabelContains = function (text, selector) {
     return this.click(this.getLabelContains(text, selector));
-}
+};
 
 casper.getContents = function (url, method) {
     return cu.decode(casper.base64encode(url, method));
-}
+};
+
+['info', 'warning'].forEach(function (level) {
+    casper[level] = function (message, pad) {
+        casper.echo(message, level.toUpperCase(), pad);
+    };
+});
 
 casper.on('error', function () {
     fs.write('casper-debug.html', this.getHTML());
@@ -27,7 +33,7 @@ casper.on('error', function () {
 casper.start();
 
 if (options.test) {
-    casper.echo('Loading test file ' + options.test);
+    casper.info('Loading test file ' + options.test);
     output.load(fs.read(options.test));
 }
 else {
@@ -39,7 +45,7 @@ else {
 }
 
 casper.then(function () {
-    this.echo('Writing output to ' + options.filename);
+    this.info('Writing output to ' + options.filename);
     fs.write(options.filename, output.get());
 });
 

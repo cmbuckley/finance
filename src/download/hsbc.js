@@ -1,19 +1,19 @@
 function login(credentials) {
     casper.thenOpen('http://www.hsbc.co.uk/1/2/personal/pib-home', function () {
-        this.echo('Logging in to HSBC');
+        this.info('Logging in to HSBC');
         this.fill('form', {userid: credentials.userid}, true);
     });
 
     // occasional interstitial page
     casper.then(function () {
         if (this.exists('#tempForm')) {
-            this.echo('Submitting login form');
+            this.info('Submitting login form');
             this.fill('#tempForm', {}, true);
         }
     });
 
     casper.then(function () {
-        this.echo('Proceeding without Secure Key');
+        this.info('Proceeding without Secure Key');
         this.clickLabel('Without Secure Key');
     });
 
@@ -24,7 +24,7 @@ function login(credentials) {
             password:        '',
         };
 
-        this.echo('Entering password');
+        this.info('Entering password');
 
         // build form values. build password field manually to avoid onsubmit javascript
         this.getElementsAttribute('input[type="password"][name^="pass"]:not([disabled])', 'id').forEach(function (field) {
@@ -46,7 +46,7 @@ function download() {
         // todo check for recent transactions dropdown
         casper.then(function () {
             var formValues = {downloadType: 'M_QIF'};
-            this.echo('  Selecting QIF format');
+            this.info('  Selecting QIF format');
 
             // credit card has different form options
             if (this.exists('#transactionPeriodSelected')) {
@@ -67,13 +67,13 @@ function download() {
                 name = 'Credit Card';
             }
 
-            this.echo('  Downloading file');
-            this.echo(url);
+            this.info('  Downloading file');
+            this.info(url);
             output.add(name, casper.getContents(url, 'POST'));
         });
     }
     else {
-        casper.echo('  No transactions in range');
+        casper.info('  No transactions in range');
     }
 }
 
@@ -84,7 +84,7 @@ function listTransactions(type, from, to, output) {
         casper.then(function () {
             // re-evaluate element info for this page - form IDs change each time
             account = this.getElementsInfo(selector)[accountIndex];
-            this.echo('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (' + (accountIndex + 1) + '/' + accounts.length + ')');
+            this.info('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (' + (accountIndex + 1) + '/' + accounts.length + ')');
             this.fill('#' + account.attributes.id, {}, true);
         });
 
@@ -95,11 +95,11 @@ function listTransactions(type, from, to, output) {
                 formSelector = '.containerMain .extContentHighlightPib form';
 
             if (/no transactions/.test(this.fetchText('#content .hsbcMainContent'))) {
-                this.echo('  No transactions found');
+                this.info('  No transactions found');
             }
             else {
                 if (this.exists(formSelector)) {
-                    this.echo('  Selecting dates: ' + from + ' - ' + (to || 'today'));
+                    this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
 
                     // all javascript form submission does here is validate the form
                     this.fill(formSelector, {
@@ -114,7 +114,7 @@ function listTransactions(type, from, to, output) {
                     this.waitForUrl('OnSelectDateThsTransactionsCommand', download);
                 }
                 else {
-                    this.echo('  Selecting recent transactions');
+                    this.info('  Selecting recent transactions');
                     download();
                 }
             }
@@ -131,7 +131,7 @@ function listTransactions(type, from, to, output) {
 function logout() {
     var button = this.getLabelContains('Log off');
     if (this.exists(button)) {
-        this.echo('Logging out');
+        this.info('Logging out');
         this.click(button);
     }
 }
@@ -149,12 +149,12 @@ exports.download = function (credentials, from, to, output) {
     });
 
     casper.then(function () {
-        this.echo('Listing regular accounts');
+        this.info('Listing regular accounts');
         listTransactions('recent-transaction', from, to, output);
     });
 
     casper.then(function () {
-        this.echo('Listing credit card accounts');
+        this.info('Listing credit card accounts');
         listTransactions('credit-card-transactions', from, to, output);
     })
 
