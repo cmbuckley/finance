@@ -37,6 +37,10 @@ function login(credentials) {
 }
 
 function download() {
+    if (casper.exists('.hsbcTextHighlightError') && casper.getHTML('.hsbcTextHighlightError').indexOf('(833)')) {
+        casper.warning('Cannot display all transactions for range', 2);
+    }
+
     var label = casper.getLabelContains('Download transactions');
 
     // check for link (missing if no transactions)
