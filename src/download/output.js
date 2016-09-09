@@ -8,10 +8,11 @@ var accounts = [],
     transfers = {
         'Cash':            /^CASH/,
         'Credit Card':     'HSBC CREDIT CARD',
-        'Regular Saver':   /^404401 [0-9]{4}6646|BUCKLEY C M *RSB REGULAR SAVER/,
+        'Regular Saver':   /^404401 [0-9]{4}6646|BUCKLEY C M \*RSB REGULAR SAVER/,
         'Current Account': /^404401 [0-9]{4}5471|MORTGAGE PAYMENT|BUCKLEY CM/,
         'HSBC ISA':        /^404401 [0-9]{4}3752|BUCKLEY C   \*LYA/,
         'Mortgage':        /MTG 400188[0-9]{4}9172/,
+        'Monzo':           /MONZO/,
         'PayPal':          /PAYPAL/,
         'Payslips':        'HESTVIEW'
     };
