@@ -10,6 +10,6 @@ mocha:
 	npm test
 
 download:
-	npm run download -- --from=$(from) --to=$(to)
+	npm run download -- --from=$(from) --to=$(to) --which=$(which)
 
 .PHONY: install clean test mocha download
