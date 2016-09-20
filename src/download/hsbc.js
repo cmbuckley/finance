@@ -37,8 +37,21 @@ function login(credentials) {
 }
 
 function download() {
-    if (casper.exists('.hsbcTextHighlightError') && casper.getHTML('.hsbcTextHighlightError').indexOf('(833)')) {
-        casper.warning('Cannot display all transactions for range', 2);
+    if (casper.exists('.hsbcTextHighlightError')) {
+        var errors = {
+                833: 'Cannot display all transactions for range'
+            },
+            rawError = casper.getHTML('.hsbcTextHighlightError'),
+            errorText;
+
+        Object.keys(errors).some(function (code) {
+            if (~rawError.indexOf('(' + code + ')')) {
+                errorText = errors[code];
+                return true;
+            }
+        });
+
+        casper.warning('  ' + (errorText || rawError));
     }
 
     var label = casper.getLabelContains('Download transactions');
