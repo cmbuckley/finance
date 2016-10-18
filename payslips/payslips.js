@@ -40,27 +40,41 @@
         }
     };
 
-    var $paymentDate = $('table:not([aria-hidden]) span:contains("Payment Date")');
+    var cells = document.querySelectorAll('table:not([aria-hidden]) td'),
+        paymentDate, index;
 
-    if (!$paymentDate.length) {
+    Array.prototype.some.call(cells, function (cell) {
+        if (cell.innerText.trim() == 'Payment Date') {
+            paymentDate = cell;
+            index = Array.prototype.indexOf.call(cell.parentNode.children, cell) + 1;
+            return true;
+        }
+    });
+
+    if (!index) {
         return window.formatters = formatters;
     }
 
-    var date = $paymentDate.parents('tr')
-                          .closest('div')
-                          .next()
-                          .find('td')
-                          .eq($paymentDate.parents('td').index())
-                          .text().replace(/\//g, '-');
-
     var file = [];
-    var payments = $('span:contains("Earnings")').parents('div[role=group]').find('div.wd-StitchedGrid .grid-body-row tr');
+    var date = parentNode(paymentDate, 'div').nextElementSibling
+                                             .querySelector('td:nth-child(' + index + ')')
+                                             .innerText.trim().replace(/\//g, '-');
 
-    payments.each(function () {
-        var $cells = $(this).find('td'),
-            isEarnings = ($cells.length == 7),
-            description = getDescription($cells, isEarnings),
-            amount = getAmount($cells, isEarnings);
+    var spans = document.querySelectorAll('span.gwt-InlineLabel'),
+        payments;
+
+    Array.prototype.some.call(spans, function (span) {
+        if (span.innerText == 'Earnings') {
+            payments = parentNode(span, 'div[role="group"]').querySelectorAll('div.wd-StitchedGrid .grid-body-row tr');
+            return true;
+        }
+    });
+
+    Array.prototype.forEach.call(payments, function (payment) {
+        var cells = payment.querySelectorAll('td'),
+            isEarnings = (cells.length == 7),
+            description = getDescription(cells, isEarnings),
+            amount = getAmount(cells, isEarnings);
 
         if (description && amount != 0) {
             file.push({
@@ -73,15 +87,24 @@
         }
     });
 
-    function getDescription($cells, hasHours) {
-        var description = $cells.eq(0).text().replace("'", ''),
-            hours = $cells.eq(2).text() * 1;
+    function parentNode(el, selector) {
+        while (el && el.parentNode) {
+            el = el.parentNode;
+            if (el.matches && el.matches(selector)) {
+                return el;
+            }
+        }
+    }
+
+    function getDescription(cells, hasHours) {
+        var description = cells[0].innerText.trim().replace("'", ''),
+            hours = cells[2].innerText.trim() * 1;
 
         return description + (hasHours && hours > 0 ? ': ' + hours: '');
     }
 
-    function getAmount($element, isEarnings) {
-        var text = $element.eq(isEarnings ? 4 : 1).text();
+    function getAmount(cells, isEarnings) {
+        var text = cells[isEarnings ? 4 : 1].innerText;
         return 100 * text.replace(/[(),]/g, '') * (isEarnings && text.indexOf('(') == -1 ? 1 : -1);
     }
 
@@ -105,18 +128,19 @@
 
     var type = 'qif';
     var output = formatters[type](file);
-    var $test = $('#test-output');
+    var test = document.getElementById('test-output');
 
     console.log('Transactions:', file);
 
-    if ($test.length) {
-        $test.text(output);
-        var expected = $('#expected-output').text().trim();
-        $test.addClass(output.trim() == expected ? 'pass' : 'fail');
+    if (test) {
+        test.value = output;
+        var expected = document.getElementById('expected-output').innerText.trim();
+        test.classList.add(output.trim() == expected ? 'pass' : 'fail');
     } else {
-        $('<a />', {
-            download: 'payslips-' + date + '.' + type,
-            href: 'data:text/' + type + ';base64,' + btoa(output)
-        })[0].click();
+        var a = document.createElement('a');
+        a.download = 'payslips-' + date + '.' + type;
+        a.href = 'data:text/' + type + ';base64,' + btoa(output);
+        document.body.appendChild(a);
+        a.click();
     }
 })();
