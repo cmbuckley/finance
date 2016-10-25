@@ -40,36 +40,41 @@
         }
     };
 
-    var cells = document.querySelectorAll('table:not([aria-hidden]) td'),
-        paymentDate, index;
+    // find all the header cells
+    var cells = document.querySelectorAll('table[data-automation-id="gridHeader"] td'),
+        date;
 
+    // find the Payment Date header cell and get the date from the info table
     Array.prototype.some.call(cells, function (cell) {
         if (cell.innerText.trim() == 'Payment Date') {
-            paymentDate = cell;
-            index = Array.prototype.indexOf.call(cell.parentNode.children, cell) + 1;
+            var index = Array.prototype.indexOf.call(cell.parentNode.children, cell) + 1;
+
+            date = parentNode(cell, 'div').nextElementSibling
+                                          .querySelector('td:nth-child(' + index + ')')
+                                          .innerText.trim().replace(/\//g, '-');
             return true;
         }
     });
 
-    if (!index) {
+    if (!date) {
         return window.formatters = formatters;
     }
 
     var file = [];
-    var date = parentNode(paymentDate, 'div').nextElementSibling
-                                             .querySelector('td:nth-child(' + index + ')')
-                                             .innerText.trim().replace(/\//g, '-');
 
-    var spans = document.querySelectorAll('span.gwt-InlineLabel'),
+    // find all the table headings
+    var spans = document.querySelectorAll('div[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
         payments;
 
+    // find the Earnings table and grab all earnings/deductions
     Array.prototype.some.call(spans, function (span) {
         if (span.innerText == 'Earnings') {
-            payments = parentNode(span, 'div[role="group"]').querySelectorAll('div.wd-StitchedGrid .grid-body-row tr');
+            payments = parentNode(span, 'div[data-automation-id="fieldSetBody"]').querySelectorAll('div.wd-StitchedGrid .grid-body-row tr');
             return true;
         }
     });
 
+    // add all payments to file
     Array.prototype.forEach.call(payments, function (payment) {
         var cells = payment.querySelectorAll('td'),
             isEarnings = (cells.length == 7),

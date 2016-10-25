@@ -11,7 +11,7 @@ textarea { border: 5px solid; }
 </table>
 
 <div class="date">
-    <div><table>
+    <div><table data-automation-id="gridHeader">
         <tr><td></td><td>
             <span>Payment Date</span>
         </td></tr>
@@ -23,9 +23,10 @@ textarea { border: 5px solid; }
     </table></div>
 </div>
 
-<div role="group">
-    <div class="wd-StitchedGrid"><span class="gwt-InlineLabel">Earnings</span><table>
-        <thead><tr>
+<div data-automation-id="fieldSetBody">
+    <div class="wd-StitchedGrid">
+        <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Earnings</span></div>
+        <table><thead><tr>
             <th>Description</th>
             <th>Dates</th>
             <th>Hours</th>
