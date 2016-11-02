@@ -39,13 +39,16 @@ function login(credentials) {
 function download() {
     if (casper.exists('.hsbcTextHighlightError')) {
         var errors = {
-                833: 'Cannot display all transactions for range'
+                '823': 'No transactions in range',
+                '833': 'Cannot display all transactions in range',
+                'ES0': 'No recent transactions, falling back to previous statement'
             },
-            rawError = casper.getHTML('.hsbcTextHighlightError'),
-            errorText;
+            rawError = casper.fetchText('.hsbcTextHighlightError'),
+            errorText, errorCode;
 
         Object.keys(errors).some(function (code) {
             if (~rawError.indexOf('(' + code + ')')) {
+                errorCode = code;
                 errorText = errors[code];
                 return true;
             }
@@ -62,13 +65,22 @@ function download() {
 
         // todo check for recent transactions dropdown
         casper.then(function () {
-            var formValues = {downloadType: 'M_QIF'};
+            var formValues = {downloadType: 'M_QIF'},
+                previousPeriodSelector = '#transactionPeriodSelected option:nth-child(3)';
+                selectedPeriod = 'CURRENTPERIOD';
+
             this.info('  Selecting QIF format');
 
             // credit card has different form options
             if (this.exists('#transactionPeriodSelected')) {
+                if (errorCode === 'ES0') {
+                    // no recent transactions - select previous statement
+                    this.info('  Selecting ' + this.fetchText(previousPeriodSelector) + ' period');
+                    selectedPeriod = this.getElementAttribute(previousPeriodSelector, 'value');
+                }
+
                 formValues = {
-                    transactionPeriodSelected: 'CURRENTPERIOD',
+                    transactionPeriodSelected: selectedPeriod,
                     formats: 'QIF1'
                 };
             }
@@ -89,9 +101,6 @@ function download() {
             output.add(name, casper.getContents(url, 'POST'));
         });
     }
-    else {
-        casper.info('  No transactions in range');
-    }
 }
 
 function listTransactions(type, from, to, output) {
@@ -111,32 +120,26 @@ function listTransactions(type, from, to, output) {
                 toDate   = (to ? new Date(to) : new Date()),
                 formSelector = '.containerMain .extContentHighlightPib form';
 
-            if (/no transactions/.test(this.fetchText('#content .hsbcMainContent'))) {
-                this.info('  No transactions found');
+            if (this.exists(formSelector)) {
+                this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
+
+                // all javascript form submission does here is validate the form
+                this.fill(formSelector, {
+                    fromDateDay:   fromDate.getDate(),
+                    fromDateMonth: fromDate.getMonth() + 1,
+                    fromDateYear:  fromDate.getFullYear(),
+                    toDateDay:     toDate.getDate(),
+                    toDateMonth:   toDate.getMonth() + 1,
+                    toDateYear:    toDate.getFullYear()
+                }, true);
+
+                this.waitForUrl('OnSelectDateThsTransactionsCommand', download);
             }
             else {
-                if (this.exists(formSelector)) {
-                    this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
-
-                    // all javascript form submission does here is validate the form
-                    this.fill(formSelector, {
-                        fromDateDay:   fromDate.getDate(),
-                        fromDateMonth: fromDate.getMonth() + 1,
-                        fromDateYear:  fromDate.getFullYear(),
-                        toDateDay:     toDate.getDate(),
-                        toDateMonth:   toDate.getMonth() + 1,
-                        toDateYear:    toDate.getFullYear()
-                    }, true);
-
-                    this.waitForUrl('OnSelectDateThsTransactionsCommand', download);
-                }
-                else {
-                    this.info('  Selecting recent transactions');
-                    download();
-                }
+                this.info('  Selecting recent transactions');
+                download();
             }
         });
-
 
         // back to the accounts page for the next iteration
         casper.then(function () {
