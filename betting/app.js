@@ -111,7 +111,7 @@
                     callback(envelope);
                 }
                 else {
-                    rows = utils.$('.betResultsRow');
+                    rows = utils.$('.bet-summary-body-row');
                     var elements = [];
 
                     utils.each(rows, function (row) {
@@ -227,7 +227,7 @@
 
                     if (race[0].match(/\d{2}:\d{2}/)) {
                         // @todo caps, 17:05 vs 5.05
-                        event = race[0] + ' ' + race[1];
+                        event = race[0].replace(':', '.') + ' ' + race[1];
                     }
 
                     if (/To Win Match|Match Betting/.test(market)) {
@@ -445,11 +445,11 @@
             },
 
             _getDate: function (str) {
-                var months = ['_','January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
+                var months = ['_','Jan','Feb','Mar','Apr','May','Jun',
+                    'Jul','Aug','Sep','Oct','Nov','Dec'];
 
                 return str.replace(/(\d+)\w+ of (\w+) (\d{4}).*/, function (_, d, m, y) {
-                    return ('0' + d).substr(-2) + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + y;
+                    return ('0' + d).substr(-2) + '-' + ('0' + months.indexOf(m.substr(0, 3))).substr(-2) + '-' + y;
                 });
             }
         },
