@@ -30,7 +30,7 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var parser = new DOMParser();
-                    callback(parser.parseFromString(xhr.responseText, contentType || 'text/xml'));
+                    callback(parser.parseFromString(xhr.responseText, contentType || 'text/html'));
                 }
             };
 
@@ -111,12 +111,17 @@
                     callback(envelope);
                 }
                 else {
-                    rows = utils.$('.bet-summary-body-row');
-                    var elements = [];
+                    var historyDoc = exports.document.querySelector('iframe').contentDocument,
+                        rows = historyDoc.querySelectorAll('.bet-summary-body-row'),
+                        elements = [];
 
                     utils.each(rows, function (row) {
-                        var d = row.querySelector('.transLink').getAttribute('onclick').match(/'([^']+)'/)[1].split('#'),
-                            url = '/MEMBERS/Authenticated/History/GetBetTransaction.aspx?bsId=' + d[0] + '&bsttId=' + d[1] + '&dsId=' + d[2] + '&ht=' + d[3] + '&bash=' + d[4] + '&strConf=' + d[5]; // bet365 BetHistoryResults js
+                        var url = ['/Members/History/SportsHistory/GetBetConfirmation',
+                                    '?Id=',        row.getAttribute('data-betid'),
+                                    '&BetStatus=', row.getAttribute('data-betstatus'),
+                                    '&Bcar=',      row.getAttribute('data-bcar'),
+                                    '&Bash=',      row.getAttribute('data-bash'),
+                                    '&Pebs=',      row.getAttribute('data-pebs')].join('');
 
                         utils.ajax(url, function (el) {
                             elements.push(el);
@@ -130,19 +135,20 @@
             },
 
             getTransactionId: function (el) {
-                return utils.text(el.querySelector('span')).split('-')[1].trim();
+                return utils.text(el.querySelector('.bet-confirmation-details-ref')).split('-')[1].trim();
             },
 
             getTransactionDate: function (el) {
-                return this._getDate(el.querySelectorAll('span')[1]);
+                return this._getDate(el.querySelector('.bet-confirmation-details-timeofbet'));
             },
 
             getStake: function (el) {
-                var betSelector = '.first.last',
+                var betSelector = '.bet-confirmation-amounts',
                     type = 'Single',
                     bet,
                     betMatch;
 
+                // TODO check new multiples format
                 if (el.querySelector('#optHdr')) {
                     type = utils.text(el.querySelector('#optHdr + tr td.first a'));
                     betSelector = '#betfooter';
@@ -164,7 +170,7 @@
             },
 
             getSelections: function (el) {
-                return utils.map(el.querySelectorAll('#tblNormal tr:not(.header):not(.bogheaders)'), function (row) {
+                return utils.map(el.querySelectorAll('.bet-confirmation-table-body tr.DefaultLayout'), function (row) {
                     var cells = row.querySelectorAll('td'),
                         event,
                         eachWay;
@@ -183,7 +189,7 @@
                         date:      this._getDate(cells[3]),
                         eachWay:   (eachWay == 'None' ? false : eachWay),
                         odds:      utils.text(cells[5]),
-                        result:    utils.text(cells[6])
+                        result:    utils.text(cells[8])
                     };
                 }, this).filter(Boolean);
             },
@@ -361,7 +367,7 @@
                                 if (elements.length == total) {
                                     callback(elements);
                                 }
-                            }, 'text/html');
+                            });
                         }
                     });
                 }
@@ -458,8 +464,8 @@
             name: 'Sky Bet',
             getElements: function (callback) {
                 function _getElements() {
-                    var accountWindow = exports.document.getElementById('SkyBetAccount').contentWindow;
-                    callback(accountWindow.document.querySelectorAll('li.transaction'));
+                    var accountDoc = exports.document.getElementById('SkyBetAccount').contentDocument;
+                    callback(accountDoc.querySelectorAll('li.transaction'));
                 }
 
                 if (SkySSO.sba.ui.isOpen) {
