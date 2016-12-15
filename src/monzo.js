@@ -1,7 +1,6 @@
 var fs = require('fs'),
     monzo = require('mondo-bank'),
-    args = require('yargs').argv,
-    config = JSON.parse(fs.readFileSync('config/monzo.json'));
+    args = require('yargs').argv;
 
 var categories = {
     general:       '', // TODO inspect
@@ -67,12 +66,13 @@ function payee(transaction) {
     return '';
 }
 
-monzo.accounts(config.token).then(function (response) {
+monzo.accounts(args.token).then(function (response) {
     monzo.transactions({
       account_id: response.accounts[0].id,
+      expand:     'merchant',
       since:      timestamp(args.from),
       before:     timestamp(args.to)
-    }, config.token).then(function (response) {
+    }, args.token).then(function (response) {
         var head = [
             '!Account',
             'NMonzo',
