@@ -105,10 +105,10 @@
     var handlers = {
         bet365: {
             getElements: function (callback) {
-                var envelope = utils.$('bet365Envelope');
+                var confirmation = utils.$('.bet-confirmation');
 
-                if (envelope.length) {
-                    callback(envelope);
+                if (confirmation.length) {
+                    callback(confirmation);
                 }
                 else {
                     var historyDoc = exports.document.querySelector('iframe').contentDocument,
@@ -143,18 +143,15 @@
             },
 
             getStake: function (el) {
-                var betSelector = '.bet-confirmation-amounts',
-                    type = 'Single',
-                    bet,
-                    betMatch;
+                var type = 'Single',
+                    bet, betMatch;
 
                 // TODO check new multiples format
-                if (el.querySelector('#optHdr')) {
-                    type = utils.text(el.querySelector('#optHdr + tr td.first a'));
-                    betSelector = '#betfooter';
+                if (el.querySelector('.multiples-bet-information')) {
+                    type = utils.text(el.querySelector('.multiples-bet-information-bet-breakdown'));
                 }
 
-                bet = utils.text(el.querySelector(betSelector));
+                bet = utils.text(el.querySelector('.bet-confirmation-amounts'));
                 console.debug('Parsing stake/returns:', bet.replace(/\s+/g, ' '));
                 betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns:\D*([\d\.]*)/);
 
