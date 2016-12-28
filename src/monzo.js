@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    monzo = require('mondo-bank'),
+    monzo = require('monzo-bank'),
     args = require('yargs').argv;
 
 var categories = {
