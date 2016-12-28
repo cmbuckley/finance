@@ -9,24 +9,39 @@ var categories = {
     bills:         'Bills',
     entertainment: 'Nights Out',
     groceries:     'Food:Groceries',
-    shopping:      '', // TODO inspect
     holidays:      '', // TODO inspet
 
+    shopping:      function (transaction) {
+        if (transaction.merchant.metadata) {
+            switch (transaction.merchant.metadata.foursquare_category) {
+                case 'Gift Shop':
+                    return 'Gifts';
+            }
+        }
+    },
     cash: lookup('local_currency', {
         '[Cash]':  'GBP',
         '[Euros]': 'EUR'
+    }, function (transaction) {
+        if (transaction.counterparty.user_id) {
+            return 'Loan';
+        }
     }),
     transport: lookup('description', {
-        'Car:Parking': 'NCP LIMITED'
+        'Car:Parking': /NCP LIMITED|CAR PARK/
     }),
     mondo: function (transaction) {
-        return (transaction.metadata.is_topup ? '[Current Account]' : '');
+        return (transaction.amount > 0 && !transaction.counterparty.user_id && transaction.is_load ? '[Current Account]' : '');
     }
+};
+
+var users = {
+    'user_00009AJ5zA1joAasHukGHp': 'Emilia Lewandowska'
 };
 
 function lookup(key, matches, defaultValue) {
     return function (transaction) {
-        return Object.keys(matches).find(function (match) {
+        return (typeof defaultValue == 'function' ? defaultValue(transaction) : null) || Object.keys(matches).find(function (match) {
             var pattern = matches[match],
                 value = transaction[key];
 
@@ -63,6 +78,11 @@ function payee(transaction) {
         return transaction.counterparty.name;
     }
 
+    // some transactions are missing names
+    if (transaction.counterparty.user_id && users[transaction.counterparty.user_id]) {
+        return users[transaction.counterparty.user_id];
+    }
+
     return '';
 }
 
@@ -84,7 +104,8 @@ monzo.accounts(args.token).then(function (response) {
         var qif = response.transactions.reduce(function (file, transaction) {
             if (
                 transaction.decline_reason // failed
-                || (args.topup === false && transaction.metadata.is_topup) // ignore topups
+                || !transaction.amount // zero amount transaction
+                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id) // ignore topups
             ) {
                 return file;
             }
