@@ -474,7 +474,7 @@
             },
 
             getTransactionId: function (el) {
-                return this._getData(el.querySelector('.bet-slip-footer'))['Bet receipt ID'];
+                return this._getData(el.querySelector('.bet-slip-footer'))['Bet receipt ID'].split('/')[2];
             },
 
             getTransactionDate: function (el) {
@@ -489,6 +489,7 @@
                     stake: this._getAmount(data['Total stake']),
                     freebet: this._getAmount(data['Freebet used']),
                     returns: this._getAmount(data['Returns']),
+                    refund:  this._getAmount(data['Refund']),
                 };
             },
 
@@ -696,9 +697,11 @@
         },
 
         getTransaction: function (data) {
+            var stake = data.stake;
+
             return {
                 date:     data.date,
-                amount:   (data.stake.returns + (data.stake.freebet || 0) - data.stake.stake) || 0,
+                amount:   (stake.returns + (stake.refund || 0) + (stake.freebet || 0) - stake.stake) || 0,
                 memo:     this.getDescription(data),
                 category: 'Leisure:Betting',
                 payee:    this.handler.name || this.name,
