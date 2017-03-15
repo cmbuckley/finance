@@ -75,7 +75,7 @@ function download() {
             if (this.exists('#transactionPeriodSelected')) {
                 if (errorCode === 'ES0') {
                     // no recent transactions - select previous statement
-                    this.info('  Selecting ' + this.fetchText(previousPeriodSelector) + ' period');
+                    this.info('  Selecting ' + this.fetchText(previousPeriodSelector).trim() + ' period');
                     selectedPeriod = this.getElementAttribute(previousPeriodSelector, 'value');
                 }
 
