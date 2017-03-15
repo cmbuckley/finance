@@ -12,7 +12,7 @@ var categories = {
     holidays:      '', // TODO inspet
 
     shopping:      function (transaction) {
-        if (transaction.merchant.metadata) {
+        if (transaction.merchant && transaction.merchant.metadata) {
             switch (transaction.merchant.metadata.foursquare_category) {
                 case 'Gift Shop':
                     return 'Gifts';
@@ -21,7 +21,8 @@ var categories = {
     },
     cash: lookup('local_currency', {
         '[Cash]':  'GBP',
-        '[Euros]': 'EUR'
+        '[Euros]': 'EUR',
+        '[Złoty]': 'PLN'
     }, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
@@ -41,7 +42,11 @@ var users = {
 
 function lookup(key, matches, defaultValue) {
     return function (transaction) {
-        return (typeof defaultValue == 'function' ? defaultValue(transaction) : null) || Object.keys(matches).find(function (match) {
+        var isFunction   = (typeof defaultValue === 'function'),
+            defaultFunc  = (isFunction ? defaultValue : function () {}),
+            defaultValue = (isFunction ? null : defaultValue);
+
+        return defaultFunc(transaction) || Object.keys(matches).find(function (match) {
             var pattern = matches[match],
                 value = transaction[key];
 
@@ -52,7 +57,7 @@ function lookup(key, matches, defaultValue) {
 
 function exit(scope) {
     return function (err) {
-        console.error('Error with', scope, err);
+        console.error('Error with', scope, '-', err);
         throw new Error(err.error.message);
     };
 }
@@ -115,7 +120,7 @@ monzo.accounts(args.token).then(function (response) {
                 'T' + (transaction.amount / 100).toFixed(2),
                 'M' + (transaction.notes || transaction.description.replace(/ +/g, ' ')),
                 'P' + payee(transaction),
-                'L' + category(transaction),
+                'L' + (category(transaction) || ''),
                 'N' + transaction.dedupe_id,
                 '^'
             ]);
