@@ -500,7 +500,7 @@
                         oddsNow       = row.querySelector('.bog-odds-now'),
                         data          = this._getData(row),
                         result        = (~utils.text(row.querySelector('.bet-status'), true).indexOf('won') ? 'Won' : 'Lost'),
-                        resultText    = data['Resulted'].split('-')[1],
+                        resultText    = (data['Resulted'].split('-')[1] || '').trim(),
                         replacements  = {
                             ' (E/W)': /[\n\s]+EW$/,
                             ' - ':    /\s{2,}/g,
@@ -512,13 +512,13 @@
                         selection = selection.replace(replacements[r], r);
                     }
 
-                    if (resultText && result == 'Won') {
+                    if (resultText && (resultText == 'Void' || result == 'Won')) {
                         result = resultText; // e.g. "Placed 3"
                     }
 
                     return {
                         selection: selection,
-                        event:     event[1].trim(),
+                        event:     event[1].trim().replace(/([\d.:]+ [a-z]*):.*$/i, '$1'), // replaces horse race event details
                         market:    event[0].trim(),
                         date:      this._getDate(data['Event date']),
                         eachWay:   (data['EW terms'] ? data['EW terms'].match(/\(each way ([^)]+)\)/)[1] : false),
@@ -547,7 +547,7 @@
             },
 
             _getAmount: function (str) {
-                return (str || '0.00').match(/\d+\.\d+/)[0] * 100;
+                return +((str || '0.00').match(/\d+\.\d+/)[0] * 100).toFixed(0);
             },
         },
 
