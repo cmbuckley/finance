@@ -41,7 +41,7 @@
     };
 
     // find all the header cells
-    var cells = document.querySelectorAll('table[data-automation-id="gridHeader"] td'),
+    var cells = document.querySelectorAll('td[role="columnheader"]'),
         date;
 
     // find the Payment Date header cell and get the date from the info table
@@ -56,7 +56,11 @@
         }
     });
 
-    if (!date) {
+    if (date) {
+        console.log('Payment date:', date);
+    }
+    else {
+        console.log('No payment date found, exiting');
         return window.formatters = formatters;
     }
 
@@ -69,7 +73,8 @@
     // find the Earnings table and grab all earnings/deductions
     Array.prototype.some.call(spans, function (span) {
         if (span.innerText == 'Earnings') {
-            payments = parentNode(span, 'div[data-automation-id="fieldSetBody"]').querySelectorAll('div.wd-StitchedGrid .grid-body-row tr');
+            payments = parentNode(span, 'div[data-automation-id="fieldSetBody"]').querySelectorAll('tr[tabindex]');
+            console.debug('Earnings:', payments);
             return true;
         }
     });
@@ -77,7 +82,7 @@
     // add all payments to file
     Array.prototype.forEach.call(payments, function (payment) {
         var cells = payment.querySelectorAll('td'),
-            isEarnings = (cells.length == 7),
+            isEarnings = (cells.length == 6),
             description = getDescription(cells, isEarnings),
             amount = getAmount(cells, isEarnings);
 
