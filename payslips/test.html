@@ -11,8 +11,8 @@ textarea { border: 5px solid; }
 </table>
 
 <div class="date">
-    <div><table data-automation-id="gridHeader">
-        <tr><td></td><td>
+    <div><table>
+        <tr><td></td><td role="columnheader">
             <span>Payment Date</span>
         </td></tr>
     </table></div>
@@ -24,7 +24,7 @@ textarea { border: 5px solid; }
 </div>
 
 <div data-automation-id="fieldSetBody">
-    <div class="wd-StitchedGrid">
+    <div class="wd-SuperGrid">
         <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Earnings</span></div>
         <table><thead><tr>
             <th>Description</th>
@@ -34,7 +34,7 @@ textarea { border: 5px solid; }
             <th>Amount</th>
             <th>YTD</th>
         </tr></thead>
-        <tbody class="grid-body-row"><tr>
+        <tbody class="grid-body-row"><tr tabindex="0">
             <td>
                 Monthly Salary
             </td>
@@ -43,96 +43,101 @@ textarea { border: 5px solid; }
             <td></td>
             <td>1,234.56</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Call Out</td>
             <td></td>
             <td></td>
             <td></td>
             <td>123.45</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Company Performance Bonus</td>
             <td></td>
             <td></td>
             <td></td>
             <td>5,432.10</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Commitment Bonus</td>
             <td></td>
             <td></td>
             <td></td>
             <td>5,999.10</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Refer a Friend Bonus</td>
             <td></td>
             <td></td>
             <td></td>
             <td>1,000.00</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Overtime x 1.5</td>
             <td></td>
             <td>10</td>
             <td></td>
             <td>234.56</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>TABLET'S</td>
             <td></td>
             <td></td>
             <td></td>
             <td>(116.50)</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>EE Smart Pension</td>
             <td></td>
             <td></td>
             <td></td>
             <td>(98.76)</td>
             <td></td>
-            <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td></td>
             <td></td>
             <td></td>
             <td></td>
             <td>Total: 9,999.99</td>
             <td></td>
-            <td></td>
         </tr></tbody>
     </table></div>
-    <div class="wd-StitchedGrid"><table>
-        <thead><tr>
+    <div class="wd-SuperGrid">
+        <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Statutory Deductions</span></div>
+        <table><thead><tr>
             <th>Description</th>
             <th>Amount</th>
             <th>YTD</th>
         </tr></thead>
-        <tbody class="grid-body-row"><tr>
+        <tbody class="grid-body-row"><tr tabindex="0">
             <td>Employee NI</td>
             <td>333.33</td>
             <td></td>
             <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td>Income Tax</td>
             <td>567.89</td>
             <td></td>
             <td></td>
-        </tr><tr>
+        </tr><tr tabindex="0">
             <td></td>
             <td>Total: 1,111.11</td>
             <td></td>
             <td></td>
-        </tr>
-        </tbody>
+        </tr></tbody>
+    </table></div>
+    <div class="wd-SuperGrid">
+        <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Deductions</span></div>
+        <table><thead><tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>YTD</th>
+        </tr></thead>
+        <tbody class="grid-body-row"><tr tabindex="0">
+            <td>Pennies From Heaven</td>
+            <td>0.01</td>
+            <td></td>
+            <td></td>
+        </tr></tbody>
     </table></div>
 </div>
 
@@ -191,6 +196,11 @@ D27-06-2013
 T-567.89
 MIncome Tax
 LTaxes:Income Tax
+^
+D27-06-2013
+T-0.01
+MPennies From Heaven
+LDonations
 ^
 </script>
 <textarea rows="20" cols="100" id="test-output"></textarea>

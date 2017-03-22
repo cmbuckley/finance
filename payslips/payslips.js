@@ -64,37 +64,40 @@
         return window.formatters = formatters;
     }
 
-    var file = [];
-
     // find all the table headings
-    var spans = document.querySelectorAll('div[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
-        payments;
+    var headings = document.querySelectorAll('div[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
+        file = [];
 
-    // find the Earnings table and grab all earnings/deductions
-    Array.prototype.some.call(spans, function (span) {
-        if (span.innerText == 'Earnings') {
-            payments = parentNode(span, 'div[data-automation-id="fieldSetBody"]').querySelectorAll('tr[tabindex]');
-            console.debug('Earnings:', payments);
-            return true;
-        }
-    });
+    ['Earnings', 'Statutory Deductions', 'Deductions'].forEach(function (type) {
+        // find the table and grab all transactions for that type
+        Array.prototype.some.call(headings, function (heading) {
+            var transactions;
 
-    // add all payments to file
-    Array.prototype.forEach.call(payments, function (payment) {
-        var cells = payment.querySelectorAll('td'),
-            isEarnings = (cells.length == 6),
-            description = getDescription(cells, isEarnings),
-            amount = getAmount(cells, isEarnings);
+            if (heading.innerText == type) {
+                transactions = parentNode(heading, 'div.wd-SuperGrid').querySelectorAll('tr[tabindex]');
+                console.debug(type, ':', transactions);
 
-        if (description && amount != 0) {
-            file.push({
-                d: date,
-                p: 0,
-                m: description,
-                a: amount,
-                c: getCategory(description)
-            });
-        }
+                // add all transactions to file
+                Array.prototype.forEach.call(transactions, function (transaction) {
+                    var cells = transaction.querySelectorAll('td'),
+                        isEarnings = (cells.length == 6),
+                        description = getDescription(cells, isEarnings),
+                        amount = getAmount(cells, isEarnings);
+
+                    if (description && amount != 0) {
+                        file.push({
+                            d: date,
+                            p: 0,
+                            m: description,
+                            a: amount,
+                            c: getCategory(description)
+                        });
+                    }
+                });
+
+                return true;
+            }
+        });
     });
 
     function parentNode(el, selector) {
@@ -132,7 +135,8 @@
             'TABLETS':                   'Computing:Hardware',
             'EE Smart Pension':          'Retirement:Pension',
             'Income Tax':                'Taxes:Income Tax',
-            'Employee NI':               'Insurance:NI'
+            'Employee NI':               'Insurance:NI',
+            'Pennies From Heaven':       'Donations'
         }[text] || '';
     }
 
