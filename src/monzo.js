@@ -1,6 +1,7 @@
 var fs = require('fs'),
     monzo = require('monzo-bank'),
-    args = require('yargs').argv;
+    args = require('yargs').argv,
+    Exporter = require('./exporter');
 
 var categories = {
     general:       '', // TODO inspect
@@ -98,35 +99,30 @@ monzo.accounts(args.token).then(function (response) {
       since:      timestamp(args.from),
       before:     timestamp(args.to)
     }, args.token).then(function (response) {
-        var head = [
-            '!Account',
-            'NMonzo',
-            'TBank',
-            '^',
-            '!Type:Bank'
-        ];
+        var exporter = Exporter({
+            format:  args.format || 'qif',
+            name:    'monzo',
+            account: 'Monzo'
+        });
 
-        var qif = response.transactions.reduce(function (file, transaction) {
+        exporter.write(response.transactions.map(function (transaction) {
             if (
                 transaction.decline_reason // failed
                 || !transaction.amount // zero amount transaction
                 || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id) // ignore topups
             ) {
-                return file;
+                return false;
             }
 
-            return file.concat([
-                'D' + date(transaction.created),
-                'T' + (transaction.amount / 100).toFixed(2),
-                'M' + (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                'P' + payee(transaction),
-                'L' + (category(transaction) || ''),
-                'N' + transaction.dedupe_id,
-                '^'
-            ]);
-        }, head).join('\n');
+            return {
+                date:     date(transaction.created),
+                amount:   transaction.amount,
+                memo:     (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                payee:    payee(transaction),
+                category: (category(transaction) || ''),
+                id:       transaction.dedupe_id,
+            };
+        }));
 
-        fs.writeFileSync('monzo.qif', qif);
-        console.log('Wrote transactions to monzo.qif');
     }).catch(exit('transactions'));
 }).catch(exit('accounts'));
