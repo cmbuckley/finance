@@ -115,12 +115,15 @@ monzo.accounts(args.token).then(function (response) {
             }
 
             return {
-                date:     date(transaction.created),
-                amount:   transaction.amount,
-                memo:     (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                payee:    payee(transaction),
-                category: (category(transaction) || ''),
-                id:       transaction.dedupe_id,
+                date:        date(transaction.created),
+                amount:      transaction.amount,
+                memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                payee:       payee(transaction),
+                category:    (category(transaction) || ''),
+                id:          transaction.dedupe_id,
+                currency:    transaction.local_currency,
+                localAmount: transaction.local_amount,
+                rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
             };
         }));
 
