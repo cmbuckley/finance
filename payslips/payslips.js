@@ -57,6 +57,7 @@
     });
 
     if (date) {
+        date = new Date(date).toISOString().substr(0, 10);
         console.log('Payment date:', date);
     }
     else {
