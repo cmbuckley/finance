@@ -3,10 +3,13 @@ module.exports = function csv(transactions, options) {
 
     var head = [
         'Date',
-        'Name',
+        'Payee',
         'Amount',
+        'Category',
         'Currency',
-        'Rate'
+        'Rate',
+        'Comments',
+        'Number',
     ].join(separator);
 
     return transactions.reduce(function (file, transaction) {
@@ -14,8 +17,11 @@ module.exports = function csv(transactions, options) {
             transaction.date,
             transaction.payee,
             (transaction.localAmount / 100).toFixed(2),
+            transaction.category,
             transaction.currency || '',
-            transaction.rate || 1
+            transaction.rate || 1,
+            transaction.memo,
+            transaction.id
         ].join(separator));
     }, [head]).join('\n');
 };
