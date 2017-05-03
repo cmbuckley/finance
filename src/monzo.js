@@ -5,21 +5,19 @@ var fs = require('fs'),
 
 var categories = {
     general:       '', // TODO inspect
-    eating_out:    'Food:Eating Out',
     expenses:      'Job Expenses', // TODO expand
     bills:         'Bills',
     entertainment: 'Nights Out',
     groceries:     'Food:Groceries',
     holidays:      '', // TODO inspet
 
-    shopping:      function (transaction) {
-        if (transaction.merchant && transaction.merchant.metadata) {
-            switch (transaction.merchant.metadata.foursquare_category) {
-                case 'Gift Shop':
-                    return 'Gifts';
-            }
-        }
-    },
+    eating_out: foursquareCategory({
+        'Fried Chicken Joint':  'Food:Takeaway',
+        'Fast Food Restaurant': 'Food:Takeaway',
+    }, 'Food:Eating Out'),
+    shopping: foursquareCategory({
+        'Gift Shop':  'Gifts',
+    }),
     cash: lookup('local_currency', {
         '[Cash]':  'GBP',
         '[Euros]': 'EUR',
@@ -85,6 +83,18 @@ function lookup(key, matches, defaultValue) {
 
             return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
         }) || defaultValue || '';
+    };
+}
+
+function foursquareCategory(matches, defaultValue) {
+    return function (transaction) {
+        if (transaction.merchant && transaction.merchant.metadata) {
+            if (matches[transaction.merchant.metadata.foursquare_category]) {
+                return matches[transaction.merchant.metadata.foursquare_category];
+            }
+        }
+
+        return defaultValue;
     };
 }
 
