@@ -37,8 +37,40 @@ var categories = {
     }
 };
 
-var users = {
-    'user_00009AJ5zA1joAasHukGHp': 'Emilia Lewandowska'
+var payees = {
+    'user_00009AJ5zA1joAasHukGHp':  'Emilia Lewandowska',
+    'merch_00009Bg3D0Oad72qvUzIaf': '360 Champagne & Cocktails',
+    'merch_000097xkqhwA5jRg7CFfWr': 'Aldi Meanwood',
+    'merch_0000990GI2UdIxOHZ0imeH': 'Asda Meanwood',
+    'merch_0000988NR1FJWBTmNVhymv': 'Be At One',
+    'merch_00009AfKXYRTDHvfIwRkCP': 'Centre Fillings',
+    'merch_00009G71vc2vEq6wB5HCzZ': 'Chop’d',
+    'merch_000094JaGKXCiLMc07WsgD': 'Co-op West Point',
+    'merch_000094JXvvv4K5uk3ZP51d': 'Co-op West Point',
+    'merch_00009A4aZnkjfXwJ8n3l2H': 'East Of Arcadia',
+    'merch_00009DRKIRqEtFp9lGf59d': 'Greggs West Point',
+    'merch_000096r2vn2ExM3jIyEayP': 'Jack-Pots',
+    'merch_000098QgS241MGxWmpG0aP': 'KFC Meanwood',
+    'merch_00009AOjSpmwUHRbn5pman': 'Lamb and Flag',
+    'merch_000097EJ1GK7YcvE25lEsT': 'Lazy Lounge',
+    'merch_00009GObREBWI0wRotPFdh': 'Manahatta',
+    'merch_00009BDH6FvuECknBk8a3t': 'Meanwood News & Booze',
+    'merch_00009ECud6e5cVz8YM1BY1': 'M&S West Point',
+    'merch_00009763yUkQQ2TdXVt2Ez': 'NCP Wellington Place',
+    'merch_000095vJZbIaLB9GKSHtGD': 'Primark Trinity',
+    'merch_000097UehpOkkQ64ajMKXJ': 'Roxy Ball Room',
+    'merch_000098VN7LfYLOZEAh2Hcf': 'Sainsbury’s Headingley',
+    'merch_000094NTIBzJXTwhrzdPzV': 'Sociable Folk',
+    'merch_000097ObP3kJiHGndj0rb7': 'Sociable Folk',
+    'merch_00009A1v5OMt01lXXeGNSz': 'Tasty Toasties',
+    'merch_0000971JeEhmyxIOu02CK9': 'Tesco Metro Leeds',
+    'merch_00009AGs9hSwYET4ndke8H': 'The Brewery Tap',
+    'merch_00009EBn96CzmqFMGNWU4X': 'The Central',
+    'merch_00009DCyOGEM3SJbiX94SX': 'The Good Luck Club',
+    'merch_00009FQAj83jRq9OMeSQDJ': 'The Good Luck Club',
+    'merch_00009GYf1bqa2A3D4jFcS9': 'Veeno',
+    'merch_000096mrXRnKOsgt6mLH5l': 'Waitrose Meanwood',
+    'merch_000094JfXOmaflIKJZOwKn': 'Wasabi Leeds',
 };
 
 function lookup(key, matches, defaultValue) {
@@ -85,8 +117,12 @@ function payee(transaction) {
     }
 
     // some transactions are missing names
-    if (transaction.counterparty.user_id && users[transaction.counterparty.user_id]) {
-        return users[transaction.counterparty.user_id];
+    if (transaction.counterparty.user_id && payees[transaction.counterparty.user_id]) {
+        return payees[transaction.counterparty.user_id];
+    }
+
+    if (transaction.merchant.id && payees[transaction.merchant.id]) {
+        return payees[transaction.merchant.id];
     }
 
     return '';
