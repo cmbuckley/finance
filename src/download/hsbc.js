@@ -36,7 +36,7 @@ function login(credentials) {
     });
 }
 
-function download() {
+function download(creditCard) {
     if (casper.exists('.hsbcTextHighlightError')) {
         var errors = {
                 '823': 'No transactions in range',
@@ -63,7 +63,6 @@ function download() {
     if (casper.exists(label)) {
         casper.click(label);
 
-        // todo check for recent transactions dropdown
         casper.then(function () {
             var formValues = {downloadType: 'M_QIF'},
                 previousPeriodSelector = '#transactionPeriodSelected option:nth-child(3)';
@@ -72,7 +71,7 @@ function download() {
             this.info('  Selecting QIF format');
 
             // credit card has different form options
-            if (this.exists('#transactionPeriodSelected')) {
+            if (creditCard) {
                 if (errorCode === 'ES0') {
                     // no recent transactions - select previous statement
                     this.info('  Selecting ' + this.fetchText(previousPeriodSelector).trim() + ' period');
@@ -80,27 +79,39 @@ function download() {
                 }
 
                 formValues = {
+                    es_iid: this.getElementAttribute('input[name="es_iid"]', 'value'),
                     transactionPeriodSelected: selectedPeriod,
                     formats: 'QIF1'
                 };
             }
 
-            this.fill('.containerMain form', formValues, true);
-        });
+            // fill the form and submit
+            this.fill('.containerMain form', formValues, !creditCard);
 
-        casper.then(function () {
-            var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
-                name = this.getHTML('.hsbcAccountType').trim();
-
-            if (/\d+/.test(name)) {
-                name = 'Credit Card';
+            if (creditCard) {
+                this.clickLabel('Download transactions');
             }
-
-            this.info('  Downloading file');
-            this.info(url);
-            output.add(name, casper.getContents(url, 'POST'));
         });
+
+        if (creditCard) {
+            casper.waitForUrl('downloadtransaction=', downloadFile);
+        }
+        else {
+            casper.then(downloadFile);
+        }
     }
+}
+
+function downloadFile() {
+    var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
+        name = this.getHTML('.hsbcAccountType').trim();
+
+    if (/\d+/.test(name)) {
+        name = 'Credit Card';
+    }
+
+    this.info('  Downloading file');
+    output.add(name, casper.getContents(url, 'POST'));
 }
 
 function listTransactions(type, from, to, output) {
@@ -133,11 +144,13 @@ function listTransactions(type, from, to, output) {
                     toDateYear:    toDate.getFullYear()
                 }, true);
 
-                this.waitForUrl('OnSelectDateThsTransactionsCommand', download);
+                this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
+                    download();
+                });
             }
             else {
                 this.info('  Selecting recent transactions');
-                download();
+                download(true);
             }
         });
 
@@ -157,7 +170,10 @@ function logout() {
 }
 
 // log out on error
-casper.on('error', logout);
+casper.on('error', function (msg, trace) {
+    this.warning(msg);
+    logout();
+});
 
 exports.download = function (credentials, from, to, output) {
     login(credentials);
@@ -176,7 +192,7 @@ exports.download = function (credentials, from, to, output) {
     casper.then(function () {
         this.info('Listing credit card accounts');
         listTransactions('credit-card-transactions', from, to, output);
-    })
+    });
 
     casper.then(logout);
 };
