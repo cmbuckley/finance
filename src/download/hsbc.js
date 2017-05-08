@@ -36,7 +36,9 @@ function login(credentials) {
     });
 }
 
-function download(creditCard) {
+function selectFileOptions(creditCard, from) {
+    casper.info('  Selecting file options');
+
     if (casper.exists('.hsbcTextHighlightError')) {
         var errors = {
                 '823': 'No transactions in range',
@@ -63,40 +65,44 @@ function download(creditCard) {
     if (casper.exists(label)) {
         casper.click(label);
 
-        casper.then(function () {
-            var formValues = {downloadType: 'M_QIF'},
-                previousPeriodSelector = '#transactionPeriodSelected option:nth-child(3)';
-                selectedPeriod = 'CURRENTPERIOD';
+        if (creditCard) {
+            casper.then(function () {
+                var previousPeriodSelector = '#transactionPeriodSelected option:nth-child(3)',
+                    selectedPeriod = 'CURRENTPERIOD';
 
-            this.info('  Selecting QIF format');
-
-            // credit card has different form options
-            if (creditCard) {
                 if (errorCode === 'ES0') {
-                    // no recent transactions - select previous statement
-                    this.info('  Selecting ' + this.fetchText(previousPeriodSelector).trim() + ' period');
+                    // no recent transactions - select previous statement - if date is relevant
                     selectedPeriod = this.getElementAttribute(previousPeriodSelector, 'value');
+
+                    if (selectedPeriod < from) {
+                        this.warning('  No transactions in range');
+                        selectedPeriod = false;
+                    }
+                    else {
+                        this.info('  Selecting ' + this.fetchText(previousPeriodSelector).trim() + ' period');
+                    }
                 }
 
-                formValues = {
-                    es_iid: this.getElementAttribute('input[name="es_iid"]', 'value'),
-                    transactionPeriodSelected: selectedPeriod,
-                    formats: 'QIF1'
-                };
-            }
+                if (selectedPeriod) {
+                    // fill the form (submit with js affter)
+                    this.fill('.containerMain form', {
+                        es_iid:                    this.getElementAttribute('input[name="es_iid"]', 'value'),
+                        transactionPeriodSelected: selectedPeriod,
+                        formats:                   'QIF1'
+                    });
 
-            // fill the form and submit
-            this.fill('.containerMain form', formValues, !creditCard);
-
-            if (creditCard) {
-                this.clickLabel('Download transactions');
-            }
-        });
-
-        if (creditCard) {
-            casper.waitForUrl('downloadtransaction=', downloadFile);
+                    this.clickLabel('Download transactions');
+                    this.waitForUrl('downloadtransaction=', downloadFile);
+                }
+            });
         }
         else {
+            casper.then(function () {
+                this.fill('.containerMain form', {
+                    downloadType: 'M_QIF'
+                }, true);
+            });
+
             casper.then(downloadFile);
         }
     }
@@ -145,12 +151,12 @@ function listTransactions(type, from, to, output) {
                 }, true);
 
                 this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
-                    download();
+                    selectFileOptions();
                 });
             }
             else {
                 this.info('  Selecting recent transactions');
-                download(true);
+                selectFileOptions(true, from);
             }
         });
 
