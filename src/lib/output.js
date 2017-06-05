@@ -3,7 +3,8 @@ var accounts = [],
         'HSBC ADVANCE': 'Current Account',
         'LOY ISA ADV':  'HSBC ISA',
         'MORTGAGE':     'Mortgage',
-        'PREF REG SAV': 'Regular Saver'
+        'PREF REG SAV': 'Regular Saver',
+        'FLEX SAV PRE': 'Flexible Saver'
     },
     transfers = {
         'Cash':            /^CASH/,
