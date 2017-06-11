@@ -23,8 +23,13 @@ module.exports = function exporter(options) {
 
     return {
         write: function (transactions) {
-            fs.writeFileSync(filename, adapter(transactions.filter(Boolean), options));
-            console.log('Wrote transactions to ' + filename);
+            console.log('Exporting to', filename);
+
+            adapter(transactions.filter(Boolean), options, function (err, contents) {
+                fs.writeFile(filename, contents, function () {
+                    console.log('Wrote transactions to', filename);
+                });
+            });
         }
     };
 };

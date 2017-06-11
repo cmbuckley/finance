@@ -1,4 +1,4 @@
-module.exports = function qif(transactions, options) {
+module.exports = function qif(transactions, options, callback) {
     var head = [
         '!Account',
         'N' + (options.account || 'Bank'),
@@ -7,7 +7,7 @@ module.exports = function qif(transactions, options) {
         '!Type:Bank'
     ];
 
-    return transactions.reduce(function (file, transaction) {
+    callback(null, transactions.reduce(function (file, transaction) {
         return file.concat([
             'D' + transaction.date,
             'T' + (transaction.amount / 100).toFixed(2),
@@ -17,5 +17,5 @@ module.exports = function qif(transactions, options) {
             'N' + transaction.id,
             '^'
         ]);
-    }, head).join('\n');
+    }, head).join('\n'));
 };

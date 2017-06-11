@@ -1,6 +1,6 @@
-module.exports = function csv(transactions, options) {
-    var separator = options.separator || ',';
+var stringify = require('csv-stringify');
 
+module.exports = function csv(transactions, options, callback) {
     var head = [
         'Date',
         'Payee',
@@ -10,10 +10,10 @@ module.exports = function csv(transactions, options) {
         'Rate',
         'Comments',
         'Number',
-    ].join(separator);
+    ];
 
-    return transactions.reduce(function (file, transaction) {
-        return file.concat([
+    stringify([head].concat(transactions.map(function (transaction) {
+        return [
             transaction.date,
             transaction.payee,
             (transaction.localAmount / 100).toFixed(2),
@@ -22,6 +22,8 @@ module.exports = function csv(transactions, options) {
             transaction.rate || 1,
             transaction.memo,
             transaction.id
-        ].join(separator));
-    }, [head]).join('\n');
+        ];
+    })), {
+        delimiter: options.delimiter
+    }, callback);
 };

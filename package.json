@@ -5,20 +5,18 @@
   "private": true,
   "author": "Chris Buckley <chris@cmbuckley.co.uk>",
   "engines": {
-    "node": ">= 0.8.x"
+    "npm": ">2.0.0"
   },
   "scripts": {
     "test": "mocha --recursive test",
     "casper": "PHANTOMJS_EXECUTABLE=node_modules/.bin/phantomjs casperjs src/download.js",
     "monzo": "node src/monzo.js"
   },
-  "engines": {
-    "npm": ">2.0.0"
-  },
   "dependencies": {
     "casperjs": "~1.1.3",
-    "phantomjs-prebuilt": "~2.1.12",
+    "csv-stringify": "^1.0.4",
     "monzo-bank": "~0.1.12",
+    "phantomjs-prebuilt": "~2.1.12",
     "yargs": "~6.4.0"
   },
   "devDependencies": {
