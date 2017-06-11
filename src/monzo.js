@@ -100,8 +100,8 @@ function foursquareCategory(matches, defaultValue) {
 
 function exit(scope) {
     return function (err) {
-        console.error('Error with', scope, '-', err);
-        throw new Error(err.error.message);
+        console.error('Error with', scope);
+        console.error(err.stack);
     };
 }
 
@@ -131,7 +131,7 @@ function payee(transaction) {
         return payees[transaction.counterparty.user_id];
     }
 
-    if (transaction.merchant.id && payees[transaction.merchant.id]) {
+    if (transaction.merchant && transaction.merchant.id && payees[transaction.merchant.id]) {
         return payees[transaction.merchant.id];
     }
 
