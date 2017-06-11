@@ -34,6 +34,7 @@
                     'T' + (row.a / 100).toFixed(2),
                     'M' + row.m,
                     'L' + (transfers[row.m] ? '[' + transfers[row.m] + ']' : row.c),
+                    'P' + row.p,
                     '^'
                 ]);
             }, head).join('\n');
@@ -57,7 +58,7 @@
     });
 
     if (date) {
-        date = new Date(date).toISOString().substr(0, 10);
+        date = new Date(date + ' 00:00:00+00:00').toISOString().substr(0, 10);
         console.log('Payment date:', date);
     }
     else {
@@ -88,7 +89,7 @@
                     if (description && amount != 0) {
                         file.push({
                             d: date,
-                            p: 0,
+                            p: getPayee(description),
                             m: description,
                             a: amount,
                             c: getCategory(description)
@@ -139,6 +140,14 @@
             'Employee NI':               'Insurance:NI',
             'Pennies From Heaven':       'Donations'
         }[text] || '';
+    }
+
+    function getPayee(text) {
+        if (getCategory(text).split(':')[0] == 'Salary') {
+            return 'Sky Bet';
+        }
+
+        return '';
     }
 
     var type = 'qif';
