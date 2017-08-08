@@ -3,6 +3,8 @@ var fs = require('fs'),
     args = require('yargs').argv,
     Exporter = require('./exporter');
 
+monzo.setHost('https://internal-api.monzo.com');
+
 var categories = {
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
@@ -19,9 +21,9 @@ var categories = {
         'Gift Shop':  'Gifts',
     }),
     cash: lookup('local_currency', {
-        '[Cash]':  'GBP',
-        '[Euros]': 'EUR',
-        '[Złoty]': 'PLN'
+        [transfer('Cash')]:  'GBP',
+        [transfer('Euros')]: 'EUR',
+        [transfer('Złoty')]: 'PLN'
     }, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
@@ -31,7 +33,7 @@ var categories = {
         'Car:Parking': /NCP LIMITED|CAR PARK/
     }),
     mondo: function (transaction) {
-        return (transaction.amount > 0 && !transaction.counterparty.user_id && transaction.is_load ? '[Current Account]' : '');
+        return (transaction.amount > 0 && !transaction.counterparty.user_id && transaction.is_load ? transfer('Current Account') : '');
     }
 };
 
@@ -71,6 +73,15 @@ var payees = {
     'merch_000096mrXRnKOsgt6mLH5l': 'Waitrose Meanwood',
     'merch_000094JfXOmaflIKJZOwKn': 'Wasabi Leeds',
 };
+
+function transfer(account) {
+    // transfer as category not supported with CSV import
+    if (args.format == 'csv') {
+        return '';
+    }
+
+    return '[' + account + ']';
+}
 
 function lookup(key, matches, defaultValue) {
     return function (transaction) {
