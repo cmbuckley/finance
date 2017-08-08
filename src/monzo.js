@@ -37,6 +37,7 @@ var categories = {
 
 var payees = {
     'user_00009AJ5zA1joAasHukGHp':  'Emilia Lewandowska',
+    'user_000096wneGBzTkXmQ30qiP':  'Marc Easen',
     'merch_00009Bg3D0Oad72qvUzIaf': '360 Champagne & Cocktails',
     'merch_000097xkqhwA5jRg7CFfWr': 'Aldi Meanwood',
     'merch_0000990GI2UdIxOHZ0imeH': 'Asda Meanwood',
@@ -101,7 +102,7 @@ function foursquareCategory(matches, defaultValue) {
 function exit(scope) {
     return function (err) {
         console.error('Error with', scope);
-        console.error(err.stack);
+        console.error(err.stack || err.error);
     };
 }
 
@@ -127,8 +128,12 @@ function payee(transaction) {
     }
 
     // some transactions are missing names
-    if (transaction.counterparty.user_id && payees[transaction.counterparty.user_id]) {
-        return payees[transaction.counterparty.user_id];
+    if (transaction.counterparty.user_id) {
+        if (payees[transaction.counterparty.user_id]) {
+            return payees[transaction.counterparty.user_id];
+        }
+
+        console.log('Unknown user', transaction.counterparty.user_id + ':', transaction.notes);
     }
 
     if (transaction.merchant && transaction.merchant.id && payees[transaction.merchant.id]) {
@@ -155,7 +160,7 @@ monzo.accounts(args.token).then(function (response) {
             if (
                 transaction.decline_reason // failed
                 || !transaction.amount // zero amount transaction
-                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id) // ignore topups
+                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
             ) {
                 return false;
             }
