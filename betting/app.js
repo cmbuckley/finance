@@ -153,7 +153,7 @@
 
                 bet = utils.text(el.querySelector('.bet-confirmation-amounts'));
                 console.debug('Parsing stake/returns:', bet.replace(/\s+/g, ' '));
-                betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns:\D*([\d\.]*)/);
+                betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns?:\D*([\d\.]*)/);
 
                 if (~bet.indexOf('Unit Stake')) {
                     type = 'E/W Single';
