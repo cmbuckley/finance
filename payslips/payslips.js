@@ -143,7 +143,7 @@
     }
 
     function getPayee(text) {
-        if (getCategory(text).split(':')[0] == 'Salary') {
+        if (getCategory(text).split(':')[0] == 'Salary' || text == 'Pennies From Heaven') {
             return 'Sky Bet';
         }
 
