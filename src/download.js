@@ -31,9 +31,14 @@ casper.getContents = function (url, method) {
     };
 });
 
-casper.on('error', function (msg) {
-    this.warning(msg);
-    fs.write('casper-debug.html', this.getHTML());
+['error', 'timeout', 'waitFor.timeout'].forEach(function (event) {
+    casper.on(event, function (msg) {
+        if (typeof msg == 'string') {
+            this.warning(msg);
+        }
+
+        fs.write('casper-debug.html', this.getHTML());
+    });
 });
 
 casper.start();
