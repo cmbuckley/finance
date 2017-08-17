@@ -43,6 +43,10 @@ function login(credentials) {
     });
 }
 
+function getDate(date) {
+    return date.toISOString().substr(0, 10).split('-').reverse().join('/');
+}
+
 function selectFileOptions(creditCard, from) {
     casper.info('  Selecting file options');
 
@@ -116,19 +120,15 @@ function selectFileOptions(creditCard, from) {
 }
 
 function downloadFile() {
-    var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
-        name = this.getHTML('.hsbcAccountType').trim();
-
-    if (/\d+/.test(name)) {
-        name = 'Credit Card';
-    }
+    var url  = this.getElementAttribute('form[name$="downloadForm"]', 'action');
 
     this.info('  Downloading file');
-    output.add(name, casper.getContents(url, 'POST'));
+    output.add('Joint 1st Account', casper.getContents(url, 'POST'));
 }
 
-function listTransactions(type, from, to, output) {
-    var selector = 'form[action$="' + type + '"]';
+function listTransactions(from, to, output) {
+    var type = 'sLink',
+        selector = 'form#vcpost10[action$="' + type + '"]';
 
     casper.getElementsInfo(selector).forEach(function (account, accountIndex, accounts) {
         casper.then(function () {
@@ -138,39 +138,33 @@ function listTransactions(type, from, to, output) {
             this.fill('#' + account.attributes.id, {}, true);
         });
 
-        // wait for the transactions page
+        // click the download link
         casper.waitForUrl(type, function () {
+            this.fill('#vcpost5', {}, true);
+        });
+
+        casper.waitForText('download transactions', function () {
             var fromDate = new Date(from),
-                toDate   = (to ? new Date(to) : new Date()),
-                formSelector = '.containerMain .extContentHighlightPib form';
+                toDate   = (to ? new Date(to) : new Date());
 
-            if (this.exists(formSelector)) {
-                this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
+            // can't download transactions from today
+            if (!to) { toDate.setDate(toDate.getDate() - 1); }
+            this.info('  Selecting dates: ' + from + ' - ' + (to || 'yesterday'));
 
-                // all javascript form submission does here is validate the form
-                this.fill(formSelector, {
-                    fromDateDay:   fromDate.getDate(),
-                    fromDateMonth: fromDate.getMonth() + 1,
-                    fromDateYear:  fromDate.getFullYear(),
-                    toDateDay:     toDate.getDate(),
-                    toDateMonth:   toDate.getMonth() + 1,
-                    toDateYear:    toDate.getFullYear()
-                }, true);
+            this.fill('form', {
+                DownloadFromDate: fromDate.toISOString().substr(0, 10).split('-').reverse().join('/'),
+                DownloadToDate:   toDate.toISOString().substr(0, 10).split('-').reverse().join('/'),
+                DownloadFormat:   'Quicken 98 [m/d/y]',
+            });
 
-                this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
-                    selectFileOptions();
-                });
-            }
-            else {
-                this.info('  Selecting recent transactions');
-                selectFileOptions(true, from);
-            }
+            this.clickLabel('download');
+            this.waitForSelector('form[name$="downloadForm"]', downloadFile);
         });
 
         // back to the accounts page for the next iteration
-        casper.then(function () {
+        /*casper.then(function () {
             this.clickLabel('My accounts');
-        });
+        });*/
     });
 }
 
@@ -190,18 +184,9 @@ exports.download = function (credentials, from, to, output) {
 
     // need to wait for login and token migration
     casper.waitForText('my accounts', function () {
-        this.echo('Done!');
+        this.info('Listing accounts');
+        listTransactions(from, to, output);
     });
-
-    /*casper.then(function () {
-        this.info('Listing regular accounts');
-        listTransactions('recent-transaction', from, to, output);
-    });
-
-    casper.then(function () {
-        this.info('Listing credit card accounts');
-        listTransactions('credit-card-transactions', from, to, output);
-    });*/
 
     casper.then(logout);
 };
