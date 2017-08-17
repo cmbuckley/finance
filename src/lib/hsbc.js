@@ -1,23 +1,3 @@
-config = {
-    hsbc: {
-        name: 'HSBC',
-        url: 'http://www.hsbc.co.uk/1/2/personal/pib-home',
-        labels: {
-            welcome: 'Log on to Online Banking',
-            withoutKey: 'Without Secure Key',
-            logout: 'Log Out',
-        },
-        password: {
-            selector: 'input.active',
-            iterator: function (field, casper) {
-                var pos = +field.substr(-1);
-                return pos - (pos > 6 ? 9 : 1);
-            }
-        }
-
-    }
-};
-
 function Adapter(casper, config) {
     this.config = config;
     this.casper = casper;
