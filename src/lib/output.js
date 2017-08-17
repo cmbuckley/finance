@@ -1,10 +1,11 @@
 var accounts = [],
     names = {
-        'HSBC ADVANCE': 'Current Account',
-        'LOY ISA ADV':  'HSBC ISA',
-        'MORTGAGE':     'Mortgage',
-        'PREF REG SAV': 'Regular Saver',
-        'FLEX SAV PRE': 'Flexible Saver'
+        'HSBC ADVANCE':      'Current Account',
+        'LOY ISA ADV':       'HSBC ISA',
+        'MORTGAGE':          'Mortgage',
+        'PREF REG SAV':      'Regular Saver',
+        'FLEX SAV PRE':      'Flexible Saver',
+        'Joint 1st Account': 'Shared Account'
     },
     transfers = {
         'Cash':            /^CASH/,
@@ -15,7 +16,8 @@ var accounts = [],
         'Mortgage':        /MTG 400188[0-9]{4}9172/,
         'Monzo':           /MONZO/,
         'PayPal':          /PAYPAL/,
-        'Payslips':        'HESTVIEW'
+        'Payslips':        'HESTVIEW',
+        'Shared Account':  'MR C BUCKLEY'
     };
 
 exports.load = function (content) {
@@ -28,7 +30,7 @@ exports.load = function (content) {
 exports.add = function (accountName, transactions) {
     accounts.push({
         name:         names[accountName] || accountName,
-        transactions: transactions
+        transactions: transactions.replace(/\r/g, '')
     });
 };
 

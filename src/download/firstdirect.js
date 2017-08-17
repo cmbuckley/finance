@@ -120,10 +120,11 @@ function selectFileOptions(creditCard, from) {
 }
 
 function downloadFile() {
-    var url  = this.getElementAttribute('form[name$="downloadForm"]', 'action');
+    var url  = this.getElementAttribute('form[name$="downloadForm"]', 'action'),
+        name = this.fetchText('.NORMALBLA[colspan="4"]').split(/\s+/).slice(3).join(' ');
 
     this.info('  Downloading file');
-    output.add('Joint 1st Account', casper.getContents(url, 'POST'));
+    output.add(name, this.getContents(url, 'POST'));
 }
 
 function listTransactions(from, to, output) {
