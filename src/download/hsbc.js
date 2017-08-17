@@ -13,6 +13,13 @@ var Adapter = require('../lib/hsbc'),
                 var pos = +field.substr(-1);
                 return pos - (pos > 6 ? 9 : 1);
             }
+        },
+        accountName: {
+            selector: '.hsbcAccountType',
+            modifier: function (name) {
+                name = name.trim();
+                return (/\d+/.test(name) ? 'Credit Card' : name);
+            }
         }
     });
 
@@ -72,7 +79,7 @@ function selectFileOptions(creditCard, from) {
                     });
 
                     this.clickLabel('Download transactions');
-                    this.waitForUrl('downloadtransaction=', downloadFile);
+                    this.waitForUrl('downloadtransaction=', adapter.downloadFile.bind(adapter));
                 }
             });
         }
@@ -83,24 +90,12 @@ function selectFileOptions(creditCard, from) {
                 }, true);
             });
 
-            casper.then(downloadFile);
+            casper.then(adapter.downloadFile.bind(adapter));
         }
     }
 }
 
-function downloadFile() {
-    var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
-        name = this.getHTML('.hsbcAccountType').trim();
-
-    if (/\d+/.test(name)) {
-        name = 'Credit Card';
-    }
-
-    this.info('  Downloading file');
-    output.add(name, this.getContents(url, 'POST'));
-}
-
-function listTransactions(type, from, to, output) {
+function listTransactions(type, from, to) {
     var selector = 'form[action$="' + type + '"]';
 
     casper.getElementsInfo(selector).forEach(function (account, accountIndex, accounts) {
@@ -162,6 +157,7 @@ casper.on('error', function (msg, trace) {
 });
 
 exports.download = function (credentials, from, to, output) {
+    adapter.setOutput(output);
     adapter.login(credentials);
 
     // need to wait for login and token migration
@@ -172,12 +168,12 @@ exports.download = function (credentials, from, to, output) {
 
     casper.then(function () {
         this.info('Listing regular accounts');
-        listTransactions('recent-transaction', from, to, output);
+        listTransactions('recent-transaction', from, to);
     });
 
     casper.then(function () {
         this.info('Listing credit card accounts');
-        listTransactions('credit-card-transactions', from, to, output);
+        listTransactions('credit-card-transactions', from, to);
     });
 
     casper.then(logout);

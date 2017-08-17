@@ -3,6 +3,10 @@ function Adapter(casper, config) {
     this.casper = casper;
 }
 
+Adapter.prototype.setOutput = function (output) {
+    this.output = output;
+};
+
 Adapter.prototype.login = function (credentials) {
     var config = this.config,
         casper = this.casper;
@@ -43,6 +47,14 @@ Adapter.prototype.login = function (credentials) {
 
         this.fill('form', values, true);
     });
+};
+
+Adapter.prototype.downloadFile = function () {
+    var url  = this.casper.getElementAttribute('form[name$="downloadForm"]', 'action'),
+        name = this.casper.fetchText(this.config.accountName.selector);
+
+    this.casper.info('  Downloading file');
+    this.output.add(this.config.accountName.modifier(name), casper.getContents(url, 'POST'));
 };
 
 Adapter.prototype.logout = function () {
@@ -125,18 +137,6 @@ function selectFileOptions(creditCard, from) {
             casper.then(downloadFile);
         }
     }
-}
-
-function downloadFile() {
-    var url  = this.getElementAttribute('.containerMain form[name$="downloadForm"]', 'action'),
-        name = this.getHTML('.hsbcAccountType').trim();
-
-    if (/\d+/.test(name)) {
-        name = 'Credit Card';
-    }
-
-    this.info('  Downloading file');
-    output.add(name, casper.getContents(url, 'POST'));
 }
 
 function listTransactions(type, from, to, output) {

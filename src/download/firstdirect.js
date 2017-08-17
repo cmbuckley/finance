@@ -17,6 +17,12 @@ var Adapter = require('../lib/hsbc'),
                     Last: -1
                 }[pos] : pos - 1);
             }
+        },
+        accountName: {
+            selector: '.NORMALBLA[colspan="4"]',
+            modifier: function (name) {
+                return name.split(/\s+/).slice(3).join(' ');
+            }
         }
     });
 
@@ -92,15 +98,7 @@ function selectFileOptions(creditCard, from) {
     }
 }
 
-function downloadFile() {
-    var url  = this.getElementAttribute('form[name$="downloadForm"]', 'action'),
-        name = this.fetchText('.NORMALBLA[colspan="4"]').split(/\s+/).slice(3).join(' ');
-
-    this.info('  Downloading file');
-    output.add(name, this.getContents(url, 'POST'));
-}
-
-function listTransactions(from, to, output) {
+function listTransactions(from, to) {
     var type = 'sLink',
         selector = 'form#vcpost10[action$="' + type + '"]';
 
@@ -132,7 +130,7 @@ function listTransactions(from, to, output) {
             });
 
             this.clickLabel('download');
-            this.waitForSelector('form[name$="downloadForm"]', downloadFile);
+            this.waitForSelector('form[name$="downloadForm"]', adapter.downloadFile.bind(adapter));
         });
 
         // back to the accounts page for the next iteration
@@ -154,12 +152,13 @@ casper.on('error', function (msg, trace) {
 });
 
 exports.download = function (credentials, from, to, output) {
+    adapter.setOutput(output);
     adapter.login(credentials);
 
     // need to wait for login and token migration
     casper.waitForText('my accounts', function () {
         this.info('Listing accounts');
-        listTransactions(from, to, output);
+        listTransactions(from, to);
     });
 
     casper.then(logout);
