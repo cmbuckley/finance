@@ -3,6 +3,7 @@ config = {
         name: 'HSBC',
         url: 'http://www.hsbc.co.uk/1/2/personal/pib-home',
         labels: {
+            welcome: 'Log on to Online Banking',
             withoutKey: 'Without Secure Key',
             logout: 'Log Out',
         },
@@ -14,38 +15,21 @@ config = {
             }
         }
 
-    },
-    firstdirect: {
-        name: 'first direct',
-        url: '',
-        labels: {
-            withoutKey: 'Without Secure Key',
-            logout: 'log off',
-        },
-        password: {
-            selector: 'input[name^="keyrcc_password"]',
-            iterator: function (field, casper) {
-                var pos = casper.fetchText('label[for="' + field + '"]').match(/\d+|[a-z]+/i);
-
-                return (isNaN(+pos) ? {
-                    penultimate: -2,
-                    Last: 1
-                }[pos] : pos - 1);
-            }
-        }
     }
 };
 
-function Adapter(adapter, casper) {
-    this.config = config[adapter];
+function Adapter(casper, config) {
+    this.config = config;
     this.casper = casper;
 }
 
-Adapter.protoype.login = function (credentials) {
+Adapter.prototype.login = function (credentials) {
     var config = this.config,
-        casper = this.caspter;
+        casper = this.casper;
 
-    casper.thenOpen(config.url, function () {
+    casper.thenOpen(config.url);
+
+    casper.waitForText(config.labels.welcome, function () {
         this.info('Logging in to ' + config.name);
         this.fill('form', {userid: credentials.userid}, true);
     });
@@ -74,7 +58,7 @@ Adapter.protoype.login = function (credentials) {
 
         // build form values. build password field manually to avoid onsubmit javascript
         this.getElementsAttribute(config.password.selector, 'id').forEach(function (field) {
-            values.password += values[field] = credentials.password.substr(config.password.iterator(field, this));
+            values.password += values[field] = credentials.password.substr(config.password.iterator(field), 1);
         });
 
         this.fill('form', values, true);
@@ -89,13 +73,7 @@ Adapter.prototype.logout = function () {
     }
 };
 
-module.exports = function (adapter, casper) {
-    if (!config[adapter]) {
-        throw new Error('Invalid adapter: ' + adapter);
-    }
-
-    return new Adapter(adapter, casper);
-};
+module.exports = Adapter;
 
 function selectFileOptions(creditCard, from) {
     casper.info('  Selecting file options');

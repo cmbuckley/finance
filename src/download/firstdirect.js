@@ -1,51 +1,24 @@
-function login(credentials) {
-    casper.thenOpen('https://www.firstdirect.com/1/2/idv.Logoff?nextPage=fsdtBalances');
+var Adapter = require('../lib/hsbc'),
+    adapter = new Adapter(casper, {
+        name: 'first direct',
+        url: 'https://www.firstdirect.com/1/2/idv.Logoff?nextPage=fsdtBalances',
+        labels: {
+            welcome: 'Welcome to Internet Banking',
+            withoutKey: 'Log on without your Secure Key',
+            logout: 'log off',
+        },
+        password: {
+            selector: 'input[name^="keyrcc_password"]',
+            iterator: function (field) {
+                var pos = casper.fetchText('label[for="' + field + '"]').match(/\d+|[a-z]+/i);
 
-    casper.waitForText('Welcome to Internet Banking', function () {
-        this.info('Logging in to first direct');
-        this.fill('form', {userid: credentials.userid}, true);
-    });
-
-    // occasional interstitial page
-    casper.then(function () {
-        if (this.exists('#tempForm')) {
-            this.info('Submitting login form');
-            this.fill('#tempForm', {}, true);
+                return (isNaN(+pos) ? {
+                    penultimate: -2,
+                    Last: -1
+                }[pos] : pos - 1);
+            }
         }
     });
-
-    casper.then(function () {
-        this.info('Proceeding without Secure Key');
-        this.clickLabel('Log on without your Secure Key');
-    });
-
-    // password form
-    casper.then(function () {
-        var values = {
-            memorableAnswer: credentials.memorableAnswer,
-            password:        '',
-        };
-
-        this.info('Entering password');
-
-        // build form values. build password field manually to avoid onsubmit javascript
-        this.getElementsAttribute('input[type="password"][name^="keyrcc_password"]', 'id').forEach(function (field) {
-            var pos = casper.fetchText('label[for="' + field + '"]').match(/\d+|[a-z]+/i);
-
-            if (isNaN(+pos)) {
-                pos = {penultimate: -1, Last: 0}[pos];
-            }
-
-            values.password += values[field] = credentials.password.substr(pos - 1, 1);
-        });
-
-        this.fill('form', values, true);
-    });
-}
-
-function getDate(date) {
-    return date.toISOString().substr(0, 10).split('-').reverse().join('/');
-}
 
 function selectFileOptions(creditCard, from) {
     casper.info('  Selecting file options');
@@ -181,7 +154,7 @@ casper.on('error', function (msg, trace) {
 });
 
 exports.download = function (credentials, from, to, output) {
-    login(credentials);
+    adapter.login(credentials);
 
     // need to wait for login and token migration
     casper.waitForText('my accounts', function () {
