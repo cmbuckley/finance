@@ -117,7 +117,7 @@ function downloadFile() {
     }
 
     this.info('  Downloading file');
-    output.add(name, casper.getContents(url, 'POST'));
+    output.add(name, this.getContents(url, 'POST'));
 }
 
 function listTransactions(type, from, to, output) {
@@ -185,7 +185,7 @@ exports.download = function (credentials, from, to, output) {
     login(credentials);
 
     // need to wait for login and token migration
-    casper.waitForUrl(/pib-home/, function () {
+    casper.waitForText('My accounts', function () {
         // click to expand and include the mortgage
         this.clickLabelContains('Show All');
     });
