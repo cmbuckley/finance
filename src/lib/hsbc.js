@@ -58,7 +58,8 @@ Adapter.prototype.downloadFile = function () {
 };
 
 Adapter.prototype.logout = function () {
-    var button = this.casper.getLabelContains(this.labels.logout);
+    var button = this.casper.getLabelContains(this.config.labels.logout);
+
     if (this.casper.exists(button)) {
         this.casper.info('Logging out');
         this.casper.click(button);

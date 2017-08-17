@@ -140,15 +140,10 @@ function listTransactions(from, to) {
     });
 }
 
-function logout() {
-    this.info('Logging out');
-    this.clickLabel('log off');
-}
-
 // log out on error
 casper.on('error', function (msg, trace) {
     this.warning(msg);
-    logout();
+    adapter.logout();
 });
 
 exports.download = function (credentials, from, to, output) {
@@ -161,5 +156,5 @@ exports.download = function (credentials, from, to, output) {
         listTransactions(from, to);
     });
 
-    casper.then(logout);
+    casper.then(adapter.logout.bind(adapter));
 };

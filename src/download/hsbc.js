@@ -5,7 +5,7 @@ var Adapter = require('../lib/hsbc'),
         labels: {
             welcome: 'Log on to Online Banking',
             withoutKey: 'Without Secure Key',
-            logout: 'Log Out',
+            logout: 'Log off',
         },
         password: {
             selector: 'input.active',
@@ -142,18 +142,10 @@ function listTransactions(type, from, to) {
     });
 }
 
-function logout() {
-    var button = this.getLabelContains('Log off');
-    if (this.exists(button)) {
-        this.info('Logging out');
-        this.click(button);
-    }
-}
-
 // log out on error
 casper.on('error', function (msg, trace) {
     this.warning(msg);
-    logout();
+    adapter.logout();
 });
 
 exports.download = function (credentials, from, to, output) {
@@ -176,5 +168,5 @@ exports.download = function (credentials, from, to, output) {
         listTransactions('credit-card-transactions', from, to);
     });
 
-    casper.then(logout);
+    casper.then(adapter.logout.bind(adapter));
 };
