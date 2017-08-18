@@ -14,7 +14,7 @@ if (options.verbose) {
 }
 
 casper.getLabelContains = function (text, selector) {
-    return Casper.selectXPath('//' + (selector || '*') + '[contains(text(), "' + text + '")]');
+    return Casper.selectXPath('//' + (selector || '*') + '[text()[contains(., "' + text + '")]]');
 };
 
 casper.clickLabelContains = function (text, selector) {

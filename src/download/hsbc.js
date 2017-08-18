@@ -14,11 +14,42 @@ var Adapter = require('../lib/hsbc'),
                 return pos - (pos > 6 ? 9 : 1);
             }
         },
+        accounts: {
+            selector: function (type) {
+                return 'form[action$="' + type + '"]';
+            },
+            callback: function (from, to) {
+                var fromDate = new Date(from),
+                    toDate   = (to ? new Date(to) : new Date()),
+                    formSelector = '.containerMain .extContentHighlightPib form';
+
+                if (this.exists(formSelector)) {
+                    this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
+
+                    // all javascript form submission does here is validate the form
+                    this.fill(formSelector, {
+                        fromDateDay:   fromDate.getDate(),
+                        fromDateMonth: fromDate.getMonth() + 1,
+                        fromDateYear:  fromDate.getFullYear(),
+                        toDateDay:     toDate.getDate(),
+                        toDateMonth:   toDate.getMonth() + 1,
+                        toDateYear:    toDate.getFullYear()
+                    }, true);
+
+                    this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
+                        selectFileOptions();
+                    });
+                }
+                else {
+                    this.info('  Selecting recent transactions');
+                    selectFileOptions(true, from);
+                }
+            }
+        },
         accountName: {
             selector: '.hsbcAccountType',
             modifier: function (name) {
-                name = name.trim();
-                return (/\d+/.test(name) ? 'Credit Card' : name);
+                return (/[\d\s]+/.test(name) ? 'Credit Card' : name.trim());
             }
         }
     });
@@ -95,59 +126,6 @@ function selectFileOptions(creditCard, from) {
     }
 }
 
-function listTransactions(type, from, to) {
-    var selector = 'form[action$="' + type + '"]';
-
-    casper.getElementsInfo(selector).forEach(function (account, accountIndex, accounts) {
-        casper.then(function () {
-            // re-evaluate element info for this page - form IDs change each time
-            account = this.getElementsInfo(selector)[accountIndex];
-            this.info('Opening "' + account.html.match(/<a[^>]*>([^<]*)<\/a>/)[1] + '" account (' + (accountIndex + 1) + '/' + accounts.length + ')');
-            this.fill('#' + account.attributes.id, {}, true);
-        });
-
-        // wait for the transactions page
-        casper.waitForUrl(type, function () {
-            var fromDate = new Date(from),
-                toDate   = (to ? new Date(to) : new Date()),
-                formSelector = '.containerMain .extContentHighlightPib form';
-
-            if (this.exists(formSelector)) {
-                this.info('  Selecting dates: ' + from + ' - ' + (to || 'today'));
-
-                // all javascript form submission does here is validate the form
-                this.fill(formSelector, {
-                    fromDateDay:   fromDate.getDate(),
-                    fromDateMonth: fromDate.getMonth() + 1,
-                    fromDateYear:  fromDate.getFullYear(),
-                    toDateDay:     toDate.getDate(),
-                    toDateMonth:   toDate.getMonth() + 1,
-                    toDateYear:    toDate.getFullYear()
-                }, true);
-
-                this.waitForUrl('OnSelectDateThsTransactionsCommand', function () {
-                    selectFileOptions();
-                });
-            }
-            else {
-                this.info('  Selecting recent transactions');
-                selectFileOptions(true, from);
-            }
-        });
-
-        // back to the accounts page for the next iteration
-        casper.then(function () {
-            this.clickLabel('My accounts');
-        });
-    });
-}
-
-// log out on error
-casper.on('error', function (msg, trace) {
-    this.warning(msg);
-    adapter.logout();
-});
-
 exports.download = function (credentials, from, to, output) {
     adapter.setOutput(output);
     adapter.login(credentials);
@@ -160,12 +138,12 @@ exports.download = function (credentials, from, to, output) {
 
     casper.then(function () {
         this.info('Listing regular accounts');
-        listTransactions('recent-transaction', from, to);
+        adapter.getTransactions('recent-transaction', from, to);
     });
 
     casper.then(function () {
         this.info('Listing credit card accounts');
-        listTransactions('credit-card-transactions', from, to);
+        adapter.getTransactions('credit-card-transactions', from, to);
     });
 
     casper.then(adapter.logout.bind(adapter));
