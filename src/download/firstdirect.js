@@ -39,7 +39,7 @@ var Adapter = require('../lib/hsbc'),
                 this.fill('form', {
                     DownloadFromDate: fromDate.toISOString().substr(0, 10).split('-').reverse().join('/'),
                     DownloadToDate:   toDate.toISOString().substr(0, 10).split('-').reverse().join('/'),
-                    DownloadFormat:   'Quicken 98 [m/d/y]',
+                    DownloadFormat:   'Quicken 98 [d/m/y]',
                 });
 
                 this.clickLabel('download');

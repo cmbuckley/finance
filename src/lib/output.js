@@ -53,8 +53,15 @@ exports.get = function () {
 
             output += 'M' + memo;
         }
-        else if (line[0] == 'D' && line[3] == '/') {
-            output = 'D' + line.substr(1).split('/').reverse().join('/');
+        else if (line[0] == 'D' && /[-/]/.test(line[3])) {
+            output = 'D';
+
+            if (/[-/]\d{2}$/.test(line)) {
+                // 2 digit year assumed to be this century
+                output += (new Date()).getFullYear().toString().substr(0, 2);
+            }
+
+            output += line.substr(1).split(/[-/]/).reverse().join('/');
         }
         else if (line[0] != 'L') {
             output = line;

@@ -49,7 +49,7 @@ var Adapter = require('../lib/hsbc'),
         accountName: {
             selector: '.hsbcAccountType',
             modifier: function (name) {
-                return (/[\d\s]+/.test(name) ? 'Credit Card' : name.trim());
+                return (/^[\d\s]+$/.test(name) ? 'Credit Card' : name.trim());
             }
         }
     });
