@@ -38,7 +38,7 @@
         },
 
         download: function (name, format, rows) {
-            format = format || 'ofx';
+            format = format || 'qif';
 
             var a = exports.document.createElement('a'),
                 output = outputters[format](rows);
@@ -75,7 +75,8 @@
                 return data.concat([
                     'D' + row.date,
                     'T' + (row.amount / 100).toFixed(2),
-                    'M' + row.memo,
+                    'M' + row.memo.replace(/\n/g, ' - '),
+                    'P' + row.payee,
                     'L' + row.category,
                     'N' + row.id,
                     '^'
