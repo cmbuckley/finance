@@ -460,16 +460,21 @@
         skybet: {
             name: 'Sky Bet',
             getElements: function (callback) {
-                function _getElements() {
-                    var accountDoc = exports.document.getElementById('SkyBetAccount').contentDocument;
+                function _getElements(accountDoc) {
+                    accountDoc = accountDoc || exports.document.getElementById('SkyBetAccount').contentDocument;
                     callback(accountDoc.querySelectorAll('li.transaction'));
                 }
 
-                if (SkySSO.sba.ui.isOpen) {
-                    _getElements();
+                if (window.SkyBetAccount) {
+                    if (SkyBetAccount.sba.ui.isOpen) {
+                        _getElements();
+                    }
+                    else {
+                        SkyBetAccount.sba.ui.open('https://www.skybet.com/secure/identity/m/history/betting/skybet?settled=Y', _getElements, true);
+                    }
                 }
                 else {
-                    SkySSO.sba.ui.open('https://www.skybet.com/secure/identity/m/history/betting/skybet?settled=Y', _getElements, true);
+                    _getElements(exports.document);
                 }
             },
 
