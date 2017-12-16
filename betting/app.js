@@ -169,20 +169,20 @@
             getSelections: function (el) {
                 return utils.map(el.querySelectorAll('.bet-confirmation-table-body tr.DefaultLayout'), function (row) {
                     var cells = row.querySelectorAll('td'),
-                        event,
-                        eachWay;
+                        event, market, eachWay;
 
                     if (cells.length == 1) {
                         return false;
                     }
 
-                    event = cells[2].innerHTML.split(/<br\/?>/);
+                    event = cells[2].firstChild.nodeValue;
+                    market = cells[2].querySelector('.bet-confirmation-table-body-event-bet-type');
                     eachWay = cells[4].innerHTML.trim().replace(/&nbsp;|\s+/g, ' ').replace(/<br\/?>/, ', ');
 
                     return {
                         selection: utils.text(cells[1]),
-                        event:     event[0].trim(),
-                        market:    event[1].trim().replace(/[()]/g, ''),
+                        event:     event.trim(),
+                        market:    market.innerHTML.trim().replace(/[()]/g, ''),
                         date:      this._getDate(cells[3]),
                         eachWay:   (eachWay == 'None' ? false : eachWay),
                         odds:      utils.text(cells[5]),
@@ -398,11 +398,17 @@
                     }
 
                     var data = this._getData(el),
-                        selection = data.extra[data.extra.length - 3].split('@'),
+                        selection = data.extra[data.extra.length - 3],
                         event = data.extra[5].replace(/^(\d\d):(\d\d).*$/, function (_, h, m) {
                             return (h > 12 ? h - 12 : h) + '.' + m
                                 + ' ' + utils.titleCase(data.extra[4].toLowerCase());
-                        })
+                        });
+
+                    if (/Rule 4/.test(selection)) {
+                        selection = data.extra[data.extra.length - 4];
+                    }
+
+                    selection = selection.split('@');
 
                     return {
                         selection: selection[0].trim(),
