@@ -40,6 +40,11 @@ var categories = {
 var payees = {
     'user_00009AJ5zA1joAasHukGHp':  'Emilia Lewandowska',
     'user_000096wneGBzTkXmQ30qiP':  'Marc Easen',
+    'user_000096bGKmot5HcrIDKhCz':  'Craig Lumley',
+    'user_000098VBRbmovokAtMyQtd':  'James Starnes',
+    'user_00009E08wLax8TDl4Egi01':  'Kameil Lewis',
+    'user_00009LOheaZtAu2IUvNvZB':  'Grace Moran',
+
     'merch_00009Bg3D0Oad72qvUzIaf': '360 Champagne & Cocktails',
     'merch_000097xkqhwA5jRg7CFfWr': 'Aldi Meanwood',
     'merch_0000990GI2UdIxOHZ0imeH': 'Asda Meanwood',
@@ -134,17 +139,24 @@ function category(transaction) {
 }
 
 function payee(transaction) {
-    if (transaction.counterparty.name) {
-        return transaction.counterparty.name;
-    }
-
-    // some transactions are missing names
+    // use known payee name if we have one
     if (transaction.counterparty.user_id) {
         if (payees[transaction.counterparty.user_id]) {
             return payees[transaction.counterparty.user_id];
         }
 
-        console.log('Unknown user', transaction.counterparty.user_id + ':', transaction.notes);
+        if (!/^anonuser_/.test(transaction.counterparty.user_id)) {
+            console.log(
+                'Unknown user',
+                transaction.counterparty.user_id + ':',
+                transaction.counterparty.name || '',
+                transaction.notes ? '(' + transaction.notes + ')' : ''
+            );
+        }
+    }
+
+    if (transaction.counterparty.name) {
+        return transaction.counterparty.name;
     }
 
     if (transaction.merchant && transaction.merchant.id && payees[transaction.merchant.id]) {
