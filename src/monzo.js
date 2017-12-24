@@ -74,9 +74,13 @@ var payees = {
     'merch_00009EBn96CzmqFMGNWU4X': 'The Central',
     'merch_00009DCyOGEM3SJbiX94SX': 'The Good Luck Club',
     'merch_00009FQAj83jRq9OMeSQDJ': 'The Good Luck Club',
+    'merch_00009Oskpbr528t7HUlSOv': 'The Good Luck Club',
+    'merch_00009PUDDhjinyInrW6jOD': 'The Wardrobe',
+    'merch_000093dFPRryYOLRmI056P': 'Uber',
     'merch_00009GYf1bqa2A3D4jFcS9': 'Veeno',
     'merch_000096mrXRnKOsgt6mLH5l': 'Waitrose Meanwood',
     'merch_000094JfXOmaflIKJZOwKn': 'Wasabi Leeds',
+    'merch_00009NLT8p6Jkoib9mZVlR': 'Whitehall Rd Car Park',
 };
 
 function transfer(account) {
@@ -159,8 +163,16 @@ function payee(transaction) {
         return transaction.counterparty.name;
     }
 
-    if (transaction.merchant && transaction.merchant.id && payees[transaction.merchant.id]) {
-        return payees[transaction.merchant.id];
+    if (transaction.merchant && transaction.merchant.id) {
+        if (payees[transaction.merchant.id]) {
+            return payees[transaction.merchant.id];
+        }
+
+        console.log(
+            'Unknown merchant',
+            transaction.merchant.id + ':',
+            transaction.merchant.name || ''
+        );
     }
 
     return '';
@@ -194,7 +206,7 @@ monzo.accounts(args.token).then(function (response) {
                 memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
                 payee:       payee(transaction),
                 category:    (category(transaction) || ''),
-                id:          transaction.dedupe_id,
+                id:          transaction.id,
                 currency:    transaction.local_currency,
                 localAmount: transaction.local_amount,
                 rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
