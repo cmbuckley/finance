@@ -168,7 +168,7 @@ function payee(transaction) {
 
 monzo.accounts(args.token).then(function (response) {
     monzo.transactions({
-      account_id: response.accounts[0].id,
+      account_id: response.accounts[args.prepaid ? 0 : 1].id, // @todo improve
       expand:     'merchant',
       since:      timestamp(args.from),
       before:     timestamp(args.to)
