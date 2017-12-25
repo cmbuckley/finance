@@ -13,7 +13,7 @@ module.exports = function qif(transactions, options, callback) {
             'T' + (transaction.amount / 100).toFixed(2),
             'M' + transaction.memo,
             'P' + transaction.payee,
-            'L' + transaction.category,
+            'L' + (transaction.transfer ? '[' + transaction.transfer + ']' : transaction.category),
             'N' + transaction.id,
             '^'
         ]);

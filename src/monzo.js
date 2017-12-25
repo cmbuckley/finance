@@ -21,20 +21,24 @@ var categories = {
         'Gift Shop':  'Gifts',
     }),
     cash: lookup('local_currency', {
-        [transfer('Cash')]:  'GBP',
-        [transfer('Euros')]: 'EUR',
-        [transfer('Złoty')]: 'PLN'
+        'Cash':  'GBP',
+        'Euros': 'EUR',
+        'Złoty': 'PLN'
     }, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
         }
     }),
     transport: lookup('description', {
-        'Car:Parking': /NCP LIMITED|CAR PARK/
-    }),
-    mondo: function (transaction) {
-        return (transaction.amount > 0 && !transaction.counterparty.user_id && transaction.is_load ? transfer('Current Account') : '');
-    }
+        'Car:Parking': /NCP LIMITED|CAR PARK|YOURPARKINGSPACECOUK/,
+        'Travel:Taxi': /UBER/,
+    })
+};
+
+var transfers = {
+    '40-47-62 XXXX6141': 'Shared Account',
+    '40-44-01 XXXX5471': 'Current Account',
+    '23-52-62 XXXX9595': 'PayPal',
 };
 
 var payees = {
@@ -83,13 +87,34 @@ var payees = {
     'merch_00009NLT8p6Jkoib9mZVlR': 'Whitehall Rd Car Park',
 };
 
-function transfer(account) {
-    // transfer as category not supported with CSV import
-    if (args.format == 'csv') {
-        return '';
+function transfer(transaction) {
+    if (transaction.counterparty &&
+        transaction.counterparty.sort_code &&
+        transaction.counterparty.account_number
+    ) {
+        var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
+                + ' XXXX' + transaction.counterparty.account_number.substr(-4);
+
+        if (transfers[key]) {
+            return transfers[key];
+        }
     }
 
-    return '[' + account + ']';
+    if (transaction.category == 'cash') {
+        return lookup('local_currency', {
+            'Cash':  'GBP',
+            'Euros': 'EUR',
+            'Złoty': 'PLN'
+        })(transaction);
+    }
+
+    if (transaction.category == 'mondo' &&
+        transaction.amount > 0 &&
+        !transaction.counterparty.user_id
+        && transaction.is_load
+    ) {
+        return 'Current Account';
+    }
 }
 
 function lookup(key, matches, defaultValue) {
@@ -139,6 +164,7 @@ function category(transaction) {
                  ? categories[transaction.category]
                  : transaction.category);
 
+
     return ((typeof category == 'function') ? category(transaction) : category);
 }
 
@@ -159,20 +185,16 @@ function payee(transaction) {
         }
     }
 
-    if (transaction.counterparty.name) {
-        return transaction.counterparty.name;
-    }
-
     if (transaction.merchant && transaction.merchant.id) {
         if (payees[transaction.merchant.id]) {
             return payees[transaction.merchant.id];
         }
 
-        console.log(
+        /*console.log(
             'Unknown merchant',
             transaction.merchant.id + ':',
             transaction.merchant.name || ''
-        );
+        );*/
     }
 
     return '';
@@ -205,6 +227,7 @@ monzo.accounts(args.token).then(function (response) {
                 amount:      transaction.amount,
                 memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
                 payee:       payee(transaction),
+                transfer:    transfer(transaction),
                 category:    (category(transaction) || ''),
                 id:          transaction.id,
                 currency:    transaction.local_currency,
