@@ -60,7 +60,7 @@
     // output handlers
     var outputters = {
         qif: function (rows) {
-            var name = 'Betting',
+            var name = rows[0].payee || 'Betting',
                 type = 'Bank';
 
             var head = [
@@ -564,6 +564,90 @@
             },
         },
 
+        williamhill: {
+            name: 'William Hill',
+
+            getElements: function (callback) {
+                var rows = utils.$('.tableData tr')
+                    elements = [],
+                    winnings = {};
+
+                utils.each(rows, function (row) {
+                    var cells = row.querySelectorAll('td'),
+                        type, id;
+
+                    if (cells.length == 0) {
+                        return;
+                    }
+
+                    type = utils.text(cells[1]);
+                    id = utils.text(cells[4]);
+
+                    if (type == 'Bet Winnings') {
+                        winnings[id] = utils.text(cells[3]);
+                    }
+                    else if (type == 'Stake') {
+                        if (winnings[id]) {
+                            row.winnings = winnings[id];
+                        }
+
+                        elements.push(row);
+                    }
+                });
+
+                callback(elements);
+            },
+
+            getTransactionId: function (el) {
+                return utils.text(el.querySelectorAll('td')[4]).split('/')[2];
+            },
+
+            getTransactionDate: function (el) {
+                return this._getDate(utils.text(el.querySelector('td')));
+            },
+
+            getStake: function (el) {
+                return {
+                    type:    'Single',
+                    stake:   this._getAmount(utils.text(el.querySelectorAll('td')[3])),
+                    returns: this._getAmount(el.winnings)
+                };
+            },
+
+            getSelections: function (el) {
+                var data = utils.text(el.querySelector('td a')).split(' – ');
+
+                if (data.length == 2) {
+                    data.push(data[1]);
+                }
+
+                data[1] = data[1].split(' @ ')[0];
+                data[2] = data[2].split(' @ ')[1].replace(/^.*\(([^)]+)\)/, '$1');
+
+                // @todo multiples
+                return [{
+                    selection: data[1],
+                    market:    data[0],
+                    eachWay:   false, // @todo
+                    odds:      data[2],
+                    result:    (el.winnings ? 'Won' : 'Lost'),
+                }];
+            },
+
+            _getDate: function (text) {
+                var yearPrefix = new Date().getFullYear().toString().substr(0, 2),
+                    months = ['_','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+                return text.replace(/^(\d{2}) (\w{3}) (\d{2}).*/, function (_, d, m, y) {
+                    return d + '-' + ('0' + months.indexOf(m)).substr(-2) + '-' + yearPrefix + y;
+                });
+            },
+
+            _getAmount: function (str) {
+                return +((str || '0.00').match(/\d+\.\d+/)[0] * 100).toFixed(0);
+            }
+        },
+
         /*skeleton: {
             name: 'Skeleton',
             getElements: function (callback) {},
@@ -649,7 +733,9 @@
                     description += ' (E/W)';
                 }
 
-                description += eventSeparator + selection.event;
+                if (selection.event) {
+                    description += eventSeparator + selection.event;
+                }
 
                 if (selection.date && selection.date != data.date) {
                     description += ' (' + selection.date + ')';
