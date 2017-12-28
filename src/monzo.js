@@ -31,6 +31,7 @@ var categories = {
     }),
     transport: lookup('description', {
         'Car:Parking': /NCP LIMITED|CAR PARK|YOURPARKINGSPACECOUK/,
+        'Car:Petrol':  /MALTHURST LIMITED/,
         'Travel:Taxi': /UBER/,
     })
 };
@@ -39,6 +40,8 @@ var transfers = {
     '40-47-62 XXXX6141': 'Shared Account',
     '40-44-01 XXXX5471': 'Current Account',
     '23-52-62 XXXX9595': 'PayPal',
+
+    'grp_000092YBvG5KUEHWvN82gz': 'PayPal',
 };
 
 var payees = {
@@ -76,15 +79,15 @@ var payees = {
     'merch_0000971JeEhmyxIOu02CK9': 'Tesco Metro Leeds',
     'merch_00009AGs9hSwYET4ndke8H': 'The Brewery Tap',
     'merch_00009EBn96CzmqFMGNWU4X': 'The Central',
-    'merch_00009DCyOGEM3SJbiX94SX': 'The Good Luck Club',
-    'merch_00009FQAj83jRq9OMeSQDJ': 'The Good Luck Club',
-    'merch_00009Oskpbr528t7HUlSOv': 'The Good Luck Club',
     'merch_00009PUDDhjinyInrW6jOD': 'The Wardrobe',
     'merch_000093dFPRryYOLRmI056P': 'Uber',
     'merch_00009GYf1bqa2A3D4jFcS9': 'Veeno',
     'merch_000096mrXRnKOsgt6mLH5l': 'Waitrose Meanwood',
     'merch_000094JfXOmaflIKJZOwKn': 'Wasabi Leeds',
-    'merch_00009NLT8p6Jkoib9mZVlR': 'Whitehall Rd Car Park',
+
+    'grp_000092JYbSIkjviyjwdqtN':   'Amazon',
+    'grp_00009FQAj7ylkIBG7G8STh':   'The Good Luck Club',
+    'grp_00009FYpfFLo2y28d1sdvN':   'Whitehall Rd Car Park',
 };
 
 function transfer(transaction) {
@@ -98,6 +101,10 @@ function transfer(transaction) {
         if (transfers[key]) {
             return transfers[key];
         }
+    }
+
+    if (transaction.merchant && transfers[transaction.merchant.group_id]) {
+        return transfers[transaction.merchant.group_id];
     }
 
     if (transaction.category == 'cash') {
@@ -190,11 +197,17 @@ function payee(transaction) {
             return payees[transaction.merchant.id];
         }
 
-        /*console.log(
-            'Unknown merchant',
-            transaction.merchant.id + ':',
-            transaction.merchant.name || ''
-        );*/
+        if (payees[transaction.merchant.group_id]) {
+            return payees[transaction.merchant.group_id];
+        }
+
+        if (!transfer(transaction)) {
+            console.log(
+                'Unknown merchant',
+                transaction.merchant.id + '/' + transaction.merchant.group_id + ':',
+                transaction.merchant.name || ''
+            );
+        }
     }
 
     return '';
