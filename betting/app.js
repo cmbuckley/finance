@@ -152,6 +152,10 @@
                     type = utils.text(el.querySelector('.multiples-bet-information-bet-breakdown'));
                 }
 
+                if (el.querySelector('.bet-confirmation-table-body-bettype')) {
+                    type = utils.text(el.querySelector('.bet-confirmation-table-body-bettype'));
+                }
+
                 bet = utils.text(el.querySelector('.bet-confirmation-amounts'));
                 console.debug('Parsing stake/returns:', bet.replace(/\s+/g, ' '));
                 betMatch = bet.match(/Stake:\D+([\d\.]+)\D+Returns?:\D*([\d\.]*)/);
@@ -168,9 +172,9 @@
             },
 
             getSelections: function (el) {
-                return utils.map(el.querySelectorAll('.bet-confirmation-table-body tr.DefaultLayout'), function (row) {
+                return utils.map(el.querySelectorAll('.bet-confirmation-table-body tr'), function (row) {
                     var cells = row.querySelectorAll('td'),
-                        event, market, eachWay;
+                        selection, event, market, eachWay;
 
                     if (cells.length == 1) {
                         return false;
@@ -179,15 +183,24 @@
                     event = cells[2].firstChild.nodeValue;
                     market = cells[2].querySelector('.bet-confirmation-table-body-event-bet-type');
                     eachWay = cells[4].innerHTML.trim().replace(/&nbsp;|\s+/g, ' ').replace(/<br\/?>/, ', ');
+                    selection = utils.text(cells[1]);
+
+                    if (market) {
+                        market = market.innerHTML.trim().replace(/[()]/g, '');
+                    }
+                    else if (row.className == 'ForecastTricastLayout') {
+                        market = 'Forecast / Tricast';
+                        selection = cells[1].innerText.trim().replace(/ \(\d+\)/g, '').split('\n').join(', ');
+                    }
 
                     return {
-                        selection: utils.text(cells[1]),
+                        selection: selection,
                         event:     event.trim(),
-                        market:    market.innerHTML.trim().replace(/[()]/g, ''),
+                        market:    market,
                         date:      this._getDate(cells[3]),
                         eachWay:   (eachWay == 'None' ? false : eachWay),
                         odds:      utils.text(cells[5]),
-                        result:    utils.text(cells[8])
+                        result:    utils.text(cells[8]) || 'Lost'
                     };
                 }, this).filter(Boolean);
             },
