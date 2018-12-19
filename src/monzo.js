@@ -19,7 +19,8 @@ var categories = {
     bills:         'Bills',
     entertainment: 'Nights Out',
     groceries:     'Food:Groceries',
-    holidays:      '', // TODO inspet
+    personal_care: 'Healthcare',
+    holidays:      '', // TODO inspect
 
     eating_out: foursquareCategory({
         'Fried Chicken Joint':  'Food:Takeaway',
@@ -41,7 +42,10 @@ var categories = {
         'Car:Parking': /NCP LIMITED|CAR PARK|YOURPARKINGSPACECOUK/,
         'Car:Petrol':  /MALTHURST LIMITED/,
         'Travel:Taxi': /UBER/,
-    })
+    }),
+    family: foursquareCategory({
+        'Garden Center': 'House:Garden',
+    }),
 };
 
 var transfers = {
