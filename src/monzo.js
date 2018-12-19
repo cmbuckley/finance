@@ -1,9 +1,14 @@
 var fs = require('fs'),
     monzo = require('monzo-bank'),
-    args = require('yargs').argv,
     Exporter = require('./exporter');
 
-monzo.setHost('https://internal-api.monzo.com');
+const auth = require('./lib/auth');
+const args = require('yargs')
+    .alias('a', 'account')
+    .default('a', 'current')
+    .choices('a', ['prepaid', 'current', 'joint'])
+    .help('help')
+    .argv;
 
 var categories = {
     general:       '', // TODO inspect
@@ -42,6 +47,7 @@ var transfers = {
     '23-52-62 XXXX9595': 'PayPal',
 
     'grp_000092YBvG5KUEHWvN82gz': 'PayPal',
+    'user_00009ADOpigooLsd1H6N0b': 'Monzo', // current account
 };
 
 var payees = {
@@ -101,6 +107,10 @@ function transfer(transaction) {
         if (transfers[key]) {
             return transfers[key];
         }
+    }
+
+    if (transaction.counterparty && transfers[transaction.counterparty.user_id]) {
+        return transfers[transaction.counterparty.user_id];
     }
 
     if (transaction.merchant && transfers[transaction.merchant.group_id]) {
@@ -182,7 +192,7 @@ function payee(transaction) {
             return payees[transaction.counterparty.user_id];
         }
 
-        if (!/^anonuser_/.test(transaction.counterparty.user_id)) {
+        if (!/^anonuser_/.test(transaction.counterparty.user_id) && !transfer(transaction)) {
             console.log(
                 'Unknown user',
                 transaction.counterparty.user_id + ':',
@@ -213,41 +223,55 @@ function payee(transaction) {
     return '';
 }
 
-monzo.accounts(args.token).then(function (response) {
-    monzo.transactions({
-      account_id: response.accounts[args.prepaid ? 0 : 1].id, // @todo improve
-      expand:     'merchant',
-      since:      timestamp(args.from),
-      before:     timestamp(args.to)
-    }, args.token).then(function (response) {
-        var exporter = Exporter({
-            format:  args.format || 'qif',
-            name:    'monzo',
-            account: 'Monzo'
-        });
+function account(accounts, type) {
+    const typeMap = {
+        joint: 'uk_retail_joint',
+        current: 'uk_retail',
+        prepaid: 'uk_prepaid'
+    };
 
-        exporter.write(response.transactions.map(function (transaction) {
-            if (
-                transaction.decline_reason // failed
-                || !transaction.amount // zero amount transaction
-                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
-            ) {
-                return false;
-            }
+    return accounts.filter(a => a.type == typeMap[type])[0];
+}
 
-            return {
-                date:        date(transaction.created),
-                amount:      transaction.amount,
-                memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                payee:       payee(transaction),
-                transfer:    transfer(transaction),
-                category:    (category(transaction) || ''),
-                id:          transaction.id,
-                currency:    transaction.local_currency,
-                localAmount: transaction.local_amount,
-                rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
-            };
-        }));
+auth.login({
+    forceLogin: args.login
+}).then(function (config) {
+    monzo.accounts(config.token.access_token).then(function (response) {
+        monzo.transactions({
+          account_id: account(response.accounts, args.account).id,
+          expand:     'merchant',
+          since:      timestamp(args.from),
+          before:     timestamp(args.to)
+        }, config.token.access_token).then(function (response) {
+            var exporter = Exporter({
+                format:  args.format || 'qif',
+                name:    'monzo',
+                account: 'Monzo'
+            });
 
-    }).catch(exit('transactions'));
-}).catch(exit('accounts'));
+            exporter.write(response.transactions.map(function (transaction) {
+                if (
+                    transaction.decline_reason // failed
+                    || !transaction.amount // zero amount transaction
+                    || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
+                ) {
+                    return false;
+                }
+
+                return {
+                    date:        date(transaction.created),
+                    amount:      transaction.amount,
+                    memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                    payee:       payee(transaction),
+                    transfer:    transfer(transaction),
+                    category:    (category(transaction) || ''),
+                    id:          transaction.id,
+                    currency:    transaction.local_currency,
+                    localAmount: transaction.local_amount,
+                    rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
+                };
+            }));
+
+        }).catch(exit('transactions'));
+    }).catch(exit('accounts'));
+}).catch(exit('token'));

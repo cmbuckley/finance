@@ -1,0 +1,82 @@
+const fs = require('fs');
+const readline = require('readline');
+const url = require('url');
+const nonce = require('nonce')();
+
+const configPath = '../../config/monzo.json';
+const config = require(configPath);
+const oauth = require('simple-oauth2').create(config.credentials);
+
+function getAuthLink(options) {
+    return new Promise(function (res, rej) {
+        if (config.state && !options.forceLogin) {
+            return res(config);
+        }
+
+        config.state = nonce();
+        saveConfig(config).then(function () {
+            console.log('Please visit the following link in your browser to authorise the application:\n');
+
+            console.log(oauth.authorizationCode.authorizeURL({
+                redirect_uri: 'https://scripts.cmbuckley.co.uk/finance/',
+                state: config.state
+            }) + '\n');
+
+            res(config);
+        }).catch(rej);
+    });
+}
+
+function login(options) {
+    return new Promise(function (res, rej) {
+        if (config.token && !options.forceLogin) {
+            return res(config);
+        }
+
+        getAuthLink(options).then(function () {
+            question('Paste the URL from the "Log in to Monzo" button in the email: ').then(function (answer) {
+                const authUrl = url.parse(answer, true);
+
+                if (authUrl.query.state != config.state) {
+                    return rej('State does not match requested state');
+                }
+
+                oauth.authorizationCode.getToken({
+                    code: authUrl.query.code,
+                    redirect_uri: 'https://scripts.cmbuckley.co.uk/finance/'
+                }).then(function (result) {
+                    config.token = result;
+                    saveConfig(config).then(res, rej);
+                }).catch(rej);
+            });
+        }).catch(rej);
+    });
+}
+
+function saveConfig(config) {
+    return new Promise(function (res, rej) {
+        fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8', function (err) {
+            if (err) {
+                return rej(err);
+            }
+
+            res(config);
+        });
+    });
+}
+
+function question(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    return new Promise(function (res, rej) {
+        return rl.question(query, function (answer) {
+            rl.close();
+            res(answer);
+        });
+    });
+}
+
+module.exports = {login};
