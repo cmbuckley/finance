@@ -3,7 +3,7 @@ const readline = require('readline');
 const url = require('url');
 const nonce = require('nonce')();
 
-const configPath = '../../config/monzo.json';
+const configPath = __dirname + '/../../config/monzo.json';
 const config = require(configPath);
 const oauth = require('simple-oauth2').create(config.credentials);
 
@@ -14,6 +14,8 @@ function getAuthLink(options) {
         }
 
         config.state = nonce();
+        delete config.token;
+
         saveConfig(config).then(function () {
             console.log('Please visit the following link in your browser to authorise the application:\n');
 
@@ -30,7 +32,17 @@ function getAuthLink(options) {
 function login(options) {
     return new Promise(function (res, rej) {
         if (config.token && !options.forceLogin) {
-            return res(config);
+            const accessToken = oauth.accessToken.create(config.token);
+
+            if (!accessToken.expired()) {
+                return res(config);
+            }
+
+            console.error('Access token has expired, refreshing');
+            accessToken.refresh().then(function (newToken) {
+                config.token = newToken.token;
+                saveConfig(config).then(res, rej);
+            });
         }
 
         getAuthLink(options).then(function () {
@@ -45,7 +57,10 @@ function login(options) {
                     code: authUrl.query.code,
                     redirect_uri: 'https://scripts.cmbuckley.co.uk/finance/'
                 }).then(function (result) {
-                    config.token = result;
+                    const accessToken = oauth.accessToken.create(result);
+                    config.token = accessToken.token;
+                    delete config.state;
+
                     saveConfig(config).then(res, rej);
                 }).catch(rej);
             });
