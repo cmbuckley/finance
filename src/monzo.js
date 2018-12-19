@@ -5,8 +5,11 @@ var fs = require('fs'),
 const auth = require('./lib/auth');
 const args = require('yargs')
     .alias('a', 'account')
+    .alias('f', 'format')
     .default('a', 'current')
+    .default('f', 'qif')
     .choices('a', ['prepaid', 'current', 'joint'])
+    .choices('f', ['qif', 'csv'])
     .help('help')
     .argv;
 
@@ -60,6 +63,7 @@ var payees = {
 
     'merch_00009Bg3D0Oad72qvUzIaf': '360 Champagne & Cocktails',
     'merch_000097xkqhwA5jRg7CFfWr': 'Aldi Meanwood',
+    'merch_00009OEmC7OwkpEs7QfT2P': 'Aldi Meanwood',
     'merch_0000990GI2UdIxOHZ0imeH': 'Asda Meanwood',
     'merch_0000988NR1FJWBTmNVhymv': 'Be At One',
     'merch_00009AfKXYRTDHvfIwRkCP': 'Centre Fillings',
