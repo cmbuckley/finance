@@ -20,7 +20,7 @@ function getAuthLink(options) {
             console.log('Please visit the following link in your browser to authorise the application:\n');
 
             console.log(oauth.authorizationCode.authorizeURL({
-                redirect_uri: 'https://scripts.cmbuckley.co.uk/finance/',
+                redirect_uri: config.redirectUri,
                 state: config.state
             }) + '\n');
 
@@ -55,7 +55,7 @@ function login(options) {
 
                 oauth.authorizationCode.getToken({
                     code: authUrl.query.code,
-                    redirect_uri: 'https://scripts.cmbuckley.co.uk/finance/'
+                    redirect_uri: config.redirectUri
                 }).then(function (result) {
                     const accessToken = oauth.accessToken.create(result);
                     config.token = accessToken.token;
@@ -82,7 +82,7 @@ function saveConfig(config) {
 
 function question(query) {
     const rl = readline.createInterface({
-        input: process.stdin,
+        input:  process.stdin,
         output: process.stdout
     });
 
