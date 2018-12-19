@@ -1,0 +1,18 @@
+{
+  "credentials": {
+    "client": {
+      "id": "oauthclient_XXX",
+      "secret": ""
+    },
+    "auth": {
+      "tokenHost": "https://api.monzo.com/",
+      "tokenPath": "/oauth2/token",
+      "authorizeHost": "https://auth.monzo.com/",
+      "authorizePath": "/"
+    },
+    "options": {
+      "authorizationMethod": "body"
+    }
+  },
+  "redirectUri": "https://example.com/monzo/"
+}
