@@ -4,12 +4,10 @@ var fs = require('fs'),
 
 const auth = require('./lib/auth');
 const args = require('yargs')
-    .alias('a', 'account')
-    .alias('f', 'format')
-    .default('a', 'current')
-    .default('f', 'qif')
-    .choices('a', ['prepaid', 'current', 'joint'])
-    .choices('f', ['qif', 'csv'])
+    .option('account', {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint']})
+    .option('format', {alias: 'o', describe: 'Output format', default: 'qif', choices: ['qif', 'csv']})
+    .option('from', {alias: 'f', describe: 'Earliest date for transactions'})
+    .option('to', {alias: 't', describe: 'Latest date for transactions'})
     .help('help')
     .argv;
 
@@ -48,84 +46,28 @@ var categories = {
     }),
 };
 
-var transfers = {
-    '40-47-62 XXXX6141': 'Shared Account',
-    '40-44-01 XXXX5471': 'Current Account',
-    '23-52-62 XXXX9595': 'PayPal',
-
-    'grp_000092YBvG5KUEHWvN82gz': 'PayPal',
-    'user_00009ADOpigooLsd1H6N0b': 'Monzo', // current account
-};
-
-var payees = {
-    'user_00009AJ5zA1joAasHukGHp':  'Emilia Lewandowska',
-    'user_000096wneGBzTkXmQ30qiP':  'Marc Easen',
-    'user_000096bGKmot5HcrIDKhCz':  'Craig Lumley',
-    'user_000098VBRbmovokAtMyQtd':  'James Starnes',
-    'user_00009E08wLax8TDl4Egi01':  'Kameil Lewis',
-    'user_00009LOheaZtAu2IUvNvZB':  'Grace Moran',
-
-    'merch_00009Bg3D0Oad72qvUzIaf': '360 Champagne & Cocktails',
-    'merch_000097xkqhwA5jRg7CFfWr': 'Aldi Meanwood',
-    'merch_00009OEmC7OwkpEs7QfT2P': 'Aldi Meanwood',
-    'merch_0000990GI2UdIxOHZ0imeH': 'Asda Meanwood',
-    'merch_0000988NR1FJWBTmNVhymv': 'Be At One',
-    'merch_00009AfKXYRTDHvfIwRkCP': 'Centre Fillings',
-    'merch_00009G71vc2vEq6wB5HCzZ': 'Chop’d',
-    'merch_000094JaGKXCiLMc07WsgD': 'Co-op West Point',
-    'merch_000094JXvvv4K5uk3ZP51d': 'Co-op West Point',
-    'merch_00009A4aZnkjfXwJ8n3l2H': 'East Of Arcadia',
-    'merch_00009DRKIRqEtFp9lGf59d': 'Greggs West Point',
-    'merch_000096r2vn2ExM3jIyEayP': 'Jack-Pots',
-    'merch_000098QgS241MGxWmpG0aP': 'KFC Meanwood',
-    'merch_00009AOjSpmwUHRbn5pman': 'Lamb and Flag',
-    'merch_000097EJ1GK7YcvE25lEsT': 'Lazy Lounge',
-    'merch_00009GObREBWI0wRotPFdh': 'Manahatta',
-    'merch_00009BDH6FvuECknBk8a3t': 'Meanwood News & Booze',
-    'merch_00009ECud6e5cVz8YM1BY1': 'M&S West Point',
-    'merch_00009763yUkQQ2TdXVt2Ez': 'NCP Wellington Place',
-    'merch_000095vJZbIaLB9GKSHtGD': 'Primark Trinity',
-    'merch_000097UehpOkkQ64ajMKXJ': 'Roxy Ball Room',
-    'merch_000098VN7LfYLOZEAh2Hcf': 'Sainsbury’s Headingley',
-    'merch_000094NTIBzJXTwhrzdPzV': 'Sociable Folk',
-    'merch_000097ObP3kJiHGndj0rb7': 'Sociable Folk',
-    'merch_00009A1v5OMt01lXXeGNSz': 'Tasty Toasties',
-    'merch_0000971JeEhmyxIOu02CK9': 'Tesco Metro Leeds',
-    'merch_00009AGs9hSwYET4ndke8H': 'The Brewery Tap',
-    'merch_00009EBn96CzmqFMGNWU4X': 'The Central',
-    'merch_00009PUDDhjinyInrW6jOD': 'The Wardrobe',
-    'merch_000093dFPRryYOLRmI056P': 'Uber',
-    'merch_00009GYf1bqa2A3D4jFcS9': 'Veeno',
-    'merch_000096mrXRnKOsgt6mLH5l': 'Waitrose Meanwood',
-    'merch_000094JfXOmaflIKJZOwKn': 'Wasabi Leeds',
-
-    'grp_000092JYbSIkjviyjwdqtN':   'Amazon',
-    'grp_00009FQAj7ylkIBG7G8STh':   'The Good Luck Club',
-    'grp_00009FYpfFLo2y28d1sdvN':   'Whitehall Rd Car Park',
-};
-
-function transfer(transaction) {
+function transfer(transaction, config) {
     if (transaction.counterparty &&
         transaction.counterparty.sort_code &&
         transaction.counterparty.account_number
     ) {
         var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
-                + ' XXXX' + transaction.counterparty.account_number.substr(-4);
+                + ' ' + transaction.counterparty.account_number;
 
-        if (transfers[key]) {
-            return transfers[key];
+        if (config.transfers[key]) {
+            return config.transfers[key];
         }
     }
 
-    if (transaction.counterparty && transfers[transaction.counterparty.user_id]) {
-        return transfers[transaction.counterparty.user_id];
+    if (transaction.counterparty && config.transfers[transaction.counterparty.user_id]) {
+        return config.transfers[transaction.counterparty.user_id];
     }
 
-    if (transaction.merchant && transfers[transaction.merchant.group_id]) {
-        return transfers[transaction.merchant.group_id];
+    if (transaction.merchant && config.transfers[transaction.merchant.group_id]) {
+        return config.transfers[transaction.merchant.group_id];
     }
 
-    if (transaction.category == 'cash') {
+    if (transaction.merchant && transaction.merchant.atm) {
         return lookup('local_currency', {
             'Cash':  'GBP',
             'Euros': 'EUR',
@@ -193,14 +135,14 @@ function category(transaction) {
     return ((typeof category == 'function') ? category(transaction) : category);
 }
 
-function payee(transaction) {
+function payee(transaction, config) {
     // use known payee name if we have one
     if (transaction.counterparty.user_id) {
-        if (payees[transaction.counterparty.user_id]) {
-            return payees[transaction.counterparty.user_id];
+        if (config.payees[transaction.counterparty.user_id]) {
+            return config.payees[transaction.counterparty.user_id];
         }
 
-        if (!/^anonuser_/.test(transaction.counterparty.user_id) && !transfer(transaction)) {
+        if (!/^anonuser_/.test(transaction.counterparty.user_id) && !transfer(transaction, config)) {
             console.log(
                 'Unknown user',
                 transaction.counterparty.user_id + ':',
@@ -211,18 +153,18 @@ function payee(transaction) {
     }
 
     if (transaction.merchant && transaction.merchant.id) {
-        if (payees[transaction.merchant.id]) {
-            return payees[transaction.merchant.id];
+        if (config.payees[transaction.merchant.id]) {
+            return config.payees[transaction.merchant.id];
         }
 
-        if (payees[transaction.merchant.group_id]) {
-            return payees[transaction.merchant.group_id];
+        if (config.payees[transaction.merchant.group_id]) {
+            return config.payees[transaction.merchant.group_id];
         }
 
-        if (!transfer(transaction)) {
+        if (!transfer(transaction, config)) {
             console.log(
                 'Unknown merchant',
-                transaction.merchant.id + '/' + transaction.merchant.group_id + ':',
+                transaction.merchant.id + '/' + transaction.merchant.group_id + '/' + date(transaction.created) + ':',
                 transaction.merchant.name || ''
             );
         }
@@ -270,8 +212,8 @@ auth.login({
                     date:        date(transaction.created),
                     amount:      transaction.amount,
                     memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                    payee:       payee(transaction),
-                    transfer:    transfer(transaction),
+                    payee:       payee(transaction, config),
+                    transfer:    transfer(transaction, config),
                     category:    (category(transaction) || ''),
                     id:          transaction.id,
                     currency:    transaction.local_currency,
