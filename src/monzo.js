@@ -143,12 +143,7 @@ function payee(transaction, config) {
         }
 
         if (!/^anonuser_/.test(transaction.counterparty.user_id) && !transfer(transaction, config)) {
-            console.log(
-                'Unknown user',
-                transaction.counterparty.user_id + ':',
-                transaction.counterparty.name || '',
-                transaction.notes ? '(' + transaction.notes + ')' : ''
-            );
+            return transaction.counterparty.name;
         }
     }
 
