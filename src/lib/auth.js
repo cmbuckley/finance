@@ -39,7 +39,7 @@ function login(options) {
             }
 
             console.error('Access token has expired, refreshing');
-            accessToken.refresh().then(function (newToken) {
+            return accessToken.refresh().then(function (newToken) {
                 config.token = newToken.token;
                 saveConfig(config).then(res, rej);
             });
