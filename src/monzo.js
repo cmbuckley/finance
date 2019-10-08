@@ -58,7 +58,10 @@ var categories = {
     eating_out: foursquareCategory({
         'Fast Food Restaurant': 'Food:Takeaway',
         'Fried Chicken Joint':  'Food:Takeaway',
-    }, 'Food:Eating Out'),
+    }, lookup('description', {
+        'Food': /CENTRE FILLING|UPTON GROUP|SESAME +LEEDS|MARKS&SPENCER/,
+        'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS/i,
+    }, 'Food:Eating Out')),
     shopping: foursquareCategory({
         'Board Shop': 'Clothing',
         'Bookstore': 'Leisure:Books & Magazines',
