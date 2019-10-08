@@ -28,10 +28,18 @@ var categories = {
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
     bills:         'Bills',
-    entertainment: 'Nights Out',
     groceries:     'Food:Groceries',
     personal_care: 'Healthcare',
 
+    entertainment: lookup('description', {
+        'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
+        'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
+        'Leisure:Cinema': 'CINEMA',
+        'Leisure:Climbing': 'CLIMBING',
+        'Leisure:Music': /VINYL|HMV UK/i,
+        'Leisure:Music Events': /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
+        'Leisure:Snowboarding': 'SNOZONE',
+    }, 'Nights Out'),
     holidays: foursquareCategory({
         'Art Museum': 'Holiday:Activities',
         'Hotel': 'Holiday:Accommodation',
@@ -82,7 +90,7 @@ var categories = {
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil/,
-        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL/,
+        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED/,
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
         'Travel:Rail': /GVB|Trainline\.com|TFL.gov/i,
@@ -143,9 +151,9 @@ function transfer(transaction, config) {
 function lookup(key, matches, defaultValue) {
     return function (transaction) {
         var isFunction   = (typeof defaultValue === 'function'),
-            defaultFunc  = (isFunction ? defaultValue : function () {}),
-            defaultValue = (isFunction ? null : defaultValue);
+            defaultFunc  = (isFunction ? defaultValue : function () {});
 
+        defaultValue = (isFunction ? null : defaultValue);
         return defaultFunc(transaction) || Object.keys(matches).find(function (match) {
             var pattern = matches[match],
                 value = transaction[key];
