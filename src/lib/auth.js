@@ -31,6 +31,10 @@ function getAuthLink(options) {
 
 function login(options) {
     return new Promise(function (res, rej) {
+        if (options.fakeLogin) {
+            return res(config);
+        }
+
         if (config.token && !options.forceLogin) {
             const accessToken = oauth.accessToken.create(config.token);
 
@@ -42,6 +46,8 @@ function login(options) {
             return accessToken.refresh().then(function (newToken) {
                 config.token = newToken.token;
                 saveConfig(config).then(res, rej);
+            }).catch(function (err) {
+                rej(err.data.payload);
             });
         }
 
@@ -61,7 +67,11 @@ function login(options) {
                     config.token = accessToken.token;
                     delete config.state;
 
-                    saveConfig(config).then(res, rej);
+                    saveConfig(config).then(function () {
+                        question('Hit enter when you have approved the login in the app: ').then(function () {
+                            res(config);
+                        }).catch(rej);
+                    }).catch(rej);
                 }).catch(rej);
             });
         }).catch(rej);

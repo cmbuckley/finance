@@ -12,11 +12,11 @@ module.exports = function exporter(options) {
         throw new Error(options.format + ': format not found');
     }
 
-    if (!options.name) {
+    if (!options.name && !options.file) {
         throw new Error('Missing file name');
     }
 
-    filename = [
+    filename = options.file ? options.file : [
         options.name,
         adapter.extension || options.format
     ].join('.');

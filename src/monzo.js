@@ -8,6 +8,11 @@ const args = require('yargs')
     .option('format', {alias: 'o', describe: 'Output format', default: 'qif', choices: ['qif', 'csv']})
     .option('from', {alias: 'f', describe: 'Earliest date for transactions'})
     .option('to', {alias: 't', describe: 'Latest date for transactions'})
+    .option('no-topup', {describe: 'Don’t include topup transactions'})
+    .option('no-pot', {describe: 'Don’t include pot transactions'})
+    .option('login', {alias: 'l', describe: 'Force OAuth re-login'})
+    .option('dump', {alias: 'd', describe: 'Dump transactions to specified file'})
+    .option('load', {alias: 'u', describe: 'Load from a specified dump file'})
     .help('help')
     .argv;
 
@@ -114,7 +119,7 @@ function foursquareCategory(matches, defaultValue) {
 function exit(scope) {
     return function (err) {
         console.error('Error with', scope);
-        console.error(err.stack || err.error);
+        console.error(err.stack || err.error || err);
     };
 }
 
@@ -179,8 +184,45 @@ function account(accounts, type) {
 }
 
 auth.login({
-    forceLogin: args.login
+    forceLogin: args.login,
+    fakeLogin: args.load
 }).then(function (config) {
+    function transactionMap(transaction) {
+        if (
+            transaction.decline_reason // failed
+            || !transaction.amount // zero amount transaction
+            || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
+            || (args.pot === false && transaction.scheme == 'uk_retail_pot') // ignore pot
+        ) {
+            return false;
+        }
+
+        return {
+            date:        date(transaction.created),
+            amount:      transaction.amount,
+            memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+            payee:       payee(transaction, config),
+            transfer:    transfer(transaction, config),
+            category:    (category(transaction) || ''),
+            id:          transaction.id,
+            currency:    transaction.local_currency,
+            localAmount: transaction.local_amount,
+            rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
+        };
+    }
+
+    var exporter = Exporter({
+        format:  args.format || 'qif',
+        name:    'monzo',
+        account: 'Monzo'
+    });
+
+    if (args.load) {
+        return fs.readFile(args.load, 'utf8', function (err, data) {
+            exporter.write(JSON.parse(data).map(transactionMap));
+        });
+    }
+
     monzo.accounts(config.token.access_token).then(function (response) {
         monzo.transactions({
           account_id: account(response.accounts, args.account).id,
@@ -188,35 +230,17 @@ auth.login({
           since:      timestamp(args.from),
           before:     timestamp(args.to)
         }, config.token.access_token).then(function (response) {
-            var exporter = Exporter({
-                format:  args.format || 'qif',
-                name:    'monzo',
-                account: 'Monzo'
-            });
+            if (args.dump) {
+                return Exporter({format: 'json', file: args.dump}).write(response.transactions);
+            }
 
-            exporter.write(response.transactions.map(function (transaction) {
-                if (
-                    transaction.decline_reason // failed
-                    || !transaction.amount // zero amount transaction
-                    || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
-                ) {
-                    return false;
-                }
+            return exporter.write(response.transactions.map(transactionMap));
+        }).catch(function (resp) {
+            if (resp.error && resp.error.code == 'forbidden.verification_required') {
+                return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
+            }
 
-                return {
-                    date:        date(transaction.created),
-                    amount:      transaction.amount,
-                    memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                    payee:       payee(transaction, config),
-                    transfer:    transfer(transaction, config),
-                    category:    (category(transaction) || ''),
-                    id:          transaction.id,
-                    currency:    transaction.local_currency,
-                    localAmount: transaction.local_amount,
-                    rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
-                };
-            }));
-
-        }).catch(exit('transactions'));
+            return exit('transactions')(resp);
+        });
     }).catch(exit('accounts'));
 }).catch(exit('token'));
