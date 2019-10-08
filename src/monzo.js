@@ -16,6 +16,14 @@ const args = require('yargs')
     .help('help')
     .argv;
 
+var currencies = {
+    'Cash':  'GBP',
+    'Euros': 'EUR',
+    'HK$':   'HKD',
+    'Yen':   'JPY',
+    'Złoty': 'PLN',
+};
+
 var categories = {
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
@@ -32,11 +40,7 @@ var categories = {
     shopping: foursquareCategory({
         'Gift Shop':  'Gifts',
     }),
-    cash: lookup('local_currency', {
-        'Cash':  'GBP',
-        'Euros': 'EUR',
-        'Złoty': 'PLN'
-    }, function (transaction) {
+    cash: lookup('local_currency', currencies, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
         }
@@ -73,11 +77,13 @@ function transfer(transaction, config) {
     }
 
     if (transaction.merchant && transaction.merchant.atm) {
-        return lookup('local_currency', {
-            'Cash':  'GBP',
-            'Euros': 'EUR',
-            'Złoty': 'PLN'
-        })(transaction);
+        var account = lookup('local_currency', currencies)(transaction);
+
+        if (!account) {
+            console.error('Unknown withdrawn currency', transaction.local_currency);
+        }
+
+        return account;
     }
 
     if (transaction.category == 'mondo' &&
