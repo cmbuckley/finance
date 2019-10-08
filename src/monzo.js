@@ -38,15 +38,16 @@ var categories = {
     }, lookup('description', {
         'Car:Parking': 'MANCHESTER AIRPORT CAR',
         'Eating Out': 'HMSHOST',
-        'Holiday:Accommodation': 'MOXY STRATFORD',
+        'Holiday:Accommodation': /MOXY STRATFORD|HOTEL/,
+        'Holiday:Souvenirs': 'WDFG',
         'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
+        'Nights Out:Stag Do': 'GROUPIA',
     })),
     eating_out: foursquareCategory({
         'Fast Food Restaurant': 'Food:Takeaway',
         'Fried Chicken Joint':  'Food:Takeaway',
     }, 'Food:Eating Out'),
     shopping: foursquareCategory({
-        'Art Museum': 'Holiday:Souvenirs',
         'Board Shop': 'Clothing',
         'Bookstore': 'Leisure:Books & Magazines',
         'Boutique': 'Clothing',
@@ -63,8 +64,10 @@ var categories = {
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
     }, lookup('description', {
-        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI/,
+        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO/,
+        'Gifts': /W\.KRUK|WARNER BROS STUDIOS/,
         'House:Improvement': 'SCREWFIX',
+        'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
     })),
     cash: lookup('local_currency', currencies, function (transaction) {
         if (transaction.counterparty.user_id) {
@@ -77,8 +80,8 @@ var categories = {
         'Parking': 'Car:Parking',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL/,
-        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF/,
+        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil/,
+        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL/,
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
         'Travel:Rail': /GVB|Trainline\.com|TFL.gov/i,
@@ -90,8 +93,9 @@ var categories = {
         'Supermarket': 'House',
         'Warehouse Store': 'House',
     }, lookup('description', {
-        'House:Improvement': 'B & Q',
-
+        'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED/,
+        'Pet Care:Accommodation': 'PAWSHAKE',
+        'Pet Care:Vet': 'VETERINARY',
     })),
 };
 
@@ -184,6 +188,15 @@ function category(transaction) {
 
     if (typeof category == 'function') {
         category = category(transaction);
+    }
+
+    if (!category) {
+        console.log(
+            'Unknown category for ' + transaction.id,
+            '(' + transaction.category + '):',
+            '[' + (transaction.merchant ? transaction.merchant.name || '' : '') + ']',
+            transaction.notes || transaction.description
+        );
     }
 
     return category;
