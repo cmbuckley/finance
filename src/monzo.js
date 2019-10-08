@@ -30,7 +30,9 @@ var categories = {
     expenses:      'Job Expenses', // TODO expand
     bills:         'Bills',
     groceries:     'Food:Groceries',
-    personal_care: 'Healthcare',
+    personal_care: lookup('description', {
+        'Healthcare:Eyecare': 'CONTACT LENSES',
+    }, 'Healthcare'),
 
     entertainment: lookup('description', {
         'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
