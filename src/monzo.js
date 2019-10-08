@@ -1,5 +1,6 @@
 var fs = require('fs'),
     monzo = require('monzo-bank'),
+    moment = require('moment-timezone'),
     Exporter = require('./exporter');
 
 const auth = require('./lib/auth');
@@ -187,7 +188,7 @@ function timestamp(date) {
 }
 
 function date(timestamp) {
-    return timestamp.substr(0, 10);
+    return moment(timestamp).tz('Europe/London').format('YYYY-MM-DD');
 }
 
 function category(transaction) {
