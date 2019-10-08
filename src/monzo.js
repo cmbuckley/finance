@@ -31,28 +31,69 @@ var categories = {
     entertainment: 'Nights Out',
     groceries:     'Food:Groceries',
     personal_care: 'Healthcare',
-    holidays:      '', // TODO inspect
 
+    holidays: foursquareCategory({
+        'Art Museum': 'Holiday:Activities',
+        'Hotel': 'Holiday:Accommodation',
+        'Post Office': 'Holiday',
+    }, lookup('description', {
+        'Car:Parking': 'MANCHESTER AIRPORT CAR',
+        'Eating Out': 'HMSHOST',
+        'Holiday:Accommodation': 'MOXY STRATFORD',
+        'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
+    })),
     eating_out: foursquareCategory({
-        'Fried Chicken Joint':  'Food:Takeaway',
         'Fast Food Restaurant': 'Food:Takeaway',
+        'Fried Chicken Joint':  'Food:Takeaway',
     }, 'Food:Eating Out'),
     shopping: foursquareCategory({
-        'Gift Shop':  'Gifts',
-    }),
+        'Art Museum': 'Holiday:Souvenirs',
+        'Board Shop': 'Clothing',
+        'Bookstore': 'Leisure:Books & Magazines',
+        'Boutique': 'Clothing',
+        'Clothing Store': 'Clothing',
+        'Convenience Store': 'House', // not groceries
+        'Cosmetics Shop': 'Gifts',
+        'Department Store': 'Clothing',
+        'Food & Drink Shop': 'Food',
+        'Furniture / Home Store': 'House:Furniture',
+        'Gift Shop': 'Gifts',
+        'Jewelry Store': 'Gifts',
+        'Miscellaneous Shop': 'House',
+        'Sporting Goods Shop': 'Sporting Goods',
+        'Supermarket': 'House', // not groceries
+        'Warehouse Store': 'House',
+    }, lookup('description', {
+        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI/,
+        'House:Improvement': 'SCREWFIX',
+    })),
     cash: lookup('local_currency', currencies, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
         }
     }),
-    transport: lookup('description', {
-        'Car:Parking': /NCP LIMITED|CAR PARK|YOURPARKINGSPACECOUK/,
-        'Car:Petrol':  /MALTHURST LIMITED/,
-        'Travel:Taxi': /UBER/,
-    }),
+    transport: foursquareCategory({
+        'Gas Station': 'Car:Petrol',
+        'Gas Station / Garage': 'Car:Petrol',
+        'Parking': 'Car:Parking',
+        'Train Station': 'Travel:Rail',
+    }, lookup('description', {
+        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL/,
+        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF/,
+        'Holiday:Travel': /RYANAIR/,
+        'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
+        'Travel:Rail': /GVB|Trainline\.com|TFL.gov/i,
+        'Travel:Taxi': /UBER|bolt\.eu/i,
+    })),
     family: foursquareCategory({
         'Garden Center': 'House:Garden',
-    }),
+        'Pet Store': 'Pet Care',
+        'Supermarket': 'House',
+        'Warehouse Store': 'House',
+    }, lookup('description', {
+        'House:Improvement': 'B & Q',
+
+    })),
 };
 
 function transfer(transaction, config) {
@@ -118,7 +159,7 @@ function foursquareCategory(matches, defaultValue) {
             }
         }
 
-        return defaultValue;
+        return (typeof defaultValue == 'function') ? defaultValue(transaction) : defaultValue;
     };
 }
 
@@ -142,8 +183,11 @@ function category(transaction) {
                  ? categories[transaction.category]
                  : transaction.category);
 
+    if (typeof category == 'function') {
+        category = category(transaction);
+    }
 
-    return ((typeof category == 'function') ? category(transaction) : category);
+    return category;
 }
 
 function payee(transaction, config) {
@@ -170,7 +214,7 @@ function payee(transaction, config) {
         if (!transfer(transaction, config)) {
             console.log(
                 'Unknown merchant',
-                transaction.merchant.id + '/' + transaction.merchant.group_id + '/' + date(transaction.created) + ':',
+                transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created) + ':',
                 transaction.merchant.name || ''
             );
         }
