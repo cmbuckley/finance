@@ -5,15 +5,16 @@ const fs = require('fs'),
 
 const auth = require('./lib/auth');
 const args = require('yargs')
-    .option('account', {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint']})
-    .option('format',  {alias: 'o', describe: 'Output format',         default: 'qif',     choices: ['qif', 'csv']})
-    .option('from',    {alias: 'f', describe: 'Earliest date for transactions'})
-    .option('to',      {alias: 't', describe: 'Latest date for transactions'})
-    .option('no-pot',  {            describe: 'Don’t include pot transactions'})
-    .option('login',   {alias: 'l', describe: 'Force OAuth re-login'})
-    .option('dump',    {alias: 'd', describe: 'Dump transactions to specified file'})
-    .option('load',    {alias: 'u', describe: 'Load from a specified dump file'})
-    .option('quiet',   {alias: 'q', describe: 'Suppress output'})
+    .option('account',  {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint']})
+    .option('format',   {alias: 'o', describe: 'Output format',         default: 'qif',     choices: ['qif', 'csv']})
+    .option('from',     {alias: 'f', describe: 'Earliest date for transactions'})
+    .option('to',       {alias: 't', describe: 'Latest date for transactions'})
+    .option('no-topup', {            describe: 'Don’t include topup transactions'})
+    .option('no-pot',   {            describe: 'Don’t include pot transactions'})
+    .option('login',    {alias: 'l', describe: 'Force OAuth re-login'})
+    .option('dump',     {alias: 'd', describe: 'Dump transactions to specified file'})
+    .option('load',     {alias: 'u', describe: 'Load from a specified dump file'})
+    .option('quiet',    {alias: 'q', describe: 'Suppress output'})
     .help('help')
     .argv;
 
@@ -309,6 +310,7 @@ auth.login({
             if (
                 transaction.decline_reason // failed
                 || !transaction.amount // zero amount transaction
+                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
                 || (args.pot === false && transaction.scheme == 'uk_retail_pot') // ignore pot
             ) {
                 return false;
