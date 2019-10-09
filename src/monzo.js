@@ -43,8 +43,11 @@ const categories = {
         'Utilities:Gas': 'BRITISH GAS',
     }, 'Bills'),
     personal_care: lookup('description', {
+        'Healthcare:Dental': 'DENTAL',
         'Healthcare:Eyecare': 'CONTACT LENSES',
-    }, 'Healthcare'),
+        'Personal Care:Hair': 'CITY IMAGE',
+        'Pet Care:Vet': 'VETERINARY',
+    }, 'Personal Care'),
     entertainment: lookup('description', {
         'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
         'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
@@ -60,7 +63,7 @@ const categories = {
         'Post Office': 'Holiday',
     }, lookup('description', {
         'Car:Parking': 'MANCHESTER AIRPORT CAR',
-        'Eating Out': 'HMSHOST',
+        'Food:Eating Out': 'HMSHOST',
         'Holiday:Accommodation': /MOXY STRATFORD|HOTEL/,
         'Holiday:Souvenirs': 'WDFG',
         'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
