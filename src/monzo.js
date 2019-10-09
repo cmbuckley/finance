@@ -1,4 +1,4 @@
-var fs = require('fs'),
+const fs = require('fs'),
     monzo = require('monzo-bank'),
     moment = require('moment-timezone'),
     Exporter = require('./exporter');
@@ -6,25 +6,26 @@ var fs = require('fs'),
 const auth = require('./lib/auth');
 const args = require('yargs')
     .option('account', {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint']})
-    .option('format', {alias: 'o', describe: 'Output format', default: 'qif', choices: ['qif', 'csv']})
-    .option('from', {alias: 'f', describe: 'Earliest date for transactions'})
-    .option('to', {alias: 't', describe: 'Latest date for transactions'})
-    .option('no-pot', {describe: 'Don’t include pot transactions'})
-    .option('login', {alias: 'l', describe: 'Force OAuth re-login'})
-    .option('dump', {alias: 'd', describe: 'Dump transactions to specified file'})
-    .option('load', {alias: 'u', describe: 'Load from a specified dump file'})
-    .option('quiet', {alias: 'q', describe: 'Suppress output'})
+    .option('format',  {alias: 'o', describe: 'Output format',         default: 'qif',     choices: ['qif', 'csv']})
+    .option('from',    {alias: 'f', describe: 'Earliest date for transactions'})
+    .option('to',      {alias: 't', describe: 'Latest date for transactions'})
+    .option('no-pot',  {            describe: 'Don’t include pot transactions'})
+    .option('login',   {alias: 'l', describe: 'Force OAuth re-login'})
+    .option('dump',    {alias: 'd', describe: 'Dump transactions to specified file'})
+    .option('load',    {alias: 'u', describe: 'Load from a specified dump file'})
+    .option('quiet',   {alias: 'q', describe: 'Suppress output'})
     .help('help')
     .argv;
 
-var foreginCurrencies = {
+const foreginCurrencies = {
     'Euros': 'EUR',
     'HK$':   'HKD',
     'Yen':   'JPY',
     'Złoty': 'PLN',
 };
 
-var categories = {
+const categories = {
+    mondo:         '', // legacy
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
     groceries:     'Food:Groceries',
@@ -128,7 +129,7 @@ function transfer(transaction, config) {
         if (transaction.counterparty.sort_code &&
             transaction.counterparty.account_number
         ) {
-            var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
+            let key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
                     + ' ' + transaction.counterparty.account_number;
 
             if (config.transfers[key]) {
@@ -150,7 +151,8 @@ function transfer(transaction, config) {
     }
 
     if (transaction.merchant && transaction.merchant.atm) {
-        var account = lookup('local_currency', Object.assign({Cash: 'GBP'}, foreginCurrencies))(transaction);
+        let currencies = Object.assign({Cash: 'GBP'}, foreginCurrencies),
+            account = lookup('local_currency', currencies)(transaction);
 
         if (!account) {
             warn('Unknown withdrawn currency', transaction.local_currency);
@@ -171,12 +173,12 @@ function transfer(transaction, config) {
 
 function lookup(key, matches, defaultResponse) {
     return function (transaction) {
-        var isFunction   = (typeof defaultResponse === 'function'),
+        let isFunction   = (typeof defaultResponse === 'function'),
             defaultFunc  = (isFunction ? defaultResponse : function () {}),
             defaultValue = (isFunction ? null : defaultResponse);
 
         return Object.keys(matches).find(function (match) {
-            var pattern = matches[match],
+            let pattern = matches[match],
                 value = transaction[key];
 
             return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
@@ -218,7 +220,7 @@ function date(timestamp) {
 }
 
 function category(transaction) {
-    var category = (categories.hasOwnProperty(transaction.category)
+    let category = (categories.hasOwnProperty(transaction.category)
                  ? categories[transaction.category]
                  : transaction.category);
 
@@ -250,7 +252,7 @@ function payee(transaction, config) {
         }
 
         if (transaction.counterparty.sort_code && transaction.counterparty.account_number) {
-            var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
+            let key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
                     + ' ' + transaction.counterparty.account_number;
 
             if (config.payees[key]) {
@@ -295,7 +297,7 @@ function account(accounts, type) {
         prepaid: 'uk_prepaid'
     };
 
-    return accounts.filter(a => a.type == typeMap[type])[0];
+    return accounts.find(a => a.type == typeMap[type]);
 }
 
 auth.login({
@@ -326,6 +328,7 @@ auth.login({
             };
         }));
 
+        // pots request
         if (!args.quiet) {
             monzo.pots(config.token.access_token).then(function (response) {
                 response.pots.map(function (pot) {
@@ -341,13 +344,14 @@ auth.login({
         }
     }
 
-    var exporter = Exporter({
+    const exporter = Exporter({
         format:  args.format || 'qif',
         quiet:   args.quiet,
         name:    'monzo',
         account: 'Monzo',
     });
 
+    // load from dump file
     if (args.load) {
         return fs.readFile(args.load, 'utf8', function (err, data) {
             process(JSON.parse(data));
