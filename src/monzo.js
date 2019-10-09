@@ -250,27 +250,43 @@ auth.login({
     forceLogin: args.login,
     fakeLogin: args.load
 }).then(function (config) {
-    function transactionMap(transaction) {
-        if (
-            transaction.decline_reason // failed
-            || !transaction.amount // zero amount transaction
-            || (args.pot === false && transaction.scheme == 'uk_retail_pot') // ignore pot
-        ) {
-            return false;
-        }
+    function process(transactions) {
+        exporter.write(transactions.map(function (transaction) {
+            if (
+                transaction.decline_reason // failed
+                || !transaction.amount // zero amount transaction
+                || (args.pot === false && transaction.scheme == 'uk_retail_pot') // ignore pot
+            ) {
+                return false;
+            }
 
-        return {
-            date:        date(transaction.created),
-            amount:      transaction.amount,
-            memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-            payee:       payee(transaction, config),
-            transfer:    transfer(transaction, config),
-            category:    (category(transaction) || ''),
-            id:          transaction.id,
-            currency:    transaction.local_currency,
-            localAmount: transaction.local_amount,
-            rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
-        };
+            return {
+                date:        date(transaction.created),
+                amount:      transaction.amount,
+                memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                payee:       payee(transaction, config),
+                transfer:    transfer(transaction, config),
+                category:    (category(transaction) || ''),
+                id:          transaction.id,
+                currency:    transaction.local_currency,
+                localAmount: transaction.local_amount,
+                rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
+            };
+        }));
+
+        if (!args.quiet) {
+            monzo.pots(config.token.access_token).then(function (response) {
+                response.pots.map(function (pot) {
+                    if (!pot.deleted) {
+                        console.log(
+                            'Your Monzo balance includes a pot "' + pot.name + '" containing',
+                            (pot.balance / 100).toFixed(2),
+                            pot.currency
+                        );
+                    }
+                });
+            });
+        }
     }
 
     var exporter = Exporter({
@@ -282,7 +298,7 @@ auth.login({
 
     if (args.load) {
         return fs.readFile(args.load, 'utf8', function (err, data) {
-            exporter.write(JSON.parse(data).map(transactionMap));
+            process(JSON.parse(data));
         });
     }
 
@@ -297,7 +313,7 @@ auth.login({
                 return Exporter({format: 'json', file: args.dump}).write(response.transactions);
             }
 
-            return exporter.write(response.transactions.map(transactionMap));
+            process(response.transactions);
         }).catch(function (resp) {
             if (resp.error && resp.error.code == 'forbidden.verification_required') {
                 return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
