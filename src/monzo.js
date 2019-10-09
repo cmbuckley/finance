@@ -12,6 +12,7 @@ const args = require('yargs')
     .option('login', {alias: 'l', describe: 'Force OAuth re-login'})
     .option('dump', {alias: 'd', describe: 'Dump transactions to specified file'})
     .option('load', {alias: 'u', describe: 'Load from a specified dump file'})
+    .option('quiet', {alias: 'q', describe: 'Suppress output'})
     .help('help')
     .argv;
 
@@ -123,7 +124,7 @@ function transfer(transaction, config) {
     if (transaction.merchant && transaction.merchant.atm) {
         var account = lookup('local_currency', currencies)(transaction);
 
-        if (!account) {
+        if (!args.quiet && !account) {
             console.error('Unknown withdrawn currency', transaction.local_currency);
         }
 
@@ -190,7 +191,7 @@ function category(transaction) {
         category = category(transaction);
     }
 
-    if (!category) {
+    if (!args.quiet && !category) {
         console.log(
             'Unknown category for ' + transaction.id,
             '(' + transaction.category + '):',
@@ -223,7 +224,7 @@ function payee(transaction, config) {
             return config.payees[transaction.merchant.group_id];
         }
 
-        if (!transfer(transaction, config)) {
+        if (!args.quiet && !transfer(transaction, config)) {
             console.log(
                 'Unknown merchant',
                 transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created) + ':',
@@ -274,8 +275,9 @@ auth.login({
 
     var exporter = Exporter({
         format:  args.format || 'qif',
+        quiet:   args.quiet,
         name:    'monzo',
-        account: 'Monzo'
+        account: 'Monzo',
     });
 
     if (args.load) {

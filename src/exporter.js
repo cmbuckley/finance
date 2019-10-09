@@ -23,11 +23,11 @@ module.exports = function exporter(options) {
 
     return {
         write: function (transactions) {
-            console.log('Exporting to', filename);
+            if (!options.quiet) { console.log('Exporting to', filename); }
 
             adapter(transactions.filter(Boolean), options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
-                    console.log('Wrote transactions to', filename);
+                    if (!options.quiet) { console.log('Wrote transactions to', filename); }
                 });
             });
         }
