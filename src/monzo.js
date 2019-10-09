@@ -28,12 +28,22 @@ var currencies = {
 var categories = {
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
-    bills:         'Bills',
     groceries:     'Food:Groceries',
+
+    bills: lookup('description', {
+        'Computing': 'AWS',
+        'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS/,
+        'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
+        'Donations': /JUSTGIVING/i,
+        'House:Improvement': /TIMPSON/,
+        'House:Insurance': /SIMPLY BUSINESS/,
+        'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE/,
+        'Taxes': 'HMRC',
+        'Utilities:Gas': 'BRITISH GAS',
+    }, 'Bills'),
     personal_care: lookup('description', {
         'Healthcare:Eyecare': 'CONTACT LENSES',
     }, 'Healthcare'),
-
     entertainment: lookup('description', {
         'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
         'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
