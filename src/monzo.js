@@ -17,7 +17,7 @@ const args = require('yargs')
     .help('help')
     .argv;
 
-var currencies = {
+var foreginCurrencies = {
     'Cash':  'GBP',
     'Euros': 'EUR',
     'HK$':   'HKD',
@@ -94,7 +94,7 @@ var categories = {
         'House:Improvement': 'SCREWFIX',
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
     })),
-    cash: lookup('local_currency', currencies, function (transaction) {
+    cash: lookup('local_currency', foreginCurrencies, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
         }
@@ -125,20 +125,25 @@ var categories = {
 };
 
 function transfer(transaction, config) {
-    if (transaction.counterparty &&
-        transaction.counterparty.sort_code &&
-        transaction.counterparty.account_number
-    ) {
-        var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
-                + ' ' + transaction.counterparty.account_number;
+    if (transaction.counterparty) {
+        if (transaction.counterparty.sort_code &&
+            transaction.counterparty.account_number
+        ) {
+            var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
+                    + ' ' + transaction.counterparty.account_number;
 
-        if (config.transfers[key]) {
-            return config.transfers[key];
+            if (config.transfers[key]) {
+                return config.transfers[key];
+            }
         }
-    }
 
-    if (transaction.counterparty && config.transfers[transaction.counterparty.user_id]) {
-        return config.transfers[transaction.counterparty.user_id];
+        if (config.transfers[transaction.counterparty.user_id]) {
+            return config.transfers[transaction.counterparty.user_id];
+        }
+
+        if (config.transfers[transaction.counterparty.account_id]) {
+            return config.transfers[transaction.counterparty.account_id];
+        }
     }
 
     if (transaction.merchant && config.transfers[transaction.merchant.group_id]) {
@@ -146,7 +151,7 @@ function transfer(transaction, config) {
     }
 
     if (transaction.merchant && transaction.merchant.atm) {
-        var account = lookup('local_currency', currencies)(transaction);
+        var account = lookup('local_currency', Object.assign({Cash: 'GBP'}, foreginCurrencies))(transaction);
 
         if (!args.quiet && !account) {
             console.error('Unknown withdrawn currency', transaction.local_currency);
@@ -155,6 +160,7 @@ function transfer(transaction, config) {
         return account;
     }
 
+    // legacy
     if (transaction.category == 'mondo' &&
         transaction.amount > 0 &&
         !transaction.counterparty.user_id
@@ -230,13 +236,30 @@ function category(transaction) {
 function payee(transaction, config) {
     // use known payee name if we have one
     if (transaction.counterparty.user_id) {
+        if (transfer(transaction, config)) {
+            return '';
+        }
+
         if (config.payees[transaction.counterparty.user_id]) {
             return config.payees[transaction.counterparty.user_id];
         }
 
-        if (!/^anonuser_/.test(transaction.counterparty.user_id) && !transfer(transaction, config)) {
-            return transaction.counterparty.name;
+        if (transaction.counterparty.sort_code && transaction.counterparty.account_number) {
+            var key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
+                    + ' ' + transaction.counterparty.account_number;
+
+            if (config.payees[key]) {
+                return config.payees[key];
+            }
+
+            console.error('Unknown payee', transaction.counterparty.user_id, key, transaction.counterparty.name);
+        } else if (/^user_/.test(transaction.counterparty.user_id)) {
+            console.error('Unknown Monzo payee', transaction.counterparty.user_id + ':', transaction.counterparty.name || '(no name)');
+        } else {
+            console.error('Unknown payee', transaction.counterparty.user_id, transaction.counterparty.name);
         }
+
+        return transaction.counterparty.name || '';
     }
 
     if (transaction.merchant && transaction.merchant.id) {
