@@ -18,7 +18,6 @@ const args = require('yargs')
     .argv;
 
 var foreginCurrencies = {
-    'Cash':  'GBP',
     'Euros': 'EUR',
     'HK$':   'HKD',
     'Yen':   'JPY',
@@ -170,18 +169,18 @@ function transfer(transaction, config) {
     }
 }
 
-function lookup(key, matches, defaultValue) {
+function lookup(key, matches, defaultResponse) {
     return function (transaction) {
-        var isFunction   = (typeof defaultValue === 'function'),
-            defaultFunc  = (isFunction ? defaultValue : function () {});
+        var isFunction   = (typeof defaultResponse === 'function'),
+            defaultFunc  = (isFunction ? defaultResponse : function () {}),
+            defaultValue = (isFunction ? null : defaultResponse);
 
-        defaultValue = (isFunction ? null : defaultValue);
-        return defaultFunc(transaction) || Object.keys(matches).find(function (match) {
+        return Object.keys(matches).find(function (match) {
             var pattern = matches[match],
                 value = transaction[key];
 
             return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
-        }) || defaultValue || '';
+        }) || defaultFunc(transaction) || defaultValue || '';
     };
 }
 
