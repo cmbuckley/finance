@@ -152,8 +152,8 @@ function transfer(transaction, config) {
     if (transaction.merchant && transaction.merchant.atm) {
         var account = lookup('local_currency', Object.assign({Cash: 'GBP'}, foreginCurrencies))(transaction);
 
-        if (!args.quiet && !account) {
-            console.error('Unknown withdrawn currency', transaction.local_currency);
+        if (!account) {
+            warn('Unknown withdrawn currency', transaction.local_currency);
         }
 
         return account;
@@ -203,6 +203,12 @@ function exit(scope) {
     };
 }
 
+function warn() {
+    if (!args.quiet) {
+        console.error.apply(console, arguments);
+    }
+}
+
 function timestamp(date) {
     return date ? date + 'T00:00:00Z' : undefined;
 }
@@ -220,8 +226,8 @@ function category(transaction) {
         category = category(transaction);
     }
 
-    if (!args.quiet && !category) {
-        console.log(
+    if (!category) {
+        warn(
             'Unknown category for ' + transaction.id,
             '(' + transaction.category + '):',
             '[' + (transaction.merchant ? transaction.merchant.name || '' : '') + ']',
@@ -251,11 +257,11 @@ function payee(transaction, config) {
                 return config.payees[key];
             }
 
-            console.error('Unknown payee', transaction.counterparty.user_id, key, transaction.counterparty.name);
+            warn('Unknown payee', transaction.counterparty.user_id, key, transaction.counterparty.name);
         } else if (/^user_/.test(transaction.counterparty.user_id)) {
-            console.error('Unknown Monzo payee', transaction.counterparty.user_id + ':', transaction.counterparty.name || '(no name)');
+            warn('Unknown Monzo payee', transaction.counterparty.user_id + ':', transaction.counterparty.name || '(no name)');
         } else {
-            console.error('Unknown payee', transaction.counterparty.user_id, transaction.counterparty.name);
+            warn('Unknown payee', transaction.counterparty.user_id, transaction.counterparty.name);
         }
 
         return transaction.counterparty.name || '';
@@ -270,8 +276,8 @@ function payee(transaction, config) {
             return config.payees[transaction.merchant.group_id];
         }
 
-        if (!args.quiet && !transfer(transaction, config)) {
-            console.log(
+        if (!transfer(transaction, config)) {
+            warn(
                 'Unknown merchant',
                 transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created) + ':',
                 transaction.merchant.name || ''
