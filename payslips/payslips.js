@@ -86,7 +86,7 @@
                         description = getDescription(cells, isEarnings),
                         amount = getAmount(cells, isEarnings);
 
-                    if (description && amount != 0) {
+                    if (description && cells.length > 2 && amount != 0) {
                         file.push({
                             d: date,
                             p: getPayee(description),
@@ -113,7 +113,7 @@
 
     function getDescription(cells, hasHours) {
         var description = cells[0].innerText.trim().replace("'", ''),
-            hours = cells[2].innerText.trim() * 1;
+            hours = cells[2] ? cells[2].innerText.trim() * 1 : 0;
 
         return description + (hasHours && hours > 0 ? ': ' + hours: '');
     }
