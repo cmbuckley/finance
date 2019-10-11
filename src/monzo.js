@@ -345,7 +345,7 @@ auth.login({
                         );
                     }
                 });
-            });
+            }).catch(exit('pots'));
         }
     }
 

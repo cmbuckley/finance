@@ -9,7 +9,11 @@ module.exports = function exporter(options) {
     try {
         adapter = require('./exporter/' + options.format);
     } catch (e) {
-        throw new Error(options.format + ': format not found');
+        if (e.code == 'MODULE_NOT_FOUND') {
+            throw new Error(options.format + ': format not found');
+        }
+
+        throw e;
     }
 
     if (!options.name && !options.file) {
