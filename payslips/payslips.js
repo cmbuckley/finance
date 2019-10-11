@@ -42,7 +42,7 @@
     };
 
     // find all the header cells
-    var cells = document.querySelectorAll('td[role="columnheader"]'),
+    var cells = document.querySelectorAll('tr[aria-label="row"] td'),
         date;
 
     // find the Payment Date header cell and get the date from the info table
