@@ -9,7 +9,7 @@ module.exports = function qif(transactions, options, callback) {
 
     callback(null, transactions.reduce(function (file, transaction) {
         return file.concat([
-            'D' + transaction.date,
+            'D' + transaction.date.format('YYYY-MM-DD'),
             'T' + (transaction.amount / 100).toFixed(2),
             'M' + transaction.memo,
             'P' + transaction.payee,

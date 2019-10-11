@@ -220,7 +220,7 @@ function timestamp(date) {
 }
 
 function date(timestamp) {
-    return moment(timestamp).tz('Europe/London').format('YYYY-MM-DD');
+    return moment(timestamp).tz('Europe/London');
 }
 
 function category(transaction) {
@@ -285,7 +285,7 @@ function payee(transaction, config) {
         if (!transfer(transaction, config)) {
             warn(
                 'Unknown merchant',
-                transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created) + ':',
+                transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created).format('YYYY-MM-DD') + ':',
                 transaction.merchant.name || ''
             );
         }
