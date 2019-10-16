@@ -18,7 +18,7 @@ const args = require('yargs')
     .help('help')
     .argv;
 
-const foreginCurrencies = {
+const foreignCurrencies = {
     'Euros': 'EUR',
     'HK$':   'HKD',
     'Yen':   'JPY',
@@ -98,7 +98,7 @@ const categories = {
         'House:Improvement': 'SCREWFIX',
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
     })),
-    cash: lookup('local_currency', foreginCurrencies, function (transaction) {
+    cash: lookup('local_currency', foreignCurrencies, function (transaction) {
         if (transaction.counterparty.user_id) {
             return 'Loan';
         }
@@ -155,7 +155,7 @@ function transfer(transaction, config) {
     }
 
     if (transaction.merchant && transaction.merchant.atm) {
-        let currencies = Object.assign({Cash: 'GBP'}, foreginCurrencies),
+        let currencies = Object.assign({Cash: 'GBP'}, foreignCurrencies),
             account = lookup('local_currency', currencies)(transaction);
 
         if (!account) {
