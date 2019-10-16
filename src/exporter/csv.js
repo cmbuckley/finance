@@ -18,10 +18,10 @@ module.exports = function csv(transactions, options, callback) {
             options.account,
             transaction.date.format('YYYY-MM-DD HH:mm'),
             transaction.payee,
-            (transaction.localAmount / 100).toFixed(2),
+            this.numberFormat(transaction.localAmount, transaction.localCurrency || ''),
             transaction.category,
-            transaction.currency || '',
-            transaction.rate || 1,
+            transaction.localCurrency || '',
+            this.exchangeRate(transaction.localAmount, transaction.localCurrency, transaction.amount, transaction.currency),
             transaction.memo,
             transaction.id
         ];
@@ -29,8 +29,9 @@ module.exports = function csv(transactions, options, callback) {
         // duplicate the row for the transfer
         if (transaction.transfer) {
             let transfer = row.slice(0);
+            if (transaction.atm) { transfer[head.indexOf('Rate')] = 1; }
             transfer[head.indexOf('Account')] = transaction.transfer;
-            transfer[head.indexOf('Amount')] = (-transaction.localAmount / 100).toFixed(2);
+            transfer[head.indexOf('Amount')] = this.numberFormat(-transaction.localAmount, transaction.localCurrency || '');
             transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.localAmount < 0 ? 'from' : 'to') + ':' + options.account;
             row[head.indexOf('Category')] = 'Transfer ' + (transaction.localAmount > 0 ? 'from' : 'to') + ':' + transaction.transfer;
             rows.push(transfer);
@@ -38,7 +39,7 @@ module.exports = function csv(transactions, options, callback) {
 
         rows.push(row);
         return rows;
-    }, [head]), {
+    }.bind(this), [head]), {
         delimiter: options.delimiter
     }, callback);
 };

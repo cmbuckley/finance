@@ -320,16 +320,18 @@ auth.login({
             }
 
             return {
-                date:        date(transaction.created),
-                amount:      transaction.amount,
-                memo:        (transaction.notes || transaction.description.replace(/ +/g, ' ')),
-                payee:       payee(transaction, config),
-                transfer:    transfer(transaction, config),
-                category:    (category(transaction) || ''),
-                id:          transaction.id,
-                currency:    transaction.local_currency,
-                localAmount: transaction.local_amount,
-                rate:        (transaction.currency === transaction.local_currency ? 1 : transaction.amount / transaction.local_amount)
+                date:          date(transaction.created),
+                amount:        transaction.amount,
+                memo:          (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                payee:         payee(transaction, config),
+                transfer:      transfer(transaction, config),
+                category:      (category(transaction) || ''),
+                id:            transaction.id,
+                localCurrency: transaction.local_currency,
+                localAmount:   transaction.local_amount,
+                currency:      transaction.currency,
+                amount:        transaction.amount,
+                atm:           (transaction.merchant && transaction.merchant.atm),
             };
         }));
 
@@ -340,7 +342,7 @@ auth.login({
                     if (!pot.deleted) {
                         console.log(
                             'Your Monzo balance includes a pot "' + pot.name + '" containing',
-                            (pot.balance / 100).toFixed(2),
+                            exporter.helpers.numberFormat(pot.balance, pot.currency),
                             pot.currency
                         );
                     }
