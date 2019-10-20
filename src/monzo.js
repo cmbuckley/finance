@@ -64,7 +64,7 @@ const categories = {
     }, lookup('description', {
         'Car:Parking': 'MANCHESTER AIRPORT CAR',
         'Food:Eating Out': 'HMSHOST',
-        'Holiday:Accommodation': /MOXY STRATFORD|HOTEL/,
+        'Holiday:Accommodation': /MOXY STRATFORD|HOTEL|Booking\.com/,
         'Holiday:Souvenirs': 'WDFG',
         'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
         'Nights Out:Stag Do': 'GROUPIA',
@@ -93,9 +93,10 @@ const categories = {
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
     }, lookup('description', {
-        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO/,
-        'Gifts': /W\.KRUK|WARNER BROS STUDIOS/,
-        'House:Improvement': 'SCREWFIX',
+        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA/,
+        'Food:Alcohol': 'Veeno',
+        'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
+        'House:Improvement': /BARGAIN TOOLS|SCREWFIX/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
     })),
     cash: lookup('local_currency', foreignCurrencies, function (transaction) {
@@ -107,13 +108,14 @@ const categories = {
         'Gas Station': 'Car:Petrol',
         'Gas Station / Garage': 'Car:Petrol',
         'Parking': 'Car:Parking',
+        'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil/,
+        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC/i,
         'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED/,
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
-        'Travel:Rail': /GVB|Trainline\.com|TFL.gov/i,
+        'Travel:Rail': /GVB|Trainline|TFL.gov/i,
         'Travel:Taxi': /UBER|bolt\.eu/i,
     })),
     family: foursquareCategory({
@@ -123,7 +125,8 @@ const categories = {
         'Warehouse Store': 'House',
     }, lookup('description', {
         'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED/,
-        'Pet Care:Accommodation': 'PAWSHAKE',
+        'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
+        'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': 'VETERINARY',
     })),
 };
@@ -163,6 +166,10 @@ function transfer(transaction, config) {
         }
 
         return account;
+    }
+
+    if (/^PAYPAL /.test(transaction.description)) {
+        return 'PayPal';
     }
 
     // legacy
@@ -230,6 +237,10 @@ function category(transaction) {
 
     if (typeof category == 'function') {
         category = category(transaction);
+    }
+
+    if (!transaction.merchant.atm) {
+        return '';
     }
 
     if (!category) {
