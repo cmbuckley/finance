@@ -336,7 +336,7 @@ auth.login({
         }));
 
         // pots request
-        if (!args.quiet) {
+        if (!args.quiet && args.account == 'current' && !args.load) {
             monzo.pots(config.token.access_token).then(function (response) {
                 response.pots.map(function (pot) {
                     if (!pot.deleted) {
