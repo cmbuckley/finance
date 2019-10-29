@@ -18,7 +18,7 @@ BEGIN {
     as["BUCKLEY CM"] = "Current Account"
     as["CAPITA IRG BUCKLE"] = "Sharesave"
     as["BUCKLEY C   \\*LY[AP]"] = "ISA"
-    as["BUCKLEY C SHARED ACCOUNT"] = "Shared Account"
+    as["BUCKLEY C SHARED ACCOUNT"] = "First Direct"
 }
 {
     x = substr($0, 1, 1)
