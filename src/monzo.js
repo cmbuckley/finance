@@ -239,7 +239,7 @@ function category(transaction) {
         category = category(transaction);
     }
 
-    if (!transaction.merchant.atm) {
+    if (transaction.merchant && !transaction.merchant.atm) {
         return '';
     }
 
@@ -333,7 +333,7 @@ auth.login({
             return {
                 date:          date(transaction.created),
                 amount:        transaction.amount,
-                memo:          (transaction.notes || transaction.description.replace(/ +/g, ' ')),
+                memo:          (transaction.notes || transaction.description).replace(/[ \n]+/g, ' '),
                 payee:         payee(transaction, config),
                 transfer:      transfer(transaction, config),
                 category:      (category(transaction) || ''),
@@ -366,7 +366,7 @@ auth.login({
         format:  args.format || 'qif',
         quiet:   args.quiet,
         name:    'monzo',
-        account: 'Monzo',
+        account: {prepaid: 'Monzo Prepaid', current: 'Monzo', joint: 'Monzo Joint'}[args.account],
     });
 
     // load from dump file
