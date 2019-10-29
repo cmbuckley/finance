@@ -239,20 +239,20 @@ function category(transaction) {
         category = category(transaction);
     }
 
+    if (category) {
+        return category;
+    }
+
     if (transaction.merchant && !transaction.merchant.atm) {
         return '';
     }
 
-    if (!category) {
-        warn(
-            'Unknown category for ' + transaction.id,
-            '(' + transaction.category + '):',
-            '[' + (transaction.merchant ? transaction.merchant.name || '' : '') + ']',
-            transaction.notes || transaction.description
-        );
-    }
-
-    return category;
+    warn(
+        'Unknown category for ' + transaction.id,
+        '(' + transaction.category + '):',
+        '[' + (transaction.merchant ? transaction.merchant.name || '' : '') + ']',
+        transaction.notes || transaction.description
+    );
 }
 
 function payee(transaction, config) {
