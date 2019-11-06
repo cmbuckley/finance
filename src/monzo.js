@@ -10,7 +10,6 @@ const args = require('yargs')
     .option('from',     {alias: 'f', describe: 'Earliest date for transactions'})
     .option('to',       {alias: 't', describe: 'Latest date for transactions'})
     .option('no-topup', {            describe: 'Don’t include topup transactions'})
-    .option('no-pot',   {            describe: 'Don’t include pot transactions'})
     .option('login',    {alias: 'l', describe: 'Force OAuth re-login'})
     .option('dump',     {alias: 'd', describe: 'Dump transactions to specified file'})
     .option('load',     {alias: 'u', describe: 'Load from a specified dump file'})
@@ -243,7 +242,8 @@ function category(transaction) {
         return category;
     }
 
-    if (transaction.merchant && !transaction.merchant.atm) {
+    // ignore ATM withdrawals and internal pot transfers
+    if ((transaction.scheme == 'uk_retail_pot') || (transaction.merchant && !transaction.merchant.atm)) {
         return '';
     }
 
@@ -325,7 +325,7 @@ auth.login({
                 transaction.decline_reason // failed
                 || !transaction.amount // zero amount transaction
                 || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
-                || (args.pot === false && transaction.scheme == 'uk_retail_pot') // ignore pot
+                || (transaction.scheme == 'uk_retail_pot' && transaction.metadata.trigger == 'coin_jar') // ignore round-up
             ) {
                 return false;
             }
@@ -350,7 +350,7 @@ auth.login({
         if (!args.quiet && args.account == 'current' && !args.load) {
             monzo.pots(config.token.access_token).then(function (response) {
                 response.pots.map(function (pot) {
-                    if (!pot.deleted) {
+                    if (!pot.deleted && pot.round_up) {
                         console.log(
                             'Your Monzo balance includes a pot "' + pot.name + '" containing',
                             exporter.helpers.numberFormat(pot.balance, pot.currency),
