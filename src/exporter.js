@@ -42,12 +42,13 @@ module.exports = function exporter(options) {
 
     return {
         helpers: helpers,
-        write: function (transactions) {
+        write: function (transactions, callback) {
             if (!options.quiet) { console.log('Exporting to', filename); }
 
             adapter.call(helpers, transactions.filter(Boolean), options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
                     if (!options.quiet) { console.log('Wrote transactions to', filename); }
+                    callback && callback(contents);
                 });
             });
         }

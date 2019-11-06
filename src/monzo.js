@@ -130,6 +130,8 @@ const categories = {
     })),
 };
 
+const pots = {};
+
 function transfer(transaction, config) {
     if (transaction.counterparty) {
         if (transaction.counterparty.sort_code &&
@@ -169,6 +171,10 @@ function transfer(transaction, config) {
 
     if (/^PAYPAL /.test(transaction.description)) {
         return 'PayPal';
+    }
+
+    if (transaction.scheme == 'uk_retail_pot') {
+        return 'Monzo ' + pots[transaction.metadata.pot_id];
     }
 
     // legacy
@@ -319,7 +325,7 @@ auth.login({
     forceLogin: args.login,
     fakeLogin: args.load
 }).then(function (config) {
-    function process(transactions) {
+    function process(transactions, callback) {
         exporter.write(transactions.map(function (transaction) {
             if (
                 transaction.decline_reason // failed
@@ -344,22 +350,7 @@ auth.login({
                 amount:        transaction.amount,
                 atm:           (transaction.merchant && transaction.merchant.atm),
             };
-        }));
-
-        // pots request
-        if (!args.quiet && args.account == 'current' && !args.load) {
-            monzo.pots(config.token.access_token).then(function (response) {
-                response.pots.map(function (pot) {
-                    if (!pot.deleted && pot.round_up) {
-                        console.log(
-                            'Your Monzo balance includes a pot "' + pot.name + '" containing',
-                            exporter.helpers.numberFormat(pot.balance, pot.currency),
-                            pot.currency
-                        );
-                    }
-                });
-            }).catch(exit('pots'));
-        }
+        }), callback);
     }
 
     const exporter = Exporter({
@@ -376,24 +367,38 @@ auth.login({
         });
     }
 
-    monzo.accounts(config.token.access_token).then(function (response) {
-        monzo.transactions({
-          account_id: account(response.accounts, args.account).id,
-          expand:     'merchant',
-          since:      timestamp(args.from),
-          before:     timestamp(args.to)
-        }, config.token.access_token).then(function (response) {
-            if (args.dump) {
-                return Exporter({format: 'json', file: args.dump}).write(response.transactions);
-            }
+    monzo.accounts(config.token.access_token).then(function (accountsResponse) {
+        monzo.pots(config.token.access_token).then(function (potsResponse) {
+            potsResponse.pots.map(pot => pots[pot.id] = pot.name);
 
-            process(response.transactions);
-        }).catch(function (resp) {
-            if (resp.error && resp.error.code == 'forbidden.verification_required') {
-                return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
-            }
+            monzo.transactions({
+              account_id: account(accountsResponse.accounts, args.account).id,
+              expand:     'merchant',
+              since:      timestamp(args.from),
+              before:     timestamp(args.to)
+            }, config.token.access_token).then(function (transactionsResponse) {
+                if (args.dump) {
+                    return Exporter({format: 'json', file: args.dump}).write(transactionsResponse.transactions);
+                }
 
-            return exit('transactions')(resp);
-        });
+                process(transactionsResponse.transactions, function () {
+                    potsResponse.pots.map(function (pot) {
+                        if (!pot.deleted && pot.round_up) {
+                            console.log(
+                                'Your Monzo balance includes a pot "' + pot.name + '" containing',
+                                exporter.helpers.numberFormat(pot.balance, pot.currency),
+                                pot.currency
+                            );
+                        }
+                    });
+                });
+            }).catch(function (resp) {
+                if (resp.error && resp.error.code == 'forbidden.verification_required') {
+                    return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
+                }
+
+                return exit('transactions')(resp);
+            });
+        }).catch(exit('pots'));
     }).catch(exit('accounts'));
 }).catch(exit('token'));
