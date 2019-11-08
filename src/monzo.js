@@ -213,17 +213,17 @@ auth.login({
         account: {prepaid: 'Monzo Prepaid', current: 'Monzo', joint: 'Monzo Joint'}[args.account],
     });
 
-    // load from dump file
-    if (args.load) {
-        return fs.readFile(args.load, 'utf8', function (err, data) {
-            process(JSON.parse(data));
-        });
-    }
+    monzo.pots(config.token.access_token).then(function (potsResponse) {
+        potsResponse.pots.map(pot => pots[pot.id] = pot.name);
 
-    monzo.accounts(config.token.access_token).then(function (accountsResponse) {
-        monzo.pots(config.token.access_token).then(function (potsResponse) {
-            potsResponse.pots.map(pot => pots[pot.id] = pot.name);
+        // load from dump file
+        if (args.load) {
+            return fs.readFile(args.load, 'utf8', function (err, data) {
+                process(JSON.parse(data));
+            });
+        }
 
+        monzo.accounts(config.token.access_token).then(function (accountsResponse) {
             monzo.transactions({
               account_id: account(accountsResponse.accounts, args.account).id,
               expand:     'merchant',
