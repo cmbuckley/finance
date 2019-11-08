@@ -16,24 +16,24 @@ module.exports = function csv(transactions, options, callback) {
     stringify(transactions.reduce(function (rows, transaction) {
         let row = [
             options.account,
-            transaction.date.format('YYYY-MM-DD HH:mm'),
-            transaction.payee,
-            this.numberFormat(transaction.localAmount, transaction.localCurrency || ''),
-            transaction.category,
-            transaction.localCurrency || '',
-            this.exchangeRate(transaction.localAmount, transaction.localCurrency, transaction.amount, transaction.currency),
-            transaction.memo,
-            transaction.id
+            transaction.getDate('YYYY-MM-DD HH:mm'),
+            transaction.getPayee(),
+            transaction.getLocalAmount(),
+            transaction.getCategory(),
+            transaction.getCurrency(),
+            transaction.getExchangeRate(),
+            transaction.getMemo(),
+            transaction.getId()
         ];
 
         // duplicate the row for the transfer
-        if (transaction.transfer) {
+        if (transaction.isTransfer()) {
             let transfer = row.slice(0);
-            if (transaction.atm) { transfer[head.indexOf('Rate')] = 1; }
-            transfer[head.indexOf('Account')] = transaction.transfer;
-            transfer[head.indexOf('Amount')] = this.numberFormat(-transaction.localAmount, transaction.localCurrency || '');
-            transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.localAmount < 0 ? 'from' : 'to') + ':' + options.account;
-            row[head.indexOf('Category')] = 'Transfer ' + (transaction.localAmount > 0 ? 'from' : 'to') + ':' + transaction.transfer;
+            if (transaction.isCashWithdrawal()) { transfer[head.indexOf('Rate')] = 1; }
+            transfer[head.indexOf('Account')] = transaction.getTransfer();
+            transfer[head.indexOf('Amount')] = transaction.getLocalAmount(true);
+            transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'from' : 'to') + ':' + options.account;
+            row[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'to' : 'from') + ':' + transaction.getTransfer();
             rows.push(transfer);
         }
 

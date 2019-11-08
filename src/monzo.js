@@ -1,7 +1,7 @@
 const fs = require('fs'),
     monzo = require('monzo-bank'),
-    moment = require('moment-timezone'),
-    Exporter = require('./exporter');
+    Exporter = require('./exporter'),
+    Transaction = require('./transaction');
 
 const auth = require('./lib/auth');
 const args = require('yargs')
@@ -132,61 +132,6 @@ const categories = {
 
 const pots = {};
 
-function transfer(transaction, config) {
-    if (transaction.counterparty) {
-        if (transaction.counterparty.sort_code &&
-            transaction.counterparty.account_number
-        ) {
-            let key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
-                    + ' ' + transaction.counterparty.account_number;
-
-            if (config.transfers[key]) {
-                return config.transfers[key];
-            }
-        }
-
-        if (config.transfers[transaction.counterparty.user_id]) {
-            return config.transfers[transaction.counterparty.user_id];
-        }
-
-        if (config.transfers[transaction.counterparty.account_id]) {
-            return config.transfers[transaction.counterparty.account_id];
-        }
-    }
-
-    if (transaction.merchant && config.transfers[transaction.merchant.group_id]) {
-        return config.transfers[transaction.merchant.group_id];
-    }
-
-    if (transaction.merchant && transaction.merchant.atm) {
-        let currencies = Object.assign({Cash: 'GBP'}, foreignCurrencies),
-            account = lookup('local_currency', currencies)(transaction);
-
-        if (!account) {
-            warn('Unknown withdrawn currency', transaction.local_currency);
-        }
-
-        return account;
-    }
-
-    if (/^PAYPAL /.test(transaction.description)) {
-        return 'PayPal';
-    }
-
-    if (transaction.scheme == 'uk_retail_pot') {
-        return 'Monzo ' + pots[transaction.metadata.pot_id];
-    }
-
-    // legacy
-    if (transaction.category == 'mondo' &&
-        transaction.amount > 0 &&
-        !transaction.counterparty.user_id
-        && transaction.is_load
-    ) {
-        return 'Current Account';
-    }
-}
-
 function lookup(key, matches, defaultResponse) {
     return function (transaction) {
         let isFunction   = (typeof defaultResponse === 'function'),
@@ -231,86 +176,6 @@ function timestamp(date) {
     return date ? date + 'T00:00:00Z' : undefined;
 }
 
-function date(timestamp) {
-    return moment(timestamp).tz('Europe/London');
-}
-
-function category(transaction) {
-    let category = (categories.hasOwnProperty(transaction.category)
-                 ? categories[transaction.category]
-                 : transaction.category);
-
-    if (typeof category == 'function') {
-        category = category(transaction);
-    }
-
-    if (category) {
-        return category;
-    }
-
-    // ignore ATM withdrawals and internal pot transfers
-    if ((transaction.scheme == 'uk_retail_pot') || (transaction.merchant && !transaction.merchant.atm)) {
-        return '';
-    }
-
-    warn(
-        'Unknown category for ' + transaction.id,
-        '(' + transaction.category + '):',
-        '[' + (transaction.merchant ? transaction.merchant.name || '' : '') + ']',
-        transaction.notes || transaction.description
-    );
-}
-
-function payee(transaction, config) {
-    // use known payee name if we have one
-    if (transaction.counterparty.user_id) {
-        if (transfer(transaction, config)) {
-            return '';
-        }
-
-        if (config.payees[transaction.counterparty.user_id]) {
-            return config.payees[transaction.counterparty.user_id];
-        }
-
-        if (transaction.counterparty.sort_code && transaction.counterparty.account_number) {
-            let key = transaction.counterparty.sort_code.match(/\d{2}/g).join('-')
-                    + ' ' + transaction.counterparty.account_number;
-
-            if (config.payees[key]) {
-                return config.payees[key];
-            }
-
-            warn('Unknown payee', transaction.counterparty.user_id, key, transaction.counterparty.name);
-        } else if (/^user_/.test(transaction.counterparty.user_id)) {
-            warn('Unknown Monzo payee', transaction.counterparty.user_id + ':', transaction.counterparty.name || '(no name)');
-        } else {
-            warn('Unknown payee', transaction.counterparty.user_id, transaction.counterparty.name);
-        }
-
-        return transaction.counterparty.name || '';
-    }
-
-    if (transaction.merchant && transaction.merchant.id) {
-        if (config.payees[transaction.merchant.id]) {
-            return config.payees[transaction.merchant.id];
-        }
-
-        if (config.payees[transaction.merchant.group_id]) {
-            return config.payees[transaction.merchant.group_id];
-        }
-
-        if (!transfer(transaction, config)) {
-            warn(
-                'Unknown merchant',
-                transaction.merchant.id + ':' + transaction.merchant.group_id + ':' + date(transaction.created).format('YYYY-MM-DD') + ':',
-                transaction.merchant.name || ''
-            );
-        }
-    }
-
-    return '';
-}
-
 function account(accounts, type) {
     const typeMap = {
         joint: 'uk_retail_joint',
@@ -325,31 +190,19 @@ auth.login({
     forceLogin: args.login,
     fakeLogin: args.load
 }).then(function (config) {
-    function process(transactions, callback) {
-        exporter.write(transactions.map(function (transaction) {
-            if (
-                transaction.decline_reason // failed
-                || !transaction.amount // zero amount transaction
-                || (args.topup === false && transaction.is_load && !transaction.counterparty.user_id && transaction.amount > 0) // ignore topups
-                || (transaction.scheme == 'uk_retail_pot' && transaction.metadata.trigger == 'coin_jar') // ignore round-up
-            ) {
-                return false;
-            }
+    let connector = {
+        warn,
+        config,
+        categories,
+        pots,
+        foreignCurrencies,
+        args,
+    };
 
-            return {
-                date:          date(transaction.created),
-                amount:        transaction.amount,
-                memo:          (transaction.notes || transaction.description).replace(/[ \n]+/g, ' '),
-                payee:         payee(transaction, config),
-                transfer:      transfer(transaction, config),
-                category:      (category(transaction) || ''),
-                id:            transaction.id,
-                localCurrency: transaction.local_currency,
-                localAmount:   transaction.local_amount,
-                currency:      transaction.currency,
-                amount:        transaction.amount,
-                atm:           (transaction.merchant && transaction.merchant.atm),
-            };
+    function process(transactions, callback) {
+        exporter.write(transactions.map(function (raw) {
+            let transaction = new Transaction(raw, connector);
+            return (transaction.isValid() ? transaction : false);
         }), callback);
     }
 
