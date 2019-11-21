@@ -77,6 +77,7 @@ class MonzoTransaction {
     }
 
     getMemo() {
+        if (this.raw.scheme == 'uk_retail_pot') { return 'Added to Pot'; }
         return (this.raw.notes || this.raw.description).replace(/[ \n]+/g, ' ');
     }
 
@@ -98,7 +99,7 @@ class MonzoTransaction {
         }
 
         // ignore ATM withdrawals and internal pot transfers
-        if ((this.raw.scheme == 'uk_retail_pot') || (this.raw.merchant && !this.raw.merchant.atm)) {
+        if ((this.raw.scheme == 'uk_retail_pot') || this.isCashWithdrawal()) {
             return '';
         }
 
@@ -138,7 +139,7 @@ class MonzoTransaction {
 
         if (this.raw.merchant && this.raw.merchant.atm) {
             let currencies = Object.assign({Cash: 'GBP'}, helpers.foreignCurrencies),
-                account = currencies.find(c => c == this.raw.local_currency);
+                account = Object.keys(currencies)[Object.values(currencies).indexOf(this.raw.local_currency)];
 
             if (!account) {
                 helpers.warn('Unknown withdrawn currency', this.raw.local_currency);
