@@ -210,7 +210,7 @@ auth.login({
         format:  args.format || 'qif',
         quiet:   args.quiet,
         name:    'monzo',
-        account: {prepaid: 'Monzo Prepaid', current: 'Monzo', joint: 'Monzo Joint'}[args.account],
+        account: 'Monzo ' + args.account.replace(/^./, c => c.toUpperCase()),
     });
 
     monzo.pots(config.token.access_token).then(function (potsResponse) {
