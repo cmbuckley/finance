@@ -28,6 +28,14 @@ class MonzoTransaction {
             return false;
         }
 
+        if (!this.isSettled() && this.isForeign()) {
+            helpers.warn(
+                '### UNSETTLED TRANSACTION, AMOUNT MAY CHANGE:',
+                this.getDate('YYYY-MM-DD'),
+                (this.raw.merchant ? this.raw.merchant.name : this.notes) || ''
+            );
+        }
+
         return true;
     }
 
@@ -41,6 +49,14 @@ class MonzoTransaction {
 
     isCashWithdrawal() {
         return (this.raw.merchant && this.raw.merchant.atm);
+    }
+
+    isSettled() {
+        return !!this.raw.settled;
+    }
+
+    isForeign() {
+        return this.raw.local_currency !== this.raw.currency;
     }
 
     getDate(format) {
