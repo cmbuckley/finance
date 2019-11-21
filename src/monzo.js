@@ -115,7 +115,7 @@ const categories = {
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
         'Travel:Rail': /GVB|Trainline|TFL.gov/i,
-        'Travel:Taxi': /UBER|bolt\.eu/i,
+        'Travel:Taxi': /UBER|bolt\.eu|AMBER/i,
     })),
     family: foursquareCategory({
         'Garden Center': 'House:Garden',
