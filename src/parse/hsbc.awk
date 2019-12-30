@@ -6,7 +6,7 @@ BEGIN {
     as["MTG 400188[0-9]{4}9172"] = "Mortgage"
     as["HESTVIEW"] = "Payslips"
     as["PAYPAL"] = "PayPal"
-    as["MONZO"] = "Monzo"
+    as["MONZO"] = "Monzo Current"
     as["Monzo Joint"] = "Monzo Joint"
     as["^404401 [0-9]{4}3752"] = "ISA"
     as["^404401 [0-9]{4}6458"] = "Online Saver" # Closed
