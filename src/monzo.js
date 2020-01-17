@@ -223,39 +223,23 @@ auth.login({
     monzo.pots(config.token.access_token).then(function (potsResponse) {
         potsResponse.pots.map(pot => pots[pot.id] = pot);
 
-        // load from dump file
-        if (args.load) {
-            return fs.readFile(args.load, 'utf8', function (err, data) {
-                process(JSON.parse(data));
-            });
-        }
-
         monzo.accounts(config.token.access_token).then(function (accountsResponse) {
-            async.reduce(accounts(accountsResponse.accounts, args.account), [], function (transactions, account, callback) {
-                monzo.transactions({
-                  account_id: account.id,
-                  expand:     'merchant',
-                  since:      timestamp(args.from),
-                  before:     timestamp(args.to)
-                }, config.token.access_token).then(function (transactionsResponse) {
-                    if (args.dump) {
-                        return Exporter({format: 'json', file: args.dump}).write(transactionsResponse.transactions);
-                    }
+            // map of account IDs to names
+            const accountNames = accountsResponse.accounts.reduce(function (names, account) {
+                const type = Object.keys(accountTypeMap).find(t => accountTypeMap[t] == account.type);
+                names[account.id] = 'Monzo ' + type.replace(/^./, c => c.toUpperCase());
+                return names;
+            }, {});
 
-                    const accountName = Object.keys(accountTypeMap).find(t => accountTypeMap[t] == account.type);
-                    callback(null, transactions.concat(transactionsResponse.transactions.map(function (raw) {
-                        let transaction = new Transaction('Monzo ' + accountName.replace(/^./, c => c.toUpperCase()), raw, connector);
-                        return (transaction.isValid() ? transaction : false);
-                    }).filter(Boolean)));
-                }).catch(function (resp) {
-                    if (resp.error && resp.error.code == 'forbidden.verification_required') {
-                        return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
-                    }
+            function write(err, transactions) {
+                if (args.dump) {
+                    return Exporter({format: 'json', file: args.dump}).write(transactions);
+                }
 
-                    return exit('transactions')(resp);
-                });
-            }, function (err, transactions) {
-                exporter.write(transactions, function () {
+                exporter.write(transactions.map(function (raw) {
+                    const transaction = new Transaction(accountNames[raw.account_id], raw, connector);
+                    return (transaction.isValid() ? transaction : false);
+                }).filter(Boolean), function () {
                     potsResponse.pots.map(function (pot) {
                         if (!pot.deleted && pot.round_up) {
                             console.log(
@@ -266,7 +250,32 @@ auth.login({
                         }
                     });
                 });
-            });
+            }
+
+            // load from dump file
+            if (args.load) {
+                return fs.readFile(args.load, 'utf-8', function (err, data) {
+                    write(err, JSON.parse(data));
+                });
+            }
+
+            // @todo Promise.all
+            async.reduce(accounts(accountsResponse.accounts, args.account), [], function (transactions, account, callback) {
+                monzo.transactions({
+                  account_id: account.id,
+                  expand:     'merchant',
+                  since:      timestamp(args.from),
+                  before:     timestamp(args.to)
+                }, config.token.access_token).then(function (transactionsResponse) {
+                    callback(null, transactions.concat(transactionsResponse.transactions));
+                }).catch(function (resp) {
+                    if (resp.error && resp.error.code == 'forbidden.verification_required') {
+                        return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
+                    }
+
+                    return exit('transactions')(resp);
+                });
+            }, write);
         }).catch(exit('pots'));
     }).catch(exit('accounts'));
 }).catch(exit('token'));
