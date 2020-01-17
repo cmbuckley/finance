@@ -85,12 +85,15 @@ const categories = {
         'Department Store': 'Clothing',
         'Food & Drink Shop': 'Food',
         'Furniture / Home Store': 'House:Furniture',
+        'Garden Center': 'House:Garden',
         'Gift Shop': 'Gifts',
+        'Grocery Store': 'Food:Groceries',
         'Jewelry Store': 'Gifts',
         'Miscellaneous Shop': 'House',
         'Sporting Goods Shop': 'Sporting Goods',
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
+        'Women\'s Store': 'Clothing',
     }, lookup('description', {
         'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA/,
         'Food:Alcohol': 'Veeno',
@@ -106,12 +109,14 @@ const categories = {
     transport: foursquareCategory({
         'Gas Station': 'Car:Petrol',
         'Gas Station / Garage': 'Car:Petrol',
+        'Government Building': 'Car:Parking', // e.g. City of York parking
         'Parking': 'Car:Parking',
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC/i,
-        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED/,
+        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
+        'Car:Service & MOT': 'R H SIRRELL',
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
         'Travel:Rail': /GVB|Trainline|TFL.gov/i,
