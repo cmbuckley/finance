@@ -13,7 +13,8 @@ function numberFormat(amount, currency) {
 }
 
 class MonzoTransaction {
-    constructor(rawData, monzoHelpers) {
+    constructor(account, rawData, monzoHelpers) {
+        this.account = account;
         this.raw = rawData;
         helpers = monzoHelpers;
     }
@@ -60,6 +61,10 @@ class MonzoTransaction {
         return this.raw.local_currency !== this.raw.currency;
     }
 
+    getAccount() {
+        return this.account;
+    }
+
     getDate(format) {
         return moment(this.raw.created).tz('Europe/London').format(format);
     }
@@ -79,6 +84,7 @@ class MonzoTransaction {
 
     getMemo() {
         if (this.raw.scheme == 'uk_retail_pot') { return 'Added to Pot'; }
+        if (this.raw.scheme == 'p2p_payment' && this.raw.merchant) { return 'For ' + this.raw.merchant.name; }
         return (this.raw.notes || this.raw.description).replace(/[ \n]+/g, ' ');
     }
 

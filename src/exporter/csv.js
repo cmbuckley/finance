@@ -15,7 +15,7 @@ module.exports = function csv(transactions, options, callback) {
 
     stringify(transactions.reduce(function (rows, transaction) {
         let row = [
-            options.account,
+            transaction.getAccount(),
             transaction.getDate('YYYY-MM-DD HH:mm'),
             transaction.getPayee(),
             transaction.getLocalAmount(),
@@ -32,7 +32,7 @@ module.exports = function csv(transactions, options, callback) {
             if (transaction.isCashWithdrawal()) { transfer[head.indexOf('Rate')] = 1; }
             transfer[head.indexOf('Account')] = transaction.getTransfer();
             transfer[head.indexOf('Amount')] = transaction.getLocalAmount(true);
-            transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'from' : 'to') + ':' + options.account;
+            transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'from' : 'to') + ':' + transaction.getAccount();
             row[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'to' : 'from') + ':' + transaction.getTransfer();
             rows.push(transfer);
         }

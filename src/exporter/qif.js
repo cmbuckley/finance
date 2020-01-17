@@ -1,7 +1,9 @@
 module.exports = function qif(transactions, options, callback) {
+    if (!transactions.length) { return callback(null); }
+
     var head = [
         '!Account',
-        'N' + (options.account || 'Bank'),
+        'N' + (transactions[0].getAccount() || 'Bank'),
         'TBank',
         '^',
         '!Type:Bank'
@@ -9,12 +11,12 @@ module.exports = function qif(transactions, options, callback) {
 
     callback(null, transactions.reduce(function (file, transaction) {
         return file.concat([
-            'D' + transaction.date.format('YYYY-MM-DD'),
-            'T' + (transaction.amount / 100).toFixed(2),
-            'M' + transaction.memo,
-            'P' + transaction.payee,
-            'L' + (transaction.transfer ? '[' + transaction.transfer + ']' : transaction.category),
-            'N' + transaction.id,
+            'D' + transaction.getDate('YYYY-MM-DD'),
+            'T' + transaction.getLocalAmount(),
+            'M' + transaction.getMemo(),
+            'P' + transaction.getPayee(),
+            'L' + (transaction.isTransfer() ? '[' + transaction.getTransfer() + ']' : transaction.getCategory() || ''),
+            'N' + transaction.getId(),
             '^'
         ]);
     }, head).join('\n'));

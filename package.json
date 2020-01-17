@@ -13,6 +13,7 @@
     "monzo": "node src/monzo.js"
   },
   "dependencies": {
+    "async": "^3.1.0",
     "casperjs": "^1.1.4",
     "csv-stringify": "^1.1.2",
     "moment-timezone": "^0.5.26",

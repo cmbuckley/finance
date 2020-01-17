@@ -1,11 +1,13 @@
 const fs = require('fs'),
+    async = require('async'),
     monzo = require('monzo-bank'),
     Exporter = require('./exporter'),
     Transaction = require('./transaction');
 
 const auth = require('./lib/auth');
-const args = require('yargs')
-    .option('account',  {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint']})
+const Yargs = require('yargs');
+const args = Yargs
+    .option('account',  {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint', 'all'], type: 'array'})
     .option('format',   {alias: 'o', describe: 'Output format',         default: 'qif',     choices: ['qif', 'csv']})
     .option('from',     {alias: 'f', describe: 'Earliest date for transactions'})
     .option('to',       {alias: 't', describe: 'Latest date for transactions'})
@@ -14,6 +16,14 @@ const args = require('yargs')
     .option('dump',     {alias: 'd', describe: 'Dump transactions to specified file'})
     .option('load',     {alias: 'u', describe: 'Load from a specified dump file'})
     .option('quiet',    {alias: 'q', describe: 'Suppress output'})
+    .coerce('account',  function (account) {
+        if (account.length == 1 && account[0] == 'all') {
+            // remove 'all' option and send the rest
+            return Yargs.getOptions().choices.account.slice(0, -1);
+        }
+
+        return account;
+    })
     .help('help')
     .argv;
 
@@ -135,6 +145,12 @@ const categories = {
     })),
 };
 
+const accountTypeMap = {
+    joint: 'uk_retail_joint',
+    current: 'uk_retail',
+    prepaid: 'uk_prepaid'
+};
+
 const pots = {};
 
 function lookup(key, matches, defaultResponse) {
@@ -181,14 +197,8 @@ function timestamp(date) {
     return date ? date + 'T00:00:00Z' : undefined;
 }
 
-function account(accounts, type) {
-    const typeMap = {
-        joint: 'uk_retail_joint',
-        current: 'uk_retail',
-        prepaid: 'uk_prepaid'
-    };
-
-    return accounts.find(a => a.type == typeMap[type]);
+function accounts(accounts, types) {
+    return accounts.filter(a => types.map(t => accountTypeMap[t]).includes(a.type));
 }
 
 auth.login({
@@ -204,18 +214,10 @@ auth.login({
         args,
     };
 
-    function process(transactions, callback) {
-        exporter.write(transactions.map(function (raw) {
-            let transaction = new Transaction(raw, connector);
-            return (transaction.isValid() ? transaction : false);
-        }), callback);
-    }
-
     const exporter = Exporter({
         format:  args.format || 'qif',
         quiet:   args.quiet,
         name:    'monzo',
-        account: 'Monzo ' + args.account.replace(/^./, c => c.toUpperCase()),
     });
 
     monzo.pots(config.token.access_token).then(function (potsResponse) {
@@ -229,17 +231,31 @@ auth.login({
         }
 
         monzo.accounts(config.token.access_token).then(function (accountsResponse) {
-            monzo.transactions({
-              account_id: account(accountsResponse.accounts, args.account).id,
-              expand:     'merchant',
-              since:      timestamp(args.from),
-              before:     timestamp(args.to)
-            }, config.token.access_token).then(function (transactionsResponse) {
-                if (args.dump) {
-                    return Exporter({format: 'json', file: args.dump}).write(transactionsResponse.transactions);
-                }
+            async.reduce(accounts(accountsResponse.accounts, args.account), [], function (transactions, account, callback) {
+                monzo.transactions({
+                  account_id: account.id,
+                  expand:     'merchant',
+                  since:      timestamp(args.from),
+                  before:     timestamp(args.to)
+                }, config.token.access_token).then(function (transactionsResponse) {
+                    if (args.dump) {
+                        return Exporter({format: 'json', file: args.dump}).write(transactionsResponse.transactions);
+                    }
 
-                process(transactionsResponse.transactions, function () {
+                    const accountName = Object.keys(accountTypeMap).find(t => accountTypeMap[t] == account.type);
+                    callback(null, transactions.concat(transactionsResponse.transactions.map(function (raw) {
+                        let transaction = new Transaction('Monzo ' + accountName.replace(/^./, c => c.toUpperCase()), raw, connector);
+                        return (transaction.isValid() ? transaction : false);
+                    }).filter(Boolean)));
+                }).catch(function (resp) {
+                    if (resp.error && resp.error.code == 'forbidden.verification_required') {
+                        return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
+                    }
+
+                    return exit('transactions')(resp);
+                });
+            }, function (err, transactions) {
+                exporter.write(transactions, function () {
                     potsResponse.pots.map(function (pot) {
                         if (!pot.deleted && pot.round_up) {
                             console.log(
@@ -250,12 +266,6 @@ auth.login({
                         }
                     });
                 });
-            }).catch(function (resp) {
-                if (resp.error && resp.error.code == 'forbidden.verification_required') {
-                    return console.error('Cannot query older transactions - please refresh permissions in the Monzo app');
-                }
-
-                return exit('transactions')(resp);
             });
         }).catch(exit('pots'));
     }).catch(exit('accounts'));

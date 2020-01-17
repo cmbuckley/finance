@@ -45,9 +45,9 @@ module.exports = function exporter(options) {
         write: function (transactions, callback) {
             if (!options.quiet) { console.log('Exporting to', filename); }
 
-            adapter.call(helpers, transactions.filter(Boolean), options, function (err, contents) {
+            adapter.call(helpers, transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
-                    if (!options.quiet) { console.log('Wrote transactions to', filename); }
+                    if (!options.quiet) { console.log('Wrote ' + transactions.length + ' transactions to', filename); }
                     callback && callback(contents);
                 });
             });
