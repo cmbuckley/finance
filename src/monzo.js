@@ -219,7 +219,7 @@ auth.login({
     });
 
     monzo.pots(config.token.access_token).then(function (potsResponse) {
-        potsResponse.pots.map(pot => pots[pot.id] = pot.name);
+        potsResponse.pots.map(pot => pots[pot.id] = pot);
 
         // load from dump file
         if (args.load) {
