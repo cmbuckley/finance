@@ -26,15 +26,8 @@ module.exports = function csv(transactions, options, callback) {
             transaction.getId()
         ];
 
-        // duplicate the row for the transfer
         if (transaction.isTransfer()) {
-            let transfer = row.slice(0);
-            if (transaction.isCashWithdrawal()) { transfer[head.indexOf('Rate')] = 1; }
-            transfer[head.indexOf('Account')] = transaction.getTransfer();
-            transfer[head.indexOf('Amount')] = transaction.getLocalAmount(true);
-            transfer[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'from' : 'to') + ':' + transaction.getAccount();
             row[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'to' : 'from') + ':' + transaction.getTransfer();
-            rows.push(transfer);
         }
 
         rows.push(row);
