@@ -1,30 +1,33 @@
 const fs = require('fs'),
     monzo = require('monzo-bank'),
+    moment = require('moment-timezone'),
     Exporter = require('./exporter'),
     Transaction = require('./transaction');
 
 const auth = require('./lib/auth');
 const Yargs = require('yargs');
-const args = Yargs
-    .option('account',  {alias: 'a', describe: 'Which account to load', default: 'current', choices: ['prepaid', 'current', 'joint', 'all'], type: 'array'})
-    .option('format',   {alias: 'o', describe: 'Output format',         default: 'qif',     choices: ['qif', 'csv']})
-    .option('from',     {alias: 'f', describe: 'Earliest date for transactions'})
-    .option('to',       {alias: 't', describe: 'Latest date for transactions'})
-    .option('no-topup', {            describe: 'Don’t include topup transactions'})
-    .option('login',    {alias: 'l', describe: 'Force OAuth re-login'})
-    .option('dump',     {alias: 'd', describe: 'Dump transactions to specified file'})
-    .option('load',     {alias: 'u', describe: 'Load from a specified dump file'})
-    .option('quiet',    {alias: 'q', describe: 'Suppress output'})
-    .coerce('account',  function (account) {
-        if (account.length == 1 && account[0] == 'all') {
-            // remove 'all' option and send the rest
-            return Yargs.getOptions().choices.account.slice(0, -1);
-        }
+const args = Yargs.options({
+        account:    {alias: 'a', describe: 'Which account to load',          default: 'current', choices: ['prepaid', 'current', 'joint', 'all'], type: 'array'},
+        format:     {alias: 'o', describe: 'Output format',                  default: 'qif',     choices: ['qif', 'csv']},
+        from:       {alias: 'f', describe: 'Earliest date for transactions', default: 0},
+        to:         {alias: 't', describe: 'Latest date for transactions',   default: undefined},
+        'no-topup': {            describe: 'Don’t include topup transactions'},
+        login:      {alias: 'l', describe: 'Force OAuth re-login'},
+        dump:       {alias: 'd', describe: 'Dump transactions to specified file'},
+        load:       {alias: 'u', describe: 'Load from a specified dump file'},
+        quiet:      {alias: 'q', describe: 'Suppress output'},
+    }).coerce({
+        account: function (account) {
+            if (account.length == 1 && account[0] == 'all') {
+                // remove 'all' option and send the rest
+                return Yargs.getOptions().choices.account.slice(0, -1);
+            }
 
-        return account;
-    })
-    .help('help')
-    .argv;
+            return account;
+        },
+        from: (f => moment(f)),
+        to:   (t => moment(t)),
+    }).help('help').argv;
 
 const foreignCurrencies = {
     'Euros': 'EUR',
@@ -192,10 +195,6 @@ function warn() {
     }
 }
 
-function timestamp(date) {
-    return date ? date + 'T00:00:00Z' : undefined;
-}
-
 function accounts(accounts, types) {
     return accounts.filter(a => types.map(t => accountTypeMap[t]).includes(a.type));
 }
@@ -266,8 +265,8 @@ auth.login({
                     monzo.transactions({
                       account_id: account.id,
                       expand:     'merchant',
-                      since:      timestamp(args.from),
-                      before:     timestamp(args.to)
+                      since:      args.from.toISOString(),
+                      before:     args.to.toISOString(),
                     }, config.token.access_token).then(function (transactionsResponse) {
                         resolve(transactions.concat(transactionsResponse.transactions));
                     }).catch(function (resp) {
