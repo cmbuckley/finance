@@ -127,7 +127,7 @@ const categories = {
         'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
         'Car:Service & MOT': 'R H SIRRELL',
         'Holiday:Travel': /RYANAIR/,
-        'Travel:Bus': /AUT BILET|MPSA|MEGABUS/,
+        'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
         'Travel:Rail': /GVB|Trainline|TFL.gov/i,
         'Travel:Taxi': /UBER|bolt\.eu|AMBER/i,
     })),
