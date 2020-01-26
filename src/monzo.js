@@ -1,11 +1,11 @@
 const fs = require('fs'),
     monzo = require('monzo-bank'),
     moment = require('moment-timezone'),
+    Yargs = require('yargs'),
     Exporter = require('./exporter'),
-    Transaction = require('./transaction');
+    Transaction = require('./transaction'),
+    AuthClient = require('./lib/auth');
 
-const auth = require('./lib/auth');
-const Yargs = require('yargs');
 const args = Yargs.options({
         account:    {alias: 'a', describe: 'Which account to load',          default: 'current', choices: ['prepaid', 'current', 'joint', 'all'], type: 'array'},
         format:     {alias: 'o', describe: 'Output format',                  default: 'qif',     choices: ['qif', 'csv']},
@@ -198,6 +198,10 @@ function warn() {
 function accounts(accounts, types) {
     return accounts.filter(a => types.map(t => accountTypeMap[t]).includes(a.type));
 }
+
+const auth = new AuthClient({
+    configPath: __dirname + '/../config/monzo.json',
+});
 
 auth.login({
     forceLogin: args.login,

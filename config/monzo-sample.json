@@ -14,7 +14,7 @@
       "authorizationMethod": "body"
     }
   },
-  "redirectUri": "https://example.com/monzo/",
+  "redirect_uri": "https://example.com/monzo/",
   "payees": {
     "user_XXX": "Alice",
     "merch_YYY": "Merchant Y",
