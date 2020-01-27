@@ -8,7 +8,7 @@ const fs = require('fs'),
 
 const args = Yargs.options({
         account:    {alias: 'a', describe: 'Which account to load',          default: 'current', choices: ['prepaid', 'current', 'joint', 'all'], type: 'array'},
-        format:     {alias: 'o', describe: 'Output format',                  default: 'qif',     choices: ['qif', 'csv']},
+        format:     {alias: 'o', describe: 'Output format',                  default: 'csv',     choices: ['qif', 'csv']},
         from:       {alias: 'f', describe: 'Earliest date for transactions', default: 0},
         to:         {alias: 't', describe: 'Latest date for transactions',   default: undefined},
         'no-topup': {            describe: 'Don’t include topup transactions'},

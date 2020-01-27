@@ -4,10 +4,6 @@ const url = require('url');
 const nonce = require('nonce')();
 const Oauth = require('simple-oauth2');
 
-const configPath = __dirname + '/../../config/monzo.json';
-const config = require(configPath);
-const oauth = require('simple-oauth2').create(config.credentials);
-
 class AuthClient {
     constructor(options) {
         this.configPath = options.configPath;
@@ -28,9 +24,10 @@ class AuthClient {
             saveConfig(self).then(function () {
                 console.log('Please visit the following link in your browser to authorise the application:\n');
 
-                console.log(oauth.authorizationCode.authorizeURL({
-                    redirect_uri: config.redirect_uri,
-                    state: self.config.state
+                console.log(self.oauth.authorizationCode.authorizeURL({
+                    redirect_uri: self.config.redirect_uri,
+                    state: self.config.state,
+                    scope: self.config.scope || '',
                 }) + '\n');
 
                 res(self.config);
