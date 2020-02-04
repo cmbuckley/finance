@@ -5,10 +5,11 @@ const nonce = require('nonce')();
 const Oauth = require('simple-oauth2');
 
 class AuthClient {
-    constructor(options) {
-        this.configPath = options.configPath;
-        this.config = require(options.configPath);
-        this.oauth = Oauth.create(this.config.credentials);
+    constructor(configPath, adapterConfig) {
+        this.configPath = configPath;
+        this.config = require(configPath);
+        this.adapterConfig = adapterConfig;
+        this.oauth = Oauth.create(adapterConfig.credentials);
     }
 
     getAuthLink(options) {
@@ -25,9 +26,9 @@ class AuthClient {
                 console.log('Please visit the following link in your browser to authorise the application:\n');
 
                 console.log(self.oauth.authorizationCode.authorizeURL({
-                    redirect_uri: self.config.redirect_uri,
+                    redirect_uri: self.adapterConfig.redirect_uri,
                     state: self.config.state,
-                    scope: self.config.scope || '',
+                    scope: self.adapterConfig.scope || '',
                 }) + '\n');
 
                 res(self.config);
@@ -70,7 +71,7 @@ class AuthClient {
 
                     self.oauth.authorizationCode.getToken({
                         code: authUrl.query.code,
-                        redirect_uri: self.config.redirect_uri
+                        redirect_uri: self.adapterConfig.redirect_uri
                     }).then(function (result) {
                         const accessToken = self.oauth.accessToken.create(result);
                         self.config.token = accessToken.token;
