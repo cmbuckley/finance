@@ -6,7 +6,7 @@ var Casper  = require('casper'),
     cu      = require('clientutils').create(utils.mergeObjects({}, casper.options)),
     fs      = require('fs'),
     output  = require('lib/output'),
-    options = utils.mergeObjects(JSON.parse(fs.read('config/download.json')), casper.cli.options);
+    options = utils.mergeObjects(JSON.parse(fs.read('config/casper.json')), casper.cli.options);
 
 if (options.verbose) {
     casper.options.logLevel = 'debug';
@@ -53,7 +53,7 @@ else {
     }
     else {
         // get all download adapters
-        options.which = fs.list('src/download').map(function (file) {
+        options.which = fs.list('src/casper').map(function (file) {
             return (/\.js$/.test(file) ? file.replace('.js', '') : false);
         }).filter(Boolean);
     }
@@ -61,7 +61,7 @@ else {
     options.which.forEach(function (type) {
         if (options[type]) {
             casper.then(function () {
-                require('download/' + type).download(options[type].credentials, options.from, options.to, output);
+                require('casper/' + type).download(options[type].credentials, options.from, options.to, output);
             });
         }
     });
