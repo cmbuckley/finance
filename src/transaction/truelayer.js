@@ -104,59 +104,25 @@ class TruelayerTransaction {
     }
 
     getTransfer() {
-        return undefined; // @todo
+        const transfers = {
+            'Current Account':    /^404401 [0-9]{4}5471|BUCKLEY CM|DIRECT DEBIT PAYMENT/,
+            'ISA':                /^404401 [0-9]{4}3752|LYP ISA TRANSFER/,
+            'Online Bonus Saver': /^404401 [0-9]{4}8681/,
+            'Premier Saver':      /^404401 [0-9]{4}6646|RSB REGULAR SAVER/,
+            'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
+            'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY/,
+            'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
+            'Monzo Joint':        /Monzo Joint|JOINT MONZO/,
+            'PayPal':             /^PAYPAL/,
+            'Payslips':           'HESTVIEW',
+            'Starling':           /^Starling/,
+            'Cash':               /^CASH/,
+        };
 
-        if (this.raw.counterparty) {
-            if (this.raw.counterparty.sort_code &&
-                this.raw.counterparty.account_number
-            ) {
-                let key = this.raw.counterparty.sort_code.match(/\d{2}/g).join('-')
-                        + ' ' + this.raw.counterparty.account_number;
-
-                if (helpers.config.transfers[key]) {
-                    return helpers.config.transfers[key];
-                }
+        for (let t in transfers) {
+            if (transfers[t].test && transfers[t].test(this.raw.description) || transfers[t] == this.raw.description) {
+                return t;
             }
-
-            if (helpers.config.transfers[this.raw.counterparty.user_id]) {
-                return helpers.config.transfers[this.raw.counterparty.user_id];
-            }
-
-            if (helpers.config.transfers[this.raw.counterparty.account_id]) {
-                return helpers.config.transfers[this.raw.counterparty.account_id];
-            }
-        }
-
-        if (this.raw.merchant && helpers.config.transfers[this.raw.merchant.group_id]) {
-            return helpers.config.transfers[this.raw.merchant.group_id];
-        }
-
-        if (this.raw.merchant && this.raw.merchant.atm) {
-            let currencies = Object.assign({Cash: 'GBP'}, helpers.foreignCurrencies),
-                account = Object.keys(currencies)[Object.values(currencies).indexOf(this.raw.local_currency)];
-
-            if (!account) {
-                helpers.warn('Unknown withdrawn currency', this.raw.local_currency);
-            }
-
-            return account;
-        }
-
-        if (/^PAYPAL /.test(this.raw.description)) {
-            return 'PayPal';
-        }
-
-        if (this.raw.scheme == 'uk_retail_pot') {
-            return 'Monzo ' + helpers.pots[this.raw.metadata.pot_id].name;
-        }
-
-        // legacy
-        if (this.raw.category == 'mondo' &&
-            this.raw.amount > 0 &&
-            !this.raw.counterparty.user_id
-            && this.raw.is_load
-        ) {
-            return 'Current Account';
         }
     }
 
