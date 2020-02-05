@@ -5,7 +5,7 @@ const fs = require('fs'),
     Exporter = require('./exporter');
 
 const args = Yargs.options({
-        account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'ms', 'all'], type: 'array'},
+        account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'all'], type: 'array'},
         format:     {alias: 'o', describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', describe: 'Earliest date for transactions', default: 0},
         to:         {alias: 't', describe: 'Latest date for transactions',   default: undefined},
@@ -28,6 +28,7 @@ const args = Yargs.options({
 
 (async () => {
     const exporter = Exporter({
+        dump:    args.dump,
         format:  args.format,
         quiet:   args.quiet,
         name:    'download',
@@ -47,7 +48,7 @@ const args = Yargs.options({
                 return console.warn(err);
             }
 
-            res(previousTransactions.concat(transactions.filter(t => t.isValid())));
+            res(previousTransactions.concat(transactions));
         });
     }, Promise.resolve([]));
 

@@ -21,7 +21,7 @@ class MonzoTransaction {
     isValid() {
         if (
             this.raw.decline_reason // failed
-            || !this.raw.amount // zero amount this.raw
+            || !this.raw.amount // zero amount transaction
             || (!this.options.ignoreTopups && this.raw.is_load && !this.raw.counterparty.user_id && this.raw.amount > 0) // ignore topups
             || (this.raw.scheme == 'uk_retail_pot' && this.raw.metadata.trigger == 'coin_jar') // ignore round-up
             || (this.raw.scheme == 'uk_retail_pot' && this.options.pots[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up

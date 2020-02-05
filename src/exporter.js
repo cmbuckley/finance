@@ -21,6 +21,11 @@ module.exports = function exporter(options) {
         throw new Error('Missing/invalid export format');
     }
 
+    if (options.dump) {
+        options.file = options.dump;
+        options.format = 'json';
+    }
+
     try {
         adapter = require('./exporter/' + options.format);
     } catch (e) {
@@ -44,6 +49,7 @@ module.exports = function exporter(options) {
         helpers: helpers,
         write: function (transactions, callback) {
             if (!options.quiet) { console.log('Exporting to', filename); }
+            if (!options.dump) { transactions = transactions.filter(t => t.isValid()); }
 
             adapter.call(helpers, transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
