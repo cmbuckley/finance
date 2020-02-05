@@ -41,7 +41,7 @@ function getAdapter(account) {
         case 'monzo':
             const MonzoAdapter = require('./adapter/monzo');
             if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig); }
-            monzoAdapter.addConfig(getConfigPath(account));
+            monzoAdapter.addConfig(accountConfig);
             return monzoAdapter;
     }
 }

@@ -44,7 +44,7 @@ const args = Yargs.options({
             try {
                 transactions = await adapter.getTransactions(args.from, args.to);
             } catch (err) {
-                return rej(err);
+                return console.warn(err);
             }
 
             res(previousTransactions.concat(transactions.filter(t => t.isValid())));
