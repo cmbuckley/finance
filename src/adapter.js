@@ -43,6 +43,10 @@ function getAdapter(account) {
             if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig); }
             monzoAdapter.addConfig(accountConfig);
             return monzoAdapter;
+
+        case 'starling':
+            const StarlingAdapter = require('./adapter/starling');
+            return new StarlingAdapter(adapterPath, adapterConfig);
     }
 }
 
