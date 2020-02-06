@@ -1,5 +1,4 @@
-const fs = require('fs'),
-    moment = require('moment-timezone'),
+const moment = require('moment-timezone'),
     Yargs = require('yargs'),
     Adapter = require('./adapter'),
     Exporter = require('./exporter');
@@ -34,7 +33,7 @@ const args = Yargs.options({
         name:    'download',
     });
 
-    const adapters = await Adapter.getAll(args.account);
+    const adapters = Adapter.getAll(args.load || args.account);
     const transactions = await adapters.reduce(async function (previousPromise, adapter) {
         let previousTransactions = await previousPromise;
         await adapter.login();

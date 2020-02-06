@@ -49,6 +49,11 @@ function getAdapter(account) {
 Adapter.getAll = function (accounts) {
     let adapters = [];
 
+    if (!Array.isArray(accounts)) {
+        const LoadAdapter = require('./adapter/load');
+        return [new LoadAdapter(file)];
+    }
+
     accounts.forEach(function (account) {
         try {
             const adapter = getAdapter(account);
@@ -59,7 +64,7 @@ Adapter.getAll = function (accounts) {
         }
     });
 
-    return Promise.resolve(adapters);
+    return adapters;
 };
 
 module.exports = Adapter;
