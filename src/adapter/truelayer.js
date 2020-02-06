@@ -1,5 +1,4 @@
-const fs = require('fs'),
-    {DataAPIClient} = require('truelayer-client'),
+const {DataAPIClient} = require('truelayer-client'),
     Adapter = require('../adapter'),
     Transaction = require('../transaction/truelayer');
 

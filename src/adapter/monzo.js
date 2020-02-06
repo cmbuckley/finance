@@ -1,6 +1,4 @@
-const fs = require('fs'),
-    monzo = require('monzo-bank'),
-    moment = require('moment-timezone'),
+const monzo = require('monzo-bank'),
     Adapter = require('../adapter'),
     Transaction = require('../transaction/monzo');
 
