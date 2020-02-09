@@ -1,21 +1,9 @@
-const moment = require('moment-timezone');
+const Transaction = require('../transaction');
+let helpers = {};
 
-const decimalExceptions = {JPY: 0};
-let helpers;
-
-function numDecimals(currency) {
-    return (decimalExceptions.hasOwnProperty(currency) ? decimalExceptions[currency] : 2);
-}
-
-function numberFormat(amount, currency) {
-    var decimals = numDecimals(currency);
-    return (amount / Math.pow(10, decimals)).toFixed(decimals);
-}
-
-class StarlingTransaction {
+class StarlingTransaction extends Transaction {
     constructor(account, raw, starlingHelpers) {
-        this.account = account;
-        this.raw = raw;
+        super(account, raw, {isMinorCurrency: true});
         helpers = starlingHelpers || {};
     }
 
@@ -26,11 +14,6 @@ class StarlingTransaction {
 
     isDebit() {
         return (this.raw.direction == 'OUT');
-    }
-
-    // @todo
-    isTransfer() {
-        return !!this.getTransfer();
     }
 
     isCashWithdrawal() {
@@ -45,12 +28,8 @@ class StarlingTransaction {
         return (this.raw.amount.currency != this.raw.sourceAmount.currency);
     }
 
-    getAccount() {
-        return this.account;
-    }
-
     getDate(format) {
-        return moment(this.raw.transactionTime).tz('Europe/London').format(format);
+        return this._getDate(this.raw.transactionTime, format);
     }
 
     getCurrency() {
@@ -58,12 +37,12 @@ class StarlingTransaction {
     }
 
     getLocalAmount() {
-        return numberFormat((this.isDebit() ? -1 : 1) * this.raw.sourceAmount.minorUnits, this.getCurrency());
+        return this._getAmount((this.isDebit() ? -1 : 1) * this.raw.sourceAmount.minorUnits);
     }
 
     getExchangeRate() {
         if (!this.isForeign()) { return 1; }
-        return Math.pow(10, numDecimals(this.raw.sourceAmount.currency) - numDecimals(this.raw.amount.currency)) * this.raw.amount.minorUnits / this.raw.sourceAmount.minorUnits;
+        return Math.pow(10, this._numDecimals(this.raw.sourceAmount.currency) - this._numDecimals(this.raw.amount.currency)) * this.raw.amount.minorUnits / this.raw.sourceAmount.minorUnits;
     }
 
     getMemo() {

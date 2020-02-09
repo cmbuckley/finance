@@ -1,21 +1,9 @@
-const moment = require('moment-timezone');
-
-const decimalExceptions = {JPY: 0};
+const Transaction = require('../transaction');
 let helpers = {};
 
-function numDecimals(currency) {
-    return (decimalExceptions.hasOwnProperty(currency) ? decimalExceptions[currency] : 2);
-}
-
-function numberFormat(amount, currency) {
-    var decimals = numDecimals(currency);
-    return (amount / Math.pow(10, decimals)).toFixed(decimals);
-}
-
-class MonzoTransaction {
-    constructor(account, rawData, monzoHelpers) {
-        this.account = account;
-        this.raw = rawData;
+class MonzoTransaction extends Transaction {
+    constructor(account, raw, monzoHelpers) {
+        super(account, raw, {isMinorCurrency: true});
         helpers = monzoHelpers || {};
     }
 
@@ -45,10 +33,6 @@ class MonzoTransaction {
         return this.raw.local_amount < 0;
     }
 
-    isTransfer() {
-        return !!this.getTransfer();
-    }
-
     isCashWithdrawal() {
         return (this.raw.merchant && this.raw.merchant.atm);
     }
@@ -61,25 +45,21 @@ class MonzoTransaction {
         return this.raw.local_currency !== this.raw.currency;
     }
 
-    getAccount() {
-        return this.account;
-    }
-
     getDate(format) {
-        return moment(this.raw.created).tz('Europe/London').format(format);
+        return this._getDate(this.raw.created, format);
     }
 
     getCurrency() {
         return this.raw.local_currency || '';
     }
 
-    getLocalAmount(inverse) {
-        return numberFormat((inverse ? -1 : 1) * this.raw.local_amount, this.getCurrency());
+    getLocalAmount() {
+        return this._getAmount(this.raw.local_amount);
     }
 
     getExchangeRate() {
         if (this.raw.local_currency == this.raw.currency) { return 1; }
-        return Math.pow(10, numDecimals(this.raw.local_currency) - numDecimals(this.raw.currency)) * this.raw.amount / this.raw.local_amount;
+        return Math.pow(10, this._numDecimals(this.raw.local_currency) - this._numDecimals(this.raw.currency)) * this.raw.amount / this.raw.local_amount;
     }
 
     getMemo() {

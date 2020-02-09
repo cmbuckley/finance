@@ -1,22 +1,10 @@
-const moment = require('moment-timezone');
+const Transaction = require('../transaction');
+let helpers = {};
 
-const decimalExceptions = {JPY: 0};
-let helpers;
-
-function numDecimals(currency) {
-    return (decimalExceptions.hasOwnProperty(currency) ? decimalExceptions[currency] : 2);
-}
-
-function numberFormat(amount, currency) {
-    var decimals = numDecimals(currency);
-    return amount.toFixed(decimals);
-}
-
-class TruelayerTransaction {
+class TruelayerTransaction extends Transaction {
     constructor(account, raw, truelayerHelpers) {
-        this.account = account;
-        this.raw = raw;
-        helpers = truelayerHelpers;
+        super(account, raw);
+        helpers = truelayerHelpers || {};
     }
 
     isValid() {
@@ -25,11 +13,6 @@ class TruelayerTransaction {
 
     isDebit() {
         return (this.raw.transaction_type == 'DEBIT');
-    }
-
-	// @todo
-    isTransfer() {
-        return !!this.getTransfer();
     }
 
 	// @todo
@@ -46,20 +29,16 @@ class TruelayerTransaction {
         return this.raw.currency !== 'GBP';
     }
 
-    getAccount() {
-        return this.account;
-    }
-
     getDate(format) {
-        return moment(this.raw.timestamp).tz('Europe/London').format(format);
+        return this._getDate(this.raw.timestamp, format);
     }
 
     getCurrency() {
         return this.raw.currency || '';
     }
 
-    getLocalAmount(inverse) {
-        return numberFormat((inverse ? -1 : 1) * this.raw.amount, this.getCurrency());
+    getLocalAmount() {
+        return this._getAmount(this.raw.amount);
     }
 
     // @todo
