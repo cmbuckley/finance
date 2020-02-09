@@ -80,27 +80,15 @@ class StarlingTransaction extends Transaction {
     }
 
     getTransfer() {
-        return ''; // @todo
-        const transfers = {
-            'Current Account':    /^404401 [0-9]{4}5471|BUCKLEY CM|DIRECT DEBIT PAYMENT/,
-            'ISA':                /^404401 [0-9]{4}3752|LYP ISA TRANSFER/,
-            'Online Bonus Saver': /^404401 [0-9]{4}8681/,
-            'Premier Saver':      /^404401 [0-9]{4}6646|RSB REGULAR SAVER/,
-            'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
-            'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY/,
-            'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
-            'Monzo Joint':        /Monzo Joint|JOINT MONZO/,
-            'PayPal':             /^PAYPAL/,
-            'Payslips':           'HESTVIEW',
-            'Starling':           /^Starling/,
-            'Cash':               /^CASH/,
-        };
-
-        for (let t in transfers) {
-            if (transfers[t].test && transfers[t].test(this.raw.description) || transfers[t] == this.raw.description) {
-                return t;
-            }
+        if (this.raw.counterPartySubEntityIdentifier) {
+            return this._getTransfer(this._getBank(this.raw.counterPartySubEntityIdentifier, this.raw.counterPartySubEntitySubIdentifier));
         }
+
+        if (this.isCashWithdrawal()) {
+            return this._getTransfer(this.getCurrency());
+        }
+
+        return '';
     }
 
     getPayee() {

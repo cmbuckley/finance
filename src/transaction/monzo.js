@@ -103,36 +103,24 @@ class MonzoTransaction extends Transaction {
             if (this.raw.counterparty.sort_code &&
                 this.raw.counterparty.account_number
             ) {
-                let key = this.raw.counterparty.sort_code.match(/\d{2}/g).join('-')
-                        + ' ' + this.raw.counterparty.account_number;
-
-                if (helpers.config.transfers[key]) {
-                    return helpers.config.transfers[key];
-                }
+                return this._getTransfer(this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number));
             }
 
-            if (helpers.config.transfers[this.raw.counterparty.user_id]) {
-                return helpers.config.transfers[this.raw.counterparty.user_id];
+            if (this.adapter.data.transfers[this.raw.counterparty.user_id]) {
+                return this.adapter.data.transfers[this.raw.counterparty.user_id];
             }
 
-            if (helpers.config.transfers[this.raw.counterparty.account_id]) {
-                return helpers.config.transfers[this.raw.counterparty.account_id];
+            if (this.adapter.data.transfers[this.raw.counterparty.account_id]) {
+                return this.adapter.data.transfers[this.raw.counterparty.account_id];
             }
         }
 
-        if (this.raw.merchant && helpers.config.transfers[this.raw.merchant.group_id]) {
-            return helpers.config.transfers[this.raw.merchant.group_id];
+        if (this.raw.merchant && this.adapter.data.transfers[this.raw.merchant.group_id]) {
+            return this.adapter.data.transfers[this.raw.merchant.group_id];
         }
 
-        if (this.raw.merchant && this.raw.merchant.atm) {
-            let currencies = Object.assign({Cash: 'GBP'}, helpers.foreignCurrencies),
-                account = Object.keys(currencies)[Object.values(currencies).indexOf(this.raw.local_currency)];
-
-            if (!account) {
-                helpers.warn('Unknown withdrawn currency', this.raw.local_currency);
-            }
-
-            return account;
+        if (this.isCashWithdrawal()) {
+            return this._getTransfer(this.getCurrency());
         }
 
         if (/^PAYPAL /.test(this.raw.description)) {
@@ -160,16 +148,16 @@ class MonzoTransaction extends Transaction {
                 return '';
             }
 
-            if (helpers.config.payees[this.raw.counterparty.user_id]) {
-                return helpers.config.payees[this.raw.counterparty.user_id];
+            if (this.adapter.data.payees[this.raw.counterparty.user_id]) {
+                return this.adapter.data.payees[this.raw.counterparty.user_id];
             }
 
             if (this.raw.counterparty.sort_code && this.raw.counterparty.account_number) {
                 let key = this.raw.counterparty.sort_code.match(/\d{2}/g).join('-')
                         + ' ' + this.raw.counterparty.account_number;
 
-                if (helpers.config.payees[key]) {
-                    return helpers.config.payees[key];
+                if (this.adapter.data.payees[key]) {
+                    return this.adapter.data.payees[key];
                 }
 
                 helpers.warn('Unknown payee', this.raw.counterparty.user_id, key, this.raw.counterparty.name);
@@ -183,12 +171,12 @@ class MonzoTransaction extends Transaction {
         }
 
         if (this.raw.merchant && this.raw.merchant.id) {
-            if (helpers.config.payees[this.raw.merchant.id]) {
-                return helpers.config.payees[this.raw.merchant.id];
+            if (this.adapter.data.payees[this.raw.merchant.id]) {
+                return this.adapter.data.payees[this.raw.merchant.id];
             }
 
-            if (helpers.config.payees[this.raw.merchant.group_id]) {
-                return helpers.config.payees[this.raw.merchant.group_id];
+            if (this.adapter.data.payees[this.raw.merchant.group_id]) {
+                return this.adapter.data.payees[this.raw.merchant.group_id];
             }
 
             if (!this.isTransfer()) {
