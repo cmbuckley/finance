@@ -15,6 +15,8 @@ class LoadAdapter extends Adapter {
     }
 
     async getTransactions() {
+        let adapter = this;
+
         return new Promise(function (res, rej) {
             // @todo fs.promises API in v10
             fs.readFile(this.file, 'utf-8', function (err, contents) {
@@ -22,7 +24,7 @@ class LoadAdapter extends Adapter {
 
                 res(JSON.parse(contents).map(function (data) {
                     const Transaction = (data.raw.transaction_id ? TruelayerTransaction : MonzoTransaction);
-                    return new Transaction(data.account, data.raw); // @todo needs helpers support
+                    return new Transaction(data.account, data.raw, adapter); // @todo needs helpers support
                 }));
             });
         }.bind(this));

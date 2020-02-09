@@ -12,7 +12,8 @@ class TruelayerAdapter extends Adapter {
     async getTransactions(from, to) {
         let accountMap = this.accountMap,
             accessToken = this.getAccessToken(),
-            accountsResponse = await DataAPIClient.getAccounts(accessToken);
+            accountsResponse = await DataAPIClient.getAccounts(accessToken),
+            adapter = this;
 
         return await accountsResponse.results.reduce(async function (previousPromise, account) {
             let previousTransactions = await previousPromise;
@@ -32,7 +33,7 @@ class TruelayerAdapter extends Adapter {
                 }
 
                 res(previousTransactions.concat(transactionsResponse.results.map(function (raw) {
-                    return new Transaction(accountMap[account.display_name] || account.display_name, raw, {});
+                    return new Transaction(accountMap[account.display_name] || account.display_name, raw, adapter, {});
                 })));
             });
         }, Promise.resolve([]));

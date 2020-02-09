@@ -2,9 +2,10 @@ const moment = require('moment-timezone'),
     decimalExceptions = {JPY: 0};
 
 class Transaction {
-    constructor(account, raw, transactionOptions) {
+    constructor(account, raw, adapter, transactionOptions) {
         this.account = account;
         this.raw = raw;
+        this.adapter = adapter;
         this._options = transactionOptions || {};
     }
 
@@ -24,6 +25,14 @@ class Transaction {
         }
 
         return amount.toFixed(decimals);
+    }
+
+    _getTransfer(key) {
+        return this.adapter.data.transfers[key] || '';
+    }
+
+    _getBank(sortCode, account) {
+        return sortCode.match(/\d{2}/g).join('-') + ' ' + account;
     }
 
     getAccount() {

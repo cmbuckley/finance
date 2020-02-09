@@ -11,7 +11,8 @@ class StarlingAdapter extends Adapter {
         let accessToken = this.getAccessToken(),
             client = new Starling({accessToken}),
             accountName = this.config.name,
-            accountsResponse = await client.account.getAccounts();
+            accountsResponse = await client.account.getAccounts(),
+            adapter = this;
 
         return await accountsResponse.data.accounts.reduce(async function (previousPromise, account) {
             let previousTransactions = await previousPromise;
@@ -31,7 +32,7 @@ class StarlingAdapter extends Adapter {
                 }
 
                 res(previousTransactions.concat(transactionsResponse.data.feedItems.map(function (raw) {
-                    return new Transaction(accountName, raw, {});
+                    return new Transaction(accountName, raw, adapter);
                 })));
             });
         }, Promise.resolve([]));

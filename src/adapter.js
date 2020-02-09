@@ -6,6 +6,7 @@ class Adapter {
     constructor(accountPath, config) {
         this.accountPath = accountPath;
         this.config = config;
+        this.data = getConfig('data');
     }
 
     async login(options) {

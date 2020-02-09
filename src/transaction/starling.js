@@ -1,10 +1,8 @@
 const Transaction = require('../transaction');
-let helpers = {};
 
 class StarlingTransaction extends Transaction {
-    constructor(account, raw, starlingHelpers) {
-        super(account, raw, {isMinorCurrency: true});
-        helpers = starlingHelpers || {};
+    constructor(account, raw, adapter) {
+        super(account, raw, adapter, {isMinorCurrency: true});
     }
 
     isValid() {

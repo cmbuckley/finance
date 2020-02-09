@@ -204,7 +204,8 @@ class MonzoAdapter extends Adapter {
 
         let accountsResponse = await monzo.accounts(accessToken),
             accountMap = this.accountMap,
-            accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type));
+            accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type)),
+            adapter = this;
 
         let transactions = await accounts.reduce(async function (previousPromise, account) {
             let transactions = await previousPromise;
@@ -228,7 +229,7 @@ class MonzoAdapter extends Adapter {
                 }
 
                 resolve(transactions.concat(transactionsResponse.transactions.map(function (raw) {
-                    return new Transaction(accountMap[account.type] || account.display_name, raw, connector);
+                    return new Transaction(accountMap[account.type] || account.display_name, raw, adapter, connector);
                 })));
             });
         }, Promise.resolve([]));

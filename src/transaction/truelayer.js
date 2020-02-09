@@ -2,8 +2,8 @@ const Transaction = require('../transaction');
 let helpers = {};
 
 class TruelayerTransaction extends Transaction {
-    constructor(account, raw, truelayerHelpers) {
-        super(account, raw);
+    constructor(account, raw, adapter, truelayerHelpers) {
+        super(account, raw, adapter);
         helpers = truelayerHelpers || {};
     }
 

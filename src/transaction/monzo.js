@@ -2,8 +2,8 @@ const Transaction = require('../transaction');
 let helpers = {};
 
 class MonzoTransaction extends Transaction {
-    constructor(account, raw, monzoHelpers) {
-        super(account, raw, {isMinorCurrency: true});
+    constructor(account, raw, adapter, monzoHelpers) {
+        super(account, raw, adapter, {isMinorCurrency: true});
         helpers = monzoHelpers || {};
     }
 
