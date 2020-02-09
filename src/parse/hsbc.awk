@@ -11,7 +11,7 @@ BEGIN {
     as["^404401 [0-9]{4}3752"] = "ISA"
     as["^404401 [0-9]{4}6458"] = "Online Saver" # Closed
     as["^404401 [0-9]{4}8681"] = "Online Bonus Saver"
-    as["^404401 [0-9]{4}6646"] = "Regular Saver"
+    as["^404401 [0-9]{4}6646"] = "Premier Saver"
     as["BUCKLEY C M *RSB REGULAR SAVER"] = "Regular Saver"
     as["^404401 [0-9]{4}5471"] = "Current Account"
     as["MORTGAGE PAYMENT"] = "Current Account"
