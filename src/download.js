@@ -63,7 +63,13 @@ const logger = winston.createLogger({
     const adapters = Adapter.getAll(args.load || args.account, logger);
     const transactions = await adapters.reduce(async function (previousPromise, adapter) {
         let previousTransactions = await previousPromise;
-        await adapter.login();
+
+        try {
+            await adapter.login({forceLogin: args.login});
+        } catch (err) {
+            adapter.logger.error(err.message || err);
+            return Promise.reject(err);
+        }
 
         return new Promise(async function (res, rej) {
             let transactions = [];

@@ -1,8 +1,9 @@
-const fs = require('fs');
-const readline = require('readline');
-const url = require('url');
-const nonce = require('nonce')();
-const Oauth = require('simple-oauth2');
+const fs = require('fs'),
+    http = require('http'),
+    readline = require('readline'),
+    url = require('url'),
+    nonce = require('nonce')(),
+    Oauth = require('simple-oauth2');
 
 class AuthClient {
     constructor(configPath, adapterConfig, logger) {
@@ -16,14 +17,7 @@ class AuthClient {
     getAuthLink(options) {
         let self = this;
         return new Promise(function (res, rej) {
-            if (self.config.state && !options.forceLogin) {
-                return res(self.config);
-            }
-
-            self.config.state = nonce();
-            delete self.config.token;
-
-            saveConfig(self).then(function () {
+            function done() {
                 self.logger.info('Please visit the following link in your browser to authorise the application:');
                 self.logger.info(self.oauth.authorizationCode.authorizeURL({
                     redirect_uri: self.adapterConfig.redirect_uri,
@@ -32,7 +26,16 @@ class AuthClient {
                 }));
 
                 res(self.config);
-            }).catch(rej);
+            }
+
+            if (self.config.state && !options.forceLogin) {
+                return done();
+            }
+
+            self.config.state = nonce();
+            delete self.config.token;
+
+            saveConfig(self).then(done).catch(rej);
         });
     }
 
@@ -40,49 +43,69 @@ class AuthClient {
         let self = this;
         options = options || {};
 
-        return new Promise(function (res, rej) {
-            if (options.fakeLogin) {
-                return res(self.config);
-            }
-
+        return new Promise(function (resolve, rej) {
             if (self.config.token && !options.forceLogin) {
                 const accessToken = self.oauth.accessToken.create(self.config.token);
 
                 if (!accessToken.expired() && !options.forceRefresh) {
-                    return res(self.config);
+                    return resolve(self.config);
                 }
 
                 self.logger.info('Access token has expired, refreshing');
                 return accessToken.refresh().then(function (newToken) {
                     self.config.token = newToken.token;
-                    saveConfig(self).then(res, rej);
+                    saveConfig(self).then(resolve, rej);
                 }).catch(function (err) {
                     rej(err.data.payload);
                 });
             }
 
             self.getAuthLink(options).then(function () {
-                question('Paste the URL from the "Log in to Monzo" button in the email: ').then(function (answer) {
-                    const authUrl = url.parse(answer, true);
+                const server = http.createServer(function(req, response) {
+                    const authUrl = url.parse(req.url, true);
+                    self.logger.info('Received OAuth callback', authUrl.query);
+
+                    function error(err) {
+                        response.statusCode = 500;
+                        response.end(err.message || err);
+                        rej(err);
+                    }
 
                     if (authUrl.query.state != self.config.state) {
+                        response.statusCode = 400;
+                        response.end('State does not match requested state');
                         return rej('State does not match requested state');
                     }
 
-                    self.oauth.authorizationCode.getToken({
-                        code: authUrl.query.code,
-                        redirect_uri: self.adapterConfig.redirect_uri
-                    }).then(function (result) {
-                        const accessToken = self.oauth.accessToken.create(result);
-                        self.config.token = accessToken.token;
-                        delete self.config.state;
+                    response.end('Thanks, you may close this window');
+                    self.logger.debug('Closing HTTP server');
 
-                        saveConfig(self).then(function () {
-                            question('Hit enter when you have approved the login in the app: ').then(function () {
-                                res(self.config);
-                            }).catch(rej);
-                        }).catch(rej);
-                    }).catch(rej);
+                    server.close(() => {
+                        self.logger.debug('Retrieving access token');
+
+                        self.oauth.authorizationCode.getToken({
+                            code: authUrl.query.code,
+                            redirect_uri: self.adapterConfig.redirect_uri
+                        }).then(function (result) {
+                            const accessToken = self.oauth.accessToken.create(result);
+                            self.config.token = accessToken.token;
+                            delete self.config.state;
+
+                            saveConfig(self).then(function () {
+                                function done() {
+                                    resolve(self.config);
+                                }
+
+                                if (!self.adapterConfig.must_approve_token) { return done(); }
+                                question('Hit enter when you have approved the login in the app: ').then(done).catch(error);
+                            }).catch(error);
+                        }).catch(error);
+                    });
+                });
+
+                self.logger.info('Creating HTTP server for callback');
+                server.listen(8000, function () {
+                    self.logger.debug('HTTP server listening', {port: this.address().port});
                 });
             }).catch(rej);
         });

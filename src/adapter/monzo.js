@@ -25,20 +25,25 @@ class MonzoAdapter extends Adapter {
     }
 
     async getTransactions(from, to) {
-        let accessToken = this.getAccessToken(),
-            potsResponse = await monzo.pots(accessToken);
+        let accessToken = this.getAccessToken();
 
-        potsResponse.pots.map(function (pot) {
-            this.pots[pot.id] = 'Monzo ' + pot;
+        try {
+            let potsResponse = await monzo.pots(accessToken);
 
-            if (!pot.deleted && pot.round_up) {
-                this.logger.info('Your Monzo balance includes a pot', {
-                    pot: pot.name,
-                    amount: helpers.numberFormat(pot.balance, pot.currency),
-                    currency: pot.currency,
-                });
-            }
-        }, this);
+            potsResponse.pots.map(function (pot) {
+                this.pots[pot.id] = 'Monzo ' + pot;
+
+                if (!pot.deleted && pot.round_up) {
+                    this.logger.info('Your Monzo balance includes a pot', {
+                        pot: pot.name,
+                        amount: helpers.numberFormat(pot.balance, pot.currency),
+                        currency: pot.currency,
+                    });
+                }
+            }, this);
+        } catch (err) {
+            throw err.error;
+        }
 
         let accountsResponse = await monzo.accounts(accessToken),
             accountMap = this.accountMap,
@@ -63,7 +68,7 @@ class MonzoAdapter extends Adapter {
                         return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
                     }
 
-                    reject(resp);
+                    reject(resp.error);
                 }
 
                 resolve(transactions.concat(transactionsResponse.transactions.map(function (raw) {
