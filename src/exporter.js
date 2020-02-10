@@ -1,21 +1,6 @@
 var fs = require('fs'),
     adapter, filename;
 
-var decimalExceptions = {JPY: 0};
-var helpers = {
-    decimals: function (currency) {
-        return (decimalExceptions.hasOwnProperty(currency) ? decimalExceptions[currency] : 2);
-    },
-    exchangeRate: function (localAmount, localCurrency, amount, currency) {
-        if (localCurrency == currency) { return 1; }
-        return Math.pow(10, helpers.decimals(localCurrency) - helpers.decimals(currency)) * amount / localAmount;
-    },
-    numberFormat: function (amount, currency) {
-        var decimals = helpers.decimals(currency);
-        return (amount / Math.pow(10, decimals)).toFixed(decimals);
-    }
-};
-
 module.exports = function exporter(options) {
     if (!options.format || !/^[a-z]+$/.test(options.format)) {
         throw new Error('Missing/invalid export format');
@@ -46,12 +31,11 @@ module.exports = function exporter(options) {
     ].join('.');
 
     return {
-        helpers: helpers,
         write: function (transactions, callback) {
             if (!options.quiet) { options.logger.info('Exporting to file', {filename}); }
             if (!options.dump) { transactions = transactions.filter(t => t.isValid()); }
 
-            adapter.call(helpers, transactions, options, function (err, contents) {
+            adapter(transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
                     options.logger.debug('Wrote ' + transactions.length + ' transactions to ' + filename);
                     callback && callback(contents);

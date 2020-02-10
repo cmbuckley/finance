@@ -24,7 +24,7 @@ class LoadAdapter extends Adapter {
 
                 res(JSON.parse(contents).map(function (data) {
                     const Transaction = (data.raw.transaction_id ? TruelayerTransaction : MonzoTransaction);
-                    return new Transaction(data.account, data.raw, adapter); // @todo needs helpers support
+                    return new Transaction(data.account, data.raw, adapter); // @todo adapter needs Monzo pots support
                 }));
             });
         }.bind(this));

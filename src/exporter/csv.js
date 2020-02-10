@@ -32,7 +32,7 @@ module.exports = function csv(transactions, options, callback) {
 
         rows.push(row);
         return rows;
-    }.bind(this), [head]), {
+    }, [head]), {
         delimiter: options.delimiter
     }, callback);
 };
