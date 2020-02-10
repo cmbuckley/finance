@@ -48,12 +48,12 @@ module.exports = function exporter(options) {
     return {
         helpers: helpers,
         write: function (transactions, callback) {
-            if (!options.quiet) { console.log('Exporting to', filename); }
+            if (!options.quiet) { options.logger.info('Exporting to file', {filename}); }
             if (!options.dump) { transactions = transactions.filter(t => t.isValid()); }
 
             adapter.call(helpers, transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
-                    if (!options.quiet) { console.log('Wrote ' + transactions.length + ' transactions to', filename); }
+                    options.logger.debug('Wrote ' + transactions.length + ' transactions to ' + filename);
                     callback && callback(contents);
                 });
             });

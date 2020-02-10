@@ -5,11 +5,12 @@ const nonce = require('nonce')();
 const Oauth = require('simple-oauth2');
 
 class AuthClient {
-    constructor(configPath, adapterConfig) {
+    constructor(configPath, adapterConfig, logger) {
         this.configPath = configPath;
         this.config = require(configPath);
         this.adapterConfig = adapterConfig;
         this.oauth = Oauth.create(adapterConfig.credentials);
+        this.logger = logger;
     }
 
     getAuthLink(options) {
@@ -23,13 +24,12 @@ class AuthClient {
             delete self.config.token;
 
             saveConfig(self).then(function () {
-                console.log('Please visit the following link in your browser to authorise the application:\n');
-
-                console.log(self.oauth.authorizationCode.authorizeURL({
+                self.logger.info('Please visit the following link in your browser to authorise the application:');
+                self.logger.info(self.oauth.authorizationCode.authorizeURL({
                     redirect_uri: self.adapterConfig.redirect_uri,
                     state: self.config.state,
                     scope: self.adapterConfig.scope || '',
-                }) + '\n');
+                }));
 
                 res(self.config);
             }).catch(rej);
@@ -52,7 +52,7 @@ class AuthClient {
                     return res(self.config);
                 }
 
-                console.error('Access token has expired, refreshing');
+                self.logger.info('Access token has expired, refreshing');
                 return accessToken.refresh().then(function (newToken) {
                     self.config.token = newToken.token;
                     saveConfig(self).then(res, rej);

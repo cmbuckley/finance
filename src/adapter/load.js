@@ -5,8 +5,8 @@ const fs = require('fs'),
 
 class LoadAdapter extends Adapter {
 
-    constructor(file) {
-        super();
+    constructor(file, logger) {
+        super(null, null, logger);
         this.file = file;
     }
 

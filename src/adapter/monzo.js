@@ -149,10 +149,6 @@ function foursquareCategory(matches, defaultValue) {
     };
 }
 
-function warn() {
-    console.error.apply(console, arguments);
-}
-
 var helpers = {
     decimalExceptions: {JPY: 0},
     decimals: function (currency) {
@@ -169,8 +165,8 @@ var helpers = {
 };
 
 class MonzoAdapter extends Adapter {
-    constructor(accountPath, config) {
-        super(accountPath, config);
+    constructor(accountPath, config, logger) {
+        super(accountPath, config, logger);
         this.accountMap = {};
     }
 
@@ -183,7 +179,6 @@ class MonzoAdapter extends Adapter {
             potsResponse = await monzo.pots(accessToken);
 
         let connector = {
-            warn,
             categories,
             pots,
             foreignCurrencies,
@@ -194,13 +189,13 @@ class MonzoAdapter extends Adapter {
             pots[pot.id] = pot;
 
             if (!pot.deleted && pot.round_up) {
-                console.log(
-                    'Your Monzo balance includes a pot "' + pot.name + '" containing',
-                    helpers.numberFormat(pot.balance, pot.currency),
-                    pot.currency
-                );
+                this.logger.info('Your Monzo balance includes a pot', {
+                    pot: pot.name,
+                    amount: helpers.numberFormat(pot.balance, pot.currency),
+                    currency: pot.currency,
+                });
             }
-        });
+        }, this);
 
         let accountsResponse = await monzo.accounts(accessToken),
             accountMap = this.accountMap,

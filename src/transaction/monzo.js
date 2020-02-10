@@ -19,11 +19,11 @@ class MonzoTransaction extends Transaction {
         }
 
         if (!this.isSettled() && this.isForeign()) {
-            helpers.warn(
-                '### UNSETTLED TRANSACTION, AMOUNT MAY CHANGE:',
-                this.getDate('YYYY-MM-DD'),
-                (this.raw.merchant ? this.raw.merchant.name : this.notes) || ''
-            );
+            this.adapter.logger.warn('### UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
+                date: this.getDate('YYYY-MM-DD'),
+                merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
+                note: this.raw.notes || this.raw.description,
+            });
         }
 
         return true;
@@ -90,12 +90,12 @@ class MonzoTransaction extends Transaction {
             return '';
         }
 
-        helpers.warn(
-            'Unknown category for ' + this.raw.id,
-            '(' + this.raw.category + '):',
-            '[' + (this.raw.merchant ? this.raw.merchant.name || '' : '') + ']',
-            this.raw.notes || this.raw.description
-        );
+        this.adapter.logger.warn('Unknown category', {
+            id: this.raw.id,
+            category: this.raw.category,
+            merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
+            note: this.raw.notes || this.raw.description,
+        });
     }
 
     getTransfer() {
@@ -160,11 +160,21 @@ class MonzoTransaction extends Transaction {
                     return this.adapter.data.payees[key];
                 }
 
-                helpers.warn('Unknown payee', this.raw.counterparty.user_id, key, this.raw.counterparty.name);
+                this.adapter.logger.warn('Unknown bank payee', {
+                    user: this.raw.counterparty.user_id,
+                    account: key,
+                    name: this.raw.counterparty.name
+                });
             } else if (/^user_/.test(this.raw.counterparty.user_id)) {
-                helpers.warn('Unknown Monzo payee', this.raw.counterparty.user_id + ':', this.raw.counterparty.name || '(no name)');
+                this.adapter.logger.warn('Unknown Monzo payee', {
+                    user: this.raw.counterparty.user_id,
+                    name: this.raw.counterparty.name
+                });
             } else {
-                helpers.warn('Unknown payee', this.raw.counterparty.user_id, this.raw.counterparty.name);
+                this.adapter.logger.warn('Unknown payee', {
+                    user: this.raw.counterparty.user_id,
+                    name: this.raw.counterparty.name
+                });
             }
 
             return this.raw.counterparty.name || '';
@@ -180,11 +190,12 @@ class MonzoTransaction extends Transaction {
             }
 
             if (!this.isTransfer()) {
-                helpers.warn(
-                    'Unknown merchant',
-                    this.raw.merchant.id + ':' + this.raw.merchant.group_id + ':' + this.getDate('YYYY-MM-DD') + ':',
-                    this.raw.merchant.name || ''
-                );
+                this.adapter.logger.warn('Unknown merchant', {
+                    merchant: this.raw.merchant.id,
+                    group: this.raw.merchant.group_id,
+                    date: this.getDate('YYYY-MM-DD'),
+                    name: this.raw.merchant.name
+                });
             }
         }
 

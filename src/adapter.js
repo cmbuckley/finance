@@ -3,14 +3,15 @@ const AuthClient = require('./lib/auth');
 let monzoAdapter;
 
 class Adapter {
-    constructor(accountPath, config) {
+    constructor(accountPath, config, logger) {
         this.accountPath = accountPath;
         this.config = config;
         this.data = getConfig('data');
+        this.logger = logger;
     }
 
     async login(options) {
-        const auth = new AuthClient(this.accountPath, this.config);
+        const auth = new AuthClient(this.accountPath, this.config, this.logger);
         let config = await auth.login(options);
         this.token = config.token.access_token;
     }
@@ -28,7 +29,7 @@ function getConfig(file) {
     return require(getConfigPath(file));
 }
 
-function getAdapter(account) {
+function getAdapter(account, logger) {
     const accountPath = getConfigPath(account),
         accountConfig = require(accountPath),
         adapterPath   = getConfigPath(accountConfig.type),
@@ -37,35 +38,37 @@ function getAdapter(account) {
     switch (accountConfig.type) {
         case 'truelayer':
             const TruelayerAdapter = require('./adapter/truelayer');
-            return new TruelayerAdapter(accountPath, adapterConfig);
+            return new TruelayerAdapter(accountPath, adapterConfig, logger);
 
         case 'monzo':
             const MonzoAdapter = require('./adapter/monzo');
-            if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig); }
+            if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig, logger); }
             monzoAdapter.addConfig(accountConfig);
             return monzoAdapter;
 
         case 'starling':
             const StarlingAdapter = require('./adapter/starling');
-            return new StarlingAdapter(adapterPath, adapterConfig);
+            return new StarlingAdapter(adapterPath, adapterConfig, logger);
     }
 }
 
-Adapter.getAll = function (accounts) {
+Adapter.getAll = function (accounts, logger) {
     let adapters = [];
 
     if (!Array.isArray(accounts)) {
         const LoadAdapter = require('./adapter/load');
-        return [new LoadAdapter(file)];
+        return [new LoadAdapter(file, logger)];
     }
 
     accounts.forEach(function (account) {
+        accountLogger = logger.child({module: account});
+
         try {
-            const adapter = getAdapter(account);
+            const adapter = getAdapter(account, accountLogger);
             if (!adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }
-            console.log('Cannot find config for', account);
+            accountLogger.error('Cannot find config for', account);
         }
     });
 

@@ -4,8 +4,8 @@ const {DataAPIClient} = require('truelayer-client'),
 
 class TruelayerAdapter extends Adapter {
 
-    constructor(accountConfigPath, adapterConfig) {
-        super(accountConfigPath, adapterConfig);
+    constructor(accountConfigPath, adapterConfig, logger) {
+        super(accountConfigPath, adapterConfig, logger);
         this.accountMap = require(accountConfigPath).names || {};
     }
 
