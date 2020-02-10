@@ -20,6 +20,7 @@ class MonzoTransaction extends Transaction {
         if (!this.isSettled() && this.isForeign()) {
             this.adapter.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
                 date: this.getDate('YYYY-MM-DD'),
+                transaction: this.raw.id,
                 merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
                 note: this.raw.notes || this.raw.description,
             });
@@ -85,12 +86,12 @@ class MonzoTransaction extends Transaction {
         }
 
         // ignore ATM withdrawals and internal pot transfers
-        if ((this.raw.scheme == 'uk_retail_pot') || this.isCashWithdrawal()) {
+        if ((this.raw.scheme == 'uk_retail_pot') || this.isCashWithdrawal() || this.isTransfer()) {
             return '';
         }
 
         this.adapter.logger.warn('Unknown category', {
-            id: this.raw.id,
+            transaction: this.raw.id,
             category: this.raw.category,
             merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
             note: this.raw.notes || this.raw.description,
@@ -160,17 +161,20 @@ class MonzoTransaction extends Transaction {
                 }
 
                 this.adapter.logger.warn('Unknown bank payee', {
+                    transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     account: key,
                     name: this.raw.counterparty.name
                 });
             } else if (/^user_/.test(this.raw.counterparty.user_id)) {
                 this.adapter.logger.warn('Unknown Monzo payee', {
+                    transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     name: this.raw.counterparty.name
                 });
             } else {
                 this.adapter.logger.warn('Unknown payee', {
+                    transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     name: this.raw.counterparty.name
                 });
