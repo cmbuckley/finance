@@ -58,7 +58,7 @@ const categories = {
         'Fried Chicken Joint':  'Food:Takeaway',
     }, lookup('description', {
         'Food': /CENTRE FILLING|UPTON GROUP|SESAME +LEEDS|MARKS&SPENCER/,
-        'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS/i,
+        'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
     }, 'Food:Eating Out')),
     shopping: foursquareCategory({
         'Board Shop': 'Clothing',

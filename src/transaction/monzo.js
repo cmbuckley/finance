@@ -19,7 +19,7 @@ class MonzoTransaction extends Transaction {
         }
 
         if (!this.isSettled() && this.isForeign()) {
-            this.adapter.logger.warn('### UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
+            this.adapter.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
                 date: this.getDate('YYYY-MM-DD'),
                 merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
                 note: this.raw.notes || this.raw.description,
