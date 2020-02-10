@@ -120,8 +120,6 @@ const categories = {
     })),
 };
 
-const pots = {};
-
 function lookup(key, matches, defaultResponse) {
     return function (transaction) {
         let isFunction   = (typeof defaultResponse === 'function'),
@@ -154,10 +152,6 @@ var helpers = {
     decimals: function (currency) {
         return (this.decimalExceptions.hasOwnProperty(currency) ? this.decimalExceptions[currency] : 2);
     },
-    exchangeRate: function (localAmount, localCurrency, amount, currency) {
-        if (localCurrency == currency) { return 1; }
-        return Math.pow(10, this.decimals(localCurrency) - this.decimals(currency)) * amount / localAmount;
-    },
     numberFormat: function (amount, currency) {
         var decimals = this.decimals(currency);
         return (amount / Math.pow(10, decimals)).toFixed(decimals);
@@ -168,6 +162,7 @@ class MonzoAdapter extends Adapter {
     constructor(accountPath, config, logger) {
         super(accountPath, config, logger);
         this.accountMap = {};
+        this.pots = {};
     }
 
     addConfig(accountConfig) {
@@ -180,13 +175,10 @@ class MonzoAdapter extends Adapter {
 
         let connector = {
             categories,
-            pots,
-            foreignCurrencies,
-            config: this.config,
         };
 
         potsResponse.pots.map(function (pot) {
-            pots[pot.id] = pot;
+            this.pots[pot.id] = 'Monzo ' + pot;
 
             if (!pot.deleted && pot.round_up) {
                 this.logger.info('Your Monzo balance includes a pot', {
