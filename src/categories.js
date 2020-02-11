@@ -32,9 +32,9 @@ const categories = {
     groceries:     'Food:Groceries',
 
     bills: lookup('description', {
-        'Computing': 'AWS',
         'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
+        'Computing:VPS': 'AWS',
         'Donations': /JUSTGIVING/i,
         'House:Improvement': /TIMPSON/,
         'House:Insurance': /SIMPLY BUSINESS/,
@@ -53,7 +53,6 @@ const categories = {
         'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
         'Leisure:Cinema': 'CINEMA',
         'Leisure:Climbing': 'CLIMBING',
-        'Leisure:Music': /VINYL|HMV UK/i,
         'Leisure:Music Events': /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
         'Leisure:Snowboarding': 'SNOZONE',
     }, 'Nights Out'),
@@ -77,13 +76,13 @@ const categories = {
         'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
     }, 'Food:Eating Out')),
     shopping: foursquareCategory({
-        'Board Shop': 'Clothing',
+        'Board Shop': 'Shopping:Clothing',
         'Bookstore': 'Leisure:Books & Magazines',
-        'Boutique': 'Clothing',
-        'Clothing Store': 'Clothing',
+        'Boutique': 'Shopping:Clothing',
+        'Clothing Store': 'Shopping:Clothing',
         'Convenience Store': 'House', // not groceries
         'Cosmetics Shop': 'Gifts',
-        'Department Store': 'Clothing',
+        'Department Store': 'Shopping:Clothing',
         'Food & Drink Shop': 'Food',
         'Furniture / Home Store': 'House:Furniture',
         'Garden Center': 'House:Garden',
@@ -91,16 +90,17 @@ const categories = {
         'Grocery Store': 'Food:Groceries',
         'Jewelry Store': 'Gifts',
         'Miscellaneous Shop': 'House',
-        'Sporting Goods Shop': 'Sporting Goods',
+        'Sporting Goods Shop': 'Shopping:Sporting Goods',
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
-        'Women\'s Store': 'Clothing',
+        'Women\'s Store': 'Shopping:Clothing',
     }, lookup('description', {
-        'Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA/,
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
         'House:Improvement': /BARGAIN TOOLS|SCREWFIX/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
+        'Shopping:Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA/,
+        'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
         if (transaction.counterparty.user_id) {
