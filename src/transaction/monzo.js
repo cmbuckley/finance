@@ -2,8 +2,9 @@ const Transaction = require('../transaction'),
     categories = require('../categories');
 
 class MonzoTransaction extends Transaction {
-    constructor(account, raw, adapter) {
+    constructor(account, raw, adapter, logger) {
         super(account, raw, adapter, {isMinorCurrency: true});
+        this.logger = logger;
     }
 
     isValid() {
@@ -18,7 +19,7 @@ class MonzoTransaction extends Transaction {
         }
 
         if (!this.isSettled() && this.isForeign()) {
-            this.adapter.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
+            this.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
                 date: this.getDate('YYYY-MM-DD'),
                 transaction: this.raw.id,
                 merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
@@ -90,7 +91,7 @@ class MonzoTransaction extends Transaction {
             return '';
         }
 
-        this.adapter.logger.warn('Unknown category', {
+        this.logger.warn('Unknown category', {
             transaction: this.raw.id,
             category: this.raw.category,
             merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
@@ -160,20 +161,20 @@ class MonzoTransaction extends Transaction {
                     return this.adapter.data.payees[key];
                 }
 
-                this.adapter.logger.warn('Unknown bank payee', {
+                this.logger.warn('Unknown bank payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     account: key,
                     name: this.raw.counterparty.name
                 });
             } else if (/^user_/.test(this.raw.counterparty.user_id)) {
-                this.adapter.logger.warn('Unknown Monzo payee', {
+                this.logger.warn('Unknown Monzo payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     name: this.raw.counterparty.name
                 });
             } else {
-                this.adapter.logger.warn('Unknown payee', {
+                this.logger.warn('Unknown payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
                     name: this.raw.counterparty.name
@@ -193,7 +194,7 @@ class MonzoTransaction extends Transaction {
             }
 
             if (!this.isTransfer()) {
-                this.adapter.logger.warn('Unknown merchant', {
+                this.logger.warn('Unknown merchant', {
                     merchant: this.raw.merchant.id,
                     group: this.raw.merchant.group_id,
                     date: this.getDate('YYYY-MM-DD'),

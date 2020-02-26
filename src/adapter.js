@@ -36,19 +36,16 @@ function getAdapter(account, logger) {
         adapterConfig = require(adapterPath);
 
     switch (accountConfig.type) {
-        case 'truelayer':
-            const TruelayerAdapter = require('./adapter/truelayer');
-            return new TruelayerAdapter(accountPath, adapterConfig, logger);
-
         case 'monzo':
             const MonzoAdapter = require('./adapter/monzo');
-            if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig, logger); }
-            monzoAdapter.addConfig(accountConfig);
+            if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig, logger.child({module: 'monzo'})); }
+            monzoAdapter.addConfig(Object.assign({module: account}, accountConfig));
             return monzoAdapter;
 
         case 'starling':
-            const StarlingAdapter = require('./adapter/starling');
-            return new StarlingAdapter(adapterPath, adapterConfig, logger);
+        case 'truelayer':
+            const Adapter = require('./adapter/' + accountConfig.type);
+            return new Adapter(accountPath, adapterConfig, logger.child({module: account}));
     }
 }
 
@@ -61,10 +58,8 @@ Adapter.getAll = function (accounts, logger) {
     }
 
     accounts.forEach(function (account) {
-        accountLogger = logger.child({module: account});
-
         try {
-            const adapter = getAdapter(account, accountLogger);
+            const adapter = getAdapter(account, logger);
             if (!adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }

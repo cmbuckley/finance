@@ -21,7 +21,7 @@ class MonzoAdapter extends Adapter {
     }
 
     addConfig(accountConfig) {
-        this.accountMap[accountConfig.account] = accountConfig.name;
+        this.accountMap[accountConfig.account] = accountConfig;
     }
 
     async getTransactions(from, to) {
@@ -51,7 +51,8 @@ class MonzoAdapter extends Adapter {
             adapter = this;
 
         let transactions = await accounts.reduce(async function (previousPromise, account) {
-            let transactions = await previousPromise;
+            let transactions = await previousPromise,
+                accountLogger = adapter.logger.child({module: accountMap[account.type].module});
 
             return new Promise(async function (resolve, reject) {
                 let transactionsResponse;
@@ -72,7 +73,7 @@ class MonzoAdapter extends Adapter {
                 }
 
                 resolve(transactions.concat(transactionsResponse.transactions.map(function (raw) {
-                    return new Transaction(accountMap[account.type] || account.display_name, raw, adapter);
+                    return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger);
                 })));
             });
         }, Promise.resolve([]));
