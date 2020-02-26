@@ -124,7 +124,7 @@ class MonzoTransaction extends Transaction {
             return this._getTransfer(this.getCurrency());
         }
 
-        if (/^PAYPAL /.test(this.raw.description)) {
+        if (/^PAYPAL /.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
             return 'PayPal';
         }
 
@@ -161,6 +161,7 @@ class MonzoTransaction extends Transaction {
                     return this.adapter.data.payees[key];
                 }
 
+                console.log(this.raw.merchant);
                 this.logger.warn('Unknown bank payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,

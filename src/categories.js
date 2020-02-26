@@ -32,9 +32,9 @@ const categories = {
     groceries:     'Food:Groceries',
 
     bills: lookup('description', {
-        'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS/,
+        'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
-        'Computing:VPS': 'AWS',
+        'Computing:VPS': /AWS|52B2222845CPN/,
         'Donations': /JUSTGIVING/i,
         'House:Improvement': /TIMPSON/,
         'House:Insurance': /SIMPLY BUSINESS/,
@@ -99,7 +99,7 @@ const categories = {
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
         'House:Improvement': /BARGAIN TOOLS|SCREWFIX/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA/,
+        'Shopping:Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL/,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
