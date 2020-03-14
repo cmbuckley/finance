@@ -4,6 +4,12 @@ const moment = require('moment-timezone'),
     Adapter = require('./adapter'),
     Exporter = require('./exporter');
 
+function coerceDate(d) {
+    const m = moment(d);
+    if (m.isValid()) { return m; }
+    throw new Error('Invalid date: ' + d);
+}
+
 const args = Yargs.options({
         account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'all'], type: 'array'},
         format:     {alias: 'o', describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
@@ -23,8 +29,8 @@ const args = Yargs.options({
 
             return account;
         },
-        from: (f => moment(f)),
-        to:   (t => moment(t)),
+        from: coerceDate,
+        to:   coerceDate,
     }).help('help').argv;
 
 const logger = winston.createLogger({
@@ -78,7 +84,7 @@ const logger = winston.createLogger({
             try {
                 transactions = await adapter.getTransactions(args.from, args.to);
             } catch (err) {
-                adapter.logger.error(err);
+                adapter.logger.error(err.message || err);
             }
 
             res(previousTransactions.concat(transactions));
