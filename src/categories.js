@@ -115,7 +115,7 @@ const categories = {
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC/i,
+        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC/i,
         'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
         'Car:Service & MOT': 'R H SIRRELL',
         'Holiday:Travel': /RYANAIR/,
