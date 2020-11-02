@@ -73,7 +73,7 @@ const logger = winston.createLogger({
         try {
             await adapter.login({forceLogin: args.login});
         } catch (err) {
-            adapter.logger.error(err.message || err);
+            adapter.logger.error('Error logging in: ', {message: err.message || err.error || err});
             return Promise.reject(err);
         }
 
@@ -84,7 +84,7 @@ const logger = winston.createLogger({
             try {
                 transactions = await adapter.getTransactions(args.from, args.to);
             } catch (err) {
-                adapter.logger.error(err.message || err);
+                adapter.logger.error('Error retrieving transactions: ', {message: err.message || err.error || err});
             }
 
             res(previousTransactions.concat(transactions));

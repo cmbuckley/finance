@@ -43,7 +43,7 @@ class AuthClient {
         let self = this;
         options = options || {};
 
-        return new Promise(function (resolve, rej) {
+        return new Promise(async function (resolve, rej) {
             if (self.config.token && !options.forceLogin) {
                 const accessToken = self.oauth.accessToken.create(self.config.token);
 
@@ -52,12 +52,14 @@ class AuthClient {
                 }
 
                 self.logger.info('Access token has expired, refreshing');
-                return accessToken.refresh().then(function (newToken) {
+
+                try {
+                    let newToken = await accessToken.refresh();
                     self.config.token = newToken.token;
-                    saveConfig(self).then(resolve, rej);
-                }).catch(function (err) {
-                    rej(err.data.payload);
-                });
+                    return saveConfig(self).then(resolve, rej);
+                } catch (err) {
+                    self.logger.info('Refresh token has expired too, requesting new login');
+                }
             }
 
             self.getAuthLink(options).then(function () {
