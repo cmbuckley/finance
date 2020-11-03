@@ -25,27 +25,8 @@ class MonzoAdapter extends Adapter {
     }
 
     async getTransactions(from, to) {
-        let accessToken = this.getAccessToken();
-
-        try {
-            let potsResponse = await monzo.pots(accessToken);
-
-            potsResponse.pots.map(function (pot) {
-                this.pots[pot.id] = 'Monzo ' + pot;
-
-                if (!pot.deleted && pot.round_up) {
-                    this.logger.info('Your Monzo balance includes a pot', {
-                        pot: pot.name,
-                        amount: helpers.numberFormat(pot.balance, pot.currency),
-                        currency: pot.currency,
-                    });
-                }
-            }, this);
-        } catch (err) {
-            throw err.error;
-        }
-
-        let accountsResponse = await monzo.accounts(accessToken),
+        let accessToken = this.getAccessToken(),
+            accountsResponse = await monzo.accounts(accessToken),
             accountMap = this.accountMap,
             accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type)),
             adapter = this;
@@ -55,7 +36,25 @@ class MonzoAdapter extends Adapter {
                 accountLogger = adapter.logger.child({module: accountMap[account.type].module});
 
             return new Promise(async function (resolve, reject) {
-                let transactionsResponse;
+                let potsResponse, transactionsResponse;
+
+                try {
+                    let potsResponse = await monzo.pots(account.id, accessToken);
+
+                    potsResponse.pots.map(function (pot) {
+                        adapter.pots[pot.id] = 'Monzo ' + pot;
+
+                        if (!pot.deleted && pot.round_up) {
+                            accountLogger.info('Your Monzo balance includes a pot', {
+                                pot: pot.name,
+                                amount: helpers.numberFormat(pot.balance, pot.currency),
+                                currency: pot.currency,
+                            });
+                        }
+                    });
+                } catch (err) {
+                    reject(err.error);
+                }
 
                 try {
                     transactionsResponse = await monzo.transactions({
