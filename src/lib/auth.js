@@ -80,10 +80,10 @@ class AuthClient {
                     }
 
                     response.end('Thanks, you may close this window');
-                    self.logger.debug('Closing HTTP server');
+                    self.logger.verbose('Closing HTTP server');
 
                     server.close(() => {
-                        self.logger.debug('Retrieving access token');
+                        self.logger.verbose('Retrieving access token');
 
                         self.oauth.authorizationCode.getToken({
                             code: authUrl.query.code,
@@ -107,7 +107,7 @@ class AuthClient {
 
                 self.logger.info('Creating HTTP server for callback');
                 server.listen(8000, function () {
-                    self.logger.debug('HTTP server listening', {port: this.address().port});
+                    self.logger.verbose('HTTP server listening', {port: this.address().port});
                 });
             }).catch(rej);
         });

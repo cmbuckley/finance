@@ -31,7 +31,7 @@ const args = Yargs.options({
         },
         from: coerceDate,
         to:   coerceDate,
-    }).help('help').argv;
+    }).count('verbose').help('help').argv;
 
 const logger = winston.createLogger({
     transports: [
@@ -41,7 +41,8 @@ const logger = winston.createLogger({
             format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
         }),
         new winston.transports.Console({
-            level: args.verbose ? 'debug' : args.quiet ? 'error' : 'info',
+            prettyPrint: true,
+            level: args.verbose ? Object.entries(winston.config.npm.levels).find(l => l[1] == Math.min(args.verbose + 3, 6))[0] : args.quiet ? 'error' : 'info',
             format: winston.format.combine(
                 winston.format.colorize(),
                 winston.format.printf(function (info) {

@@ -92,10 +92,12 @@ class MonzoTransaction extends Transaction {
         }
 
         this.logger.warn('Unknown category', {
-            transaction: this.raw.id,
             category: this.raw.category,
             merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
+            merch_cat: this.raw.merchant ? this.raw.merchant.metadata.foursquare_category || '' : '',
             note: this.raw.notes || this.raw.description,
+            date: this.getDate('YYYY-MM-DD'),
+            transaction: this.raw.id,
         });
     }
 
@@ -161,7 +163,6 @@ class MonzoTransaction extends Transaction {
                     return this.adapter.data.payees[key];
                 }
 
-                console.log(this.raw.merchant);
                 this.logger.warn('Unknown bank payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,

@@ -37,7 +37,7 @@ module.exports = function exporter(options) {
 
             adapter(transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {
-                    options.logger.debug('Wrote ' + transactions.length + ' transactions to ' + filename);
+                    options.logger.verbose('Wrote ' + transactions.length + ' transactions to ' + filename);
                     callback && callback(contents);
                 });
             });
