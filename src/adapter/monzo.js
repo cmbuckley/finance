@@ -42,7 +42,7 @@ class MonzoAdapter extends Adapter {
                     let potsResponse = await monzo.pots(account.id, accessToken);
 
                     potsResponse.pots.map(function (pot) {
-                        adapter.pots[pot.id] = 'Monzo ' + pot;
+                        adapter.pots[pot.id] = pot;
 
                         if (!pot.deleted && pot.round_up) {
                             accountLogger.info('Your Monzo balance includes a pot', {

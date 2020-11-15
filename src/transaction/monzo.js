@@ -13,7 +13,7 @@ class MonzoTransaction extends Transaction {
             || !this.raw.amount // zero amount transaction
             || (this.raw.is_load && !this.raw.counterparty.user_id && this.raw.amount > 0) // ignore topups
             || (this.raw.scheme == 'uk_retail_pot' && this.raw.metadata.trigger == 'coin_jar') // ignore round-up
-            || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up
+            || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots && this.adapter.pots[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up
         ) {
             return false;
         }
@@ -130,8 +130,8 @@ class MonzoTransaction extends Transaction {
             return 'PayPal';
         }
 
-        if (this.raw.scheme == 'uk_retail_pot') {
-            return this.adapter.pots[this.raw.metadata.pot_id].name;
+        if (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots) {
+            return 'Monzo ' + this.adapter.pots[this.raw.metadata.pot_id].name;
         }
 
         // legacy
