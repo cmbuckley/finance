@@ -77,12 +77,13 @@ const categories = {
     }, 'Food:Eating Out')),
     shopping: foursquareCategory({
         'Board Shop': 'Shopping:Clothing',
-        'Bookstore': 'Leisure:Books & Magazines',
+        'Bookstore': 'Shopping:Books & Magazines',
         'Boutique': 'Shopping:Clothing',
         'Clothing Store': 'Shopping:Clothing',
         'Convenience Store': 'House', // not groceries
         'Cosmetics Shop': 'Gifts',
         'Department Store': 'Shopping:Clothing',
+        'Electronics Store': 'House:Electronics',
         'Food & Drink Shop': 'Food',
         'Furniture / Home Store': 'House:Furniture',
         'Garden Center': 'House:Garden',
@@ -90,6 +91,7 @@ const categories = {
         'Grocery Store': 'Food:Groceries',
         'Jewelry Store': 'Gifts',
         'Miscellaneous Shop': 'House',
+        'Post Office': 'Shopping:Stationery',
         'Sporting Goods Shop': 'Shopping:Sporting Goods',
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
@@ -97,7 +99,7 @@ const categories = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
-        'House:Improvement': /BARGAIN TOOLS|SCREWFIX/,
+        'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
         'Shopping:Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL/,
         'Shopping:Music': /VINYL|HMV UK/i,
@@ -108,6 +110,7 @@ const categories = {
         }
     },
     transport: foursquareCategory({
+        'Automotive Shop': 'Car',
         'Gas Station': 'Car:Petrol',
         'Gas Station / Garage': 'Car:Petrol',
         'Government Building': 'Car:Parking', // e.g. City of York parking
@@ -120,8 +123,9 @@ const categories = {
         'Car:Service & MOT': 'R H SIRRELL',
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
-        'Travel:Rail': /GVB|Trainline|TFL.gov/i,
+        'Travel:Rail': /GVB|Trainline|TFL.gov|E\/TUNNEL/i,
         'Travel:Taxi': /UBER|bolt\.eu|AMBER/i,
+        'Travel:Toll': /DART-CHARGE|^PPO /,
     })),
     family: foursquareCategory({
         'Garden Center': 'House:Garden',
@@ -134,6 +138,7 @@ const categories = {
         'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': 'VETERINARY',
     })),
+    charity: 'Donations',
 };
 
 module.exports = categories;

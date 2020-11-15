@@ -63,7 +63,7 @@ class TruelayerTransaction extends Transaction {
             'Online Bonus Saver': /^404401 [0-9]{4}8681/,
             'Premier Saver':      /^404401 [0-9]{4}6646|RSB REGULAR SAVER/,
             'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
-            'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY/,
+            'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
             'Monzo Joint':        /Monzo Joint|JOINT MONZO/,
             'PayPal':             /^PAYPAL/,
