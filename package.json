@@ -10,7 +10,6 @@
   "scripts": {
     "test": "mocha --recursive test",
     "casper": "PHANTOMJS_EXECUTABLE=node_modules/.bin/phantomjs casperjs src/casper.js",
-    "monzo": "node src/monzo.js",
     "download": "node src/download.js"
   },
   "dependencies": {
