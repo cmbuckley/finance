@@ -42,6 +42,10 @@ function getAdapter(account, logger) {
             monzoAdapter.addConfig(Object.assign({module: account}, accountConfig));
             return monzoAdapter;
 
+        case 'kraken':
+            const KrakenAdapter = require('./adapter/kraken');
+            return new KrakenAdapter(adapterPath, adapterConfig, logger.child({module: 'kraken'}));
+
         case 'starling':
         case 'truelayer':
             const Adapter = require('./adapter/' + accountConfig.type);

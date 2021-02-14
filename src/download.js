@@ -11,7 +11,7 @@ function coerceDate(d) {
 }
 
 const args = Yargs.options({
-        account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'all'], type: 'array'},
+        account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'kraken', 'all'], type: 'array'},
         format:     {alias: 'o', describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', describe: 'Earliest date for transactions', default: 0},
         to:         {alias: 't', describe: 'Latest date for transactions',   default: undefined},

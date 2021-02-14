@@ -1,5 +1,5 @@
 const moment = require('moment-timezone'),
-    decimalExceptions = {JPY: 0};
+    decimalExceptions = {JPY: 0, BTC: 8, NAN: 5};
 
 class Transaction {
     constructor(account, raw, adapter, transactionOptions) {
