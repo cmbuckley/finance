@@ -33,7 +33,7 @@ module.exports = function exporter(options) {
     return {
         write: function (transactions, callback) {
             if (!options.quiet) { options.logger.info('Exporting to file', {filename}); }
-            if (!options.dump) { transactions = transactions.filter(t => t.isValid()); }
+            if (!options.dump) { transactions = transactions.filter(t => t && t.isValid && t.isValid()); }
 
             adapter(transactions, options, function (err, contents) {
                 fs.writeFile(filename, contents, function () {

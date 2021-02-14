@@ -67,7 +67,7 @@ Adapter.getAll = function (accounts, logger) {
             if (!adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }
-            accountLogger.error('Cannot find config for', account);
+            logger.error('Cannot find config for module ' + account, err);
         }
     });
 
