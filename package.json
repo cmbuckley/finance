@@ -9,17 +9,14 @@
   },
   "scripts": {
     "test": "mocha --recursive test",
-    "casper": "PHANTOMJS_EXECUTABLE=node_modules/.bin/phantomjs casperjs src/casper.js",
     "download": "node src/download.js"
   },
   "dependencies": {
-    "casperjs": "^1.1.4",
     "csv-stringify": "^1.1.2",
     "kraken-api": "^1.0.1",
     "moment-timezone": "^0.5.31",
     "monzo-bank": "git://github.com/cmbuckley/monzo-bank.git#pots",
     "nonce": "^1.0.4",
-    "phantomjs-prebuilt": "^2.1.16",
     "simple-oauth2": "^2.5.2",
     "starling-developer-sdk": "^1.0.3",
     "truelayer-client": "^1.3.2",

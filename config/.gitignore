@@ -1,3 +1,2 @@
-casper.json
-monzo.json
-truelayer.json
+*.json
+!*-sample.json
