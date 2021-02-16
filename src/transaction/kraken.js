@@ -1,9 +1,9 @@
 const Transaction = require('../transaction');
 
 const accountMap = {
-    NANO: {name: 'Nano', currency: 'BTC'}, // temp until Money supports Nano
-    XXBT: {name: 'Bitcoin', currency: 'BTC'},
-    XXDG: {name: 'Dogecoin', currency: 'DOGE'},
+    NANO: {name: 'Nano', currency: 'BTC', symbol: 'N'}, // temp 3-letter code until Money supports Nano
+    XXBT: {name: 'Bitcoin', currency: 'BTC', symbol: '₿'},
+    XXDG: {name: 'Dogecoin', currency: 'DOGE', symbol: 'Ð'},
 };
 
 function getAccount(asset) {
@@ -21,6 +21,19 @@ function getCurrency(asset) {
     }
 
     return accountMap[asset] ? accountMap[asset].currency : asset;
+}
+
+// nice formatting for a currency amount
+function getDisplayAmount(amount, asset) {
+    if (asset[0] == 'Z') {
+        return amount.toLocaleString('en', {
+            style: 'currency',
+            currency: asset.slice(1),
+            maximumFractionDigits: 5,
+        });
+    }
+
+    return (accountMap[asset] ? accountMap[asset].symbol : (asset + ' ')) + amount.toString().replace(/\.?0+$/, '');
 }
 
 class KrakenTransaction extends Transaction {
@@ -73,6 +86,17 @@ class KrakenTransaction extends Transaction {
 
     getMemo() {
         if (this.isFee()) { return 'Trade fee'; }
+        if (this.raw.trade) {
+            let buy = (this.raw.asset[0] == 'Z'),
+                which = (buy ? this.raw.trade : this.raw),
+                other = (buy ? this.raw : this.raw.trade),
+                price = (buy ? this.getExchangeRate() : (1 / this.getExchangeRate()));
+
+            if (which.asset[0] == 'Z') { return 'Currency Conversion'; }
+
+            return (buy ? 'Buy ' : 'Sell ') + getDisplayAmount(Math.abs(which.amount), which.asset)
+                + ' @ ' + getDisplayAmount(price, other.asset);
+        }
     }
 
     getId() {
