@@ -4,6 +4,7 @@ const accountMap = {
     NANO: {name: 'Nano', currency: 'BTC', symbol: 'N'}, // temp 3-letter code until Money supports Nano
     XXBT: {name: 'Bitcoin', currency: 'BTC', symbol: '₿'},
     XXDG: {name: 'Dogecoin', currency: 'DOGE', symbol: 'Ð'},
+    XXLM: {name: 'Lumen', currency: 'BTC', symbol: '*'},
 };
 
 function getAccount(asset) {
@@ -35,7 +36,7 @@ function getDisplayAmount(amount, asset) {
         });
     }
 
-    return (accountMap[asset] ? accountMap[asset].symbol : (asset + ' ')) + amount.toString().replace(/\.?0+$/, '');
+    return (accountMap[asset] ? accountMap[asset].symbol : (asset + ' ')) + amount.toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: 5});
 }
 
 class KrakenTransaction extends Transaction {
