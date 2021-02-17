@@ -2,9 +2,10 @@ const Transaction = require('../transaction'),
     categories = require('../categories');
 
 class MonzoTransaction extends Transaction {
-    constructor(account, raw, adapter, logger) {
+    constructor(account, raw, adapter, logger, accountConfig) {
         super(account, raw, adapter, {isMinorCurrency: true});
         this.logger = logger;
+        this.accountConfig = accountConfig;
     }
 
     isValid() {
@@ -95,7 +96,8 @@ class MonzoTransaction extends Transaction {
             category: this.raw.category,
             merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
             merch_cat: this.raw.merchant ? this.raw.merchant.metadata.foursquare_category || '' : '',
-            note: this.raw.notes || this.raw.description,
+            notes: this.raw.notes,
+            description: this.raw.description,
             date: this.getDate('YYYY-MM-DD'),
             transaction: this.raw.id,
         });
@@ -126,7 +128,7 @@ class MonzoTransaction extends Transaction {
             return this._getTransfer(this.getCurrency());
         }
 
-        if (/^PAYPAL /.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
+        if (this.accountConfig.paypal_transfers && /^PAYPAL/.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
             return 'PayPal';
         }
 
