@@ -1,7 +1,7 @@
 const Transaction = require('../transaction');
 
 const accountMap = {
-    NANO: {name: 'Nano', currency: 'BTC', symbol: 'N'}, // temp 3-letter code until Money supports Nano
+    NANO: {name: 'Nano', currency: 'BTC', symbol: '𝑁'}, // temp 3-letter code until Money supports Nano
     XXBT: {name: 'Bitcoin', currency: 'BTC', symbol: '₿'},
     XXDG: {name: 'Dogecoin', currency: 'DOGE', symbol: 'Ð'},
     XXLM: {name: 'Lumen', currency: 'BTC', symbol: '*'},
