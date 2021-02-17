@@ -101,7 +101,7 @@ const categories = {
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
         'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL/,
+        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL/,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
@@ -118,7 +118,7 @@ const categories = {
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC/i,
+        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE/i,
         'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
         'Car:Service & MOT': 'R H SIRRELL',
         'Holiday:Travel': /RYANAIR/,
@@ -139,6 +139,7 @@ const categories = {
         'Pet Care:Vet': 'VETERINARY',
     })),
     charity: 'Donations',
+    gifts: 'Gifts',
 };
 
 module.exports = categories;
