@@ -12,7 +12,9 @@ function getAccount(asset) {
         return 'Kraken (' + asset.slice(1) + ')';
     }
 
-    return accountMap[asset] ? accountMap[asset].name : asset;
+    if (accountMap[asset]) {
+        return accountMap[asset].name;
+    }
 }
 
 function getCurrency(asset) {
@@ -37,9 +39,13 @@ function getDisplayAmount(amount, asset) {
 }
 
 class KrakenTransaction extends Transaction {
-    constructor(raw, adapter, logger) {
-        super(getAccount(raw.asset), raw, adapter);
-        this.logger = logger;
+    constructor(raw, adapter) {
+        let account = getAccount(raw.asset);
+        super(account || raw.asset, raw, adapter);
+
+        if (!account) {
+            this.adapter.logger.warn('Unrecognised asset', {asset: raw.asset});
+        }
     }
 
     isValid() {

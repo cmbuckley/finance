@@ -16,7 +16,8 @@ class KrakenAdapter extends Adapter {
         let response = await kraken.api('Ledgers', {start: from.unix(), end: to.unix()}),
             ids = Object.keys(response.result.ledger),
             values = Object.values(response.result.ledger),
-            trades = {};
+            trades = {},
+            adapter = this;
 
         // build a map of ids with matching refids (these are trades)
         values.forEach((transaction, key) => {
@@ -41,10 +42,10 @@ class KrakenAdapter extends Adapter {
 
             if (raw.fee > 0) {
                 // use a separate transaction to track the fee
-                transactions.push(new Transaction(Object.assign({}, raw, {type: 'fee'})));
+                transactions.push(new Transaction(Object.assign({}, raw, {type: 'fee'}), adapter));
             }
 
-            transactions.push(new Transaction(raw));
+            transactions.push(new Transaction(raw, adapter));
             return transactions;
         }, []);
     }
