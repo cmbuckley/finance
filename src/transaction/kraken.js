@@ -1,10 +1,14 @@
 const Transaction = require('../transaction');
 
 const accountMap = {
-    NANO: {name: 'Nano', currency: 'BTC', symbol: '𝑁'}, // temp 3-letter code until Money supports Nano
     XXBT: {name: 'Bitcoin', currency: 'BTC', symbol: '₿'},
     XXDG: {name: 'Dogecoin', currency: 'DOGE', symbol: 'Ð'},
+
+    //  temp 3-letter code until Money supports these currencies
+    NANO: {name: 'Nano', currency: 'BTC', symbol: '𝑁'},
     XXLM: {name: 'Lumen', currency: 'BTC', symbol: '*'},
+    ATOM: {name: 'Cosmos', currency: 'BTC', symbol: '⚛'},
+    XTZ:  {name: 'Tezos', currency: 'BTC', symbol: 'ꜩ'},
 };
 
 function getAccount(asset) {
@@ -36,7 +40,8 @@ function getDisplayAmount(amount, asset) {
         });
     }
 
-    return (accountMap[asset] ? accountMap[asset].symbol : (asset + ' ')) + amount.toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: 5});
+    return (accountMap[asset] ? accountMap[asset].symbol : (asset + ' '))
+        + amount.toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: 5});
 }
 
 class KrakenTransaction extends Transaction {
@@ -69,6 +74,11 @@ class KrakenTransaction extends Transaction {
     getCurrency() {
         // use the currency of the destination amount in a trade
         return getCurrency(!this.isFee() && this.raw.trade ? this.raw.trade.asset : this.raw.asset);
+    }
+
+    // e.g. USD is displayed in 2DP, but balances are 4DP
+    _numDecimals(currency) {
+        return super._numDecimals(currency) + 2;
     }
 
     getLocalAmount() {
