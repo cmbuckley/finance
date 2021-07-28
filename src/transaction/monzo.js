@@ -1,10 +1,8 @@
-const Transaction = require('../transaction'),
-    categories = require('../categories');
+const Transaction = require('../transaction');
 
 class MonzoTransaction extends Transaction {
     constructor(account, raw, adapter, logger, accountConfig) {
-        super(account, raw, adapter, {isMinorCurrency: true});
-        this.logger = logger;
+        super(account, raw, adapter, logger, {isMinorCurrency: true});
         this.accountConfig = accountConfig;
     }
 
@@ -74,21 +72,9 @@ class MonzoTransaction extends Transaction {
         return this.raw.id;
     }
 
-    getCategory() {
-        let category = (categories.hasOwnProperty(this.raw.category)
-                     ? categories[this.raw.category]
-                     : this.raw.category);
-
-        if (typeof category == 'function') {
-            category = category(this.raw);
-        }
-
-        if (category) {
-            return category;
-        }
-
-        // ignore ATM withdrawals and internal pot transfers
-        if ((this.raw.scheme == 'uk_retail_pot') || this.isCashWithdrawal() || this.isTransfer()) {
+    _getCategory() {
+        // ignore internal pot transfers
+        if (this.raw.scheme == 'uk_retail_pot') {
             return '';
         }
 
@@ -199,6 +185,7 @@ class MonzoTransaction extends Transaction {
 
             if (!this.isTransfer()) {
                 this.logger.warn('Unknown merchant', {
+                    online: this.raw.online ? 'yes' : 'no',
                     merchant: this.raw.merchant.id,
                     group: this.raw.merchant.group_id,
                     date: this.getDate('YYYY-MM-DD'),

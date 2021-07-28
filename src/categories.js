@@ -1,3 +1,25 @@
+function search(transaction) {
+    // monzo
+    if (transaction.category) {
+        let category = (monzo.hasOwnProperty(transaction.category)
+                     ? monzo[transaction.category]
+                     : transaction.category);
+
+        if (typeof category == 'function') {
+            category = category(transaction);
+        }
+
+        return category;
+    }
+
+    // truelayer
+    if (transaction.transaction_classification &&
+        truelayer[transaction.transaction_classification[0]]
+    ) {
+        return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1]];
+    }
+}
+
 function lookup(key, matches, defaultResponse) {
     return function (transaction) {
         let isFunction   = (typeof defaultResponse === 'function'),
@@ -25,7 +47,7 @@ function foursquareCategory(matches, defaultValue) {
     };
 }
 
-const categories = {
+const monzo = {
     mondo:         '', // legacy
     general:       '', // TODO inspect
     expenses:      'Job Expenses', // TODO expand
@@ -101,7 +123,7 @@ const categories = {
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
         'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL/,
+        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC/i,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
@@ -128,7 +150,9 @@ const categories = {
         'Travel:Toll': /DART-CHARGE|^PPO /,
     })),
     family: foursquareCategory({
+        'Convenience Store': 'House',
         'Garden Center': 'House:Garden',
+        'Hardware Store': 'House:Improvement',
         'Pet Store': 'Pet Care',
         'Supermarket': 'House',
         'Warehouse Store': 'House',
@@ -142,4 +166,138 @@ const categories = {
     gifts: 'Gifts',
 };
 
-module.exports = categories;
+const truelayer = {
+    'Uncategorized': {
+        'Cash & ATM': '',
+        'Check': ''
+    },
+    'Entertainment': {
+        'Arts': 'Entertainment:Arts & Culture',
+        'Music': 'Leisure:Music Events',
+        'Dating': '',
+        'Movies & DVDs': 'Entertainment:Movies & DVDs',
+        'Newspaper & Magazines': 'Entertainment:Newspaper & Magazines',
+        'Social Club': '',
+        'Sport': 'Entertainment:Sport & Games',
+        'Games': 'Entertainment:Sport & Games'
+    },
+    'Education': {
+        'Tuition': '',
+        'Student Loan': '',
+        'Books & Supplies': ''
+    },
+    'Shopping': {
+        'Pets': 'Pet Care',
+        'Groceries': 'Food:Groceries',
+        'General': 'Shopping',
+        'Clothing': 'Shopping:Clothing',
+        'Home': '',
+        'Books': 'Shopping:Books & Magazines',
+        'Electronics & Software': '',
+        'Hobbies': '',
+        'Sporting Goods': ''
+    },
+    'Personal Care': {
+        'Hair': 'Personal Care:Hair',
+        'Laundry': '',
+        'Beauty': 'Personal Care',
+        'Spa & Massage': 'Personal Care'
+    },
+    'Health & Fitness': {
+        'Dentist': 'Healthcare:Dental',
+        'Doctor': 'Healthcare',
+        'Eye care': 'Healthcare:Eyecare',
+        'Pharmacy': 'Healthcare:Pharmacy',
+        'Gym': 'Healthcare:Fitness',
+        'Pets': 'Pet Care',
+        'Sports': ''
+    },
+    'Food & Dining': {
+        'Catering': '',
+        'Coffee shops': 'Food:Eating Out',
+        'Delivery': 'Food:Takeaway',
+        'Fast Food': 'Food:Takeaway',
+        'Restaurants': 'Food:Eating Out',
+        'Bars': 'Nights Out'
+    },
+    'Gifts & Donations': {
+        'Gift': 'Gifts',
+        'Charity': 'Donations'
+    },
+    'Investments': {
+        'Equities': '',
+        'Bonds': '',
+        'Bank products': '',
+        'Retirement': '',
+        'Annuities': '',
+        'Real-estate': ''
+    },
+    'Bills and Utilities': {
+        'Television': 'Bills:TV Licence',
+        'Home Phone': '',
+        'Internet': 'Bills:Internet',
+        'Mobile Phone': 'Bills:Phone',
+        'Utilities': 'Utilities'
+    },
+    'Auto & Transport': {
+        'Auto Insurance': 'Car:Insurance',
+        'Auto Payment': 'Car:Purchase',
+        'Parking': 'Car:Parking',
+        'Public transport': '',
+        'Service & Auto Parts': '',
+        'Taxi': 'Travel:Taxi',
+        'Gas & Fuel': 'Car:Petrol'
+    },
+    'Travel': {
+        'Air Travel': '',
+        'Hotel': '',
+        'Rental Car & Taxi': '',
+        'Vacation': ''
+    },
+    'Fees & Charges': {
+        'Service Fee': '',
+        'Late Fee': '',
+        'Finance Charge': '',
+        'ATM Fee': '',
+        'Bank Fee': '',
+        'Commissions': ''
+    },
+    'Business Services': {
+        'Advertising': '',
+        'Financial Services': '',
+        'Office Supplies': '',
+        'Printing': '',
+        'Shipping': '',
+        'Legal': ''
+    },
+    'Personal Services': {
+        'Advisory and Consulting': '',
+        'Financial Services': '',
+        'Lawyer': '',
+        'Repairs & Maintenance': ''
+    },
+    'Taxes': {
+        'Federal Tax': '',
+        'State Tax': '',
+        'Local Tax': '',
+        'Sales Tax': '',
+        'Property Tax': ''
+    },
+    'Gambling': {
+        'Betting': 'Leisure:Betting',
+        'Lottery': '',
+        'Casino': ''
+    },
+    'Home': {
+        'Rent': 'House:Rent',
+        'Mortgage': 'House:Mortgage',
+        'Secured loans': '',
+        'Pension and insurances': '',
+        'Pension payments': '',
+        'Life insurance': '',
+        'Buildings and contents insurance': 'House:Insurance',
+        'Health insurance': ''
+    }
+};
+
+module.exports = {search};

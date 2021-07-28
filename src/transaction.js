@@ -1,11 +1,13 @@
 const moment = require('moment-timezone'),
+    categories = require('./categories'),
     decimalExceptions = {JPY: 0, BTC: 8, NAN: 5};
 
 class Transaction {
-    constructor(account, raw, adapter, transactionOptions) {
+    constructor(account, raw, adapter, logger, transactionOptions) {
         this.account = account;
         this.raw = raw;
         this.adapter = adapter;
+        this.logger = logger;
         this._options = transactionOptions || {};
     }
 
@@ -33,6 +35,22 @@ class Transaction {
 
     _getBank(sortCode, account) {
         return sortCode.match(/\d{2}/g).join('-') + ' ' + account;
+    }
+
+    getCategory() {
+        let category = categories.search(this.raw);
+        if (category) { return category; }
+
+        // ignore ATM withdrawals and transfers
+        if (this.isCashWithdrawal() || this.isTransfer()) {
+            return '';
+        }
+
+        return this._getCategory();
+    }
+
+    _getCategory() {
+        return '';
     }
 
     getAccount() {

@@ -1,8 +1,8 @@
 const Transaction = require('../transaction');
 
 class TruelayerTransaction extends Transaction {
-    constructor(account, raw, adapter) {
-        super(account, raw, adapter);
+    constructor(account, raw, adapter, logger) {
+        super(account, raw, adapter, logger);
     }
 
     isValid() {
@@ -13,7 +13,6 @@ class TruelayerTransaction extends Transaction {
         return (this.raw.transaction_type == 'DEBIT');
     }
 
-	// @todo
     isCashWithdrawal() {
         return (this.raw.merchant && this.raw.merchant.atm);
     }
@@ -22,7 +21,6 @@ class TruelayerTransaction extends Transaction {
         return true;
     }
 
-	// @todo improve
     isForeign() {
         return this.raw.currency !== 'GBP';
     }
@@ -52,8 +50,13 @@ class TruelayerTransaction extends Transaction {
         return this.raw.transaction_id;
     }
 
-    getCategory() {
-        return ''; // @todo
+    _getCategory() {
+        this.logger.warn('Unknown category', {
+            category: this.raw.transaction_classification,
+            description: this.raw.description,
+            date: this.getDate('YYYY-MM-DD'),
+            transaction: this.raw.id,
+        });
     }
 
     getTransfer() {
@@ -65,7 +68,7 @@ class TruelayerTransaction extends Transaction {
             'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
             'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
-            'Monzo Joint':        /Monzo Joint|JOINT MONZO/,
+            'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
             'PayPal':             /^PAYPAL/,
             'Payslips':           'HESTVIEW',
             'Starling':           /^Starling/,

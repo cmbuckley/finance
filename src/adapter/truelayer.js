@@ -34,7 +34,7 @@ class TruelayerAdapter extends Adapter {
 
                 res(previousTransactions.concat(transactionsResponse.results.map(function (raw) {
                     adapter.logger.silly('Raw transaction', raw);
-                    return new Transaction(accountMap[account.display_name] || account.display_name, raw, adapter, {});
+                    return new Transaction(accountMap[account.account_number.iban] || account.display_name, raw, adapter, adapter.logger);
                 })));
             });
         }, Promise.resolve([]));
