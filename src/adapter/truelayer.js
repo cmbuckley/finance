@@ -13,16 +13,19 @@ class TruelayerAdapter extends Adapter {
         let accountMap = this.accountMap,
             accessToken = this.getAccessToken(),
             accountsResponse = await DataAPIClient.getAccounts(accessToken),
+            cardsResponse = await DataAPIClient.getCards(accessToken),
             adapter = this;
 
-        return await accountsResponse.results.reduce(async function (previousPromise, account) {
-            let previousTransactions = await previousPromise;
+        // get transactions for normal accounts and card accounts
+        return await accountsResponse.results.concat(cardsResponse.results).reduce(async function (previousPromise, account) {
+            let previousTransactions = await previousPromise,
+                apiMethod = (account.card_type ? 'getCardTransactions' : 'getTransactions');
 
             return new Promise(async function (res, rej) {
                 let transactionsResponse;
 
                 try {
-                    transactionsResponse = await DataAPIClient.getTransactions(
+                    transactionsResponse = await DataAPIClient[apiMethod](
                         accessToken,
                         account.account_id,
                         from.format('YYYY-MM-DD'),
@@ -34,7 +37,7 @@ class TruelayerAdapter extends Adapter {
 
                 res(previousTransactions.concat(transactionsResponse.results.map(function (raw) {
                     adapter.logger.silly('Raw transaction', raw);
-                    return new Transaction(accountMap[account.account_number.iban] || account.display_name, raw, adapter, adapter.logger);
+                    return new Transaction(accountMap[account.account_id] || account.display_name, raw, adapter, adapter.logger);
                 })));
             });
         }, Promise.resolve([]));
