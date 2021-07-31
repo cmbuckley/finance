@@ -42,17 +42,18 @@
     };
 
     // find all the header cells
-    var cells = document.querySelectorAll('tr[aria-label="row"] td'),
+    var cells = document.querySelectorAll('tr[data-automation-id="tableHeaderRow"] th span'),
         date;
 
     // find the Payment Date header cell and get the date from the info table
     Array.prototype.some.call(cells, function (cell) {
         if (cell.innerText.trim() == 'Payment Date') {
-            var index = Array.prototype.indexOf.call(cell.parentNode.children, cell) + 1;
+            var header = parentNode(cell, 'th'),
+                index = Array.prototype.indexOf.call(header.parentNode.children, header) + 1;
 
-            date = parentNode(cell, 'div').nextElementSibling
-                                          .querySelector('td:nth-child(' + index + ')')
-                                          .innerText.trim().replace(/\//g, '-');
+            date = parentNode(cell, 'thead').nextElementSibling
+                    .querySelector('td:nth-child(' + index + ')')
+                    .innerText.trim().replace(/\//g, '-');
             return true;
         }
     });
@@ -67,7 +68,7 @@
     }
 
     // find all the table headings
-    var headings = document.querySelectorAll('div[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
+    var headings = document.querySelectorAll('[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
         file = [];
 
     ['Earnings', 'Statutory Deductions', 'Deductions'].forEach(function (type) {
@@ -76,15 +77,14 @@
             var transactions;
 
             if (heading.innerText == type) {
-                transactions = parentNode(heading, 'div.wd-SuperGrid').querySelectorAll('tr[tabindex]');
+                transactions = parentNode(heading, '[data-automation-id="rivaWidget"]').querySelectorAll('tbody tr');
                 console.debug(type, ':', transactions);
 
                 // add all transactions to file
                 Array.prototype.forEach.call(transactions, function (transaction) {
                     var cells = transaction.querySelectorAll('td'),
-                        isEarnings = (cells.length == 6),
-                        description = getDescription(cells, isEarnings),
-                        amount = getAmount(cells, isEarnings);
+                        description = getDescription(cells, type == 'Earnings'),
+                        amount = getAmount(cells, type);
 
                     if (description && cells.length > 2 && amount != 0) {
                         file.push({
@@ -118,9 +118,11 @@
         return description + (hasHours && hours > 0 ? ': ' + hours: '');
     }
 
-    function getAmount(cells, isEarnings) {
-        var text = cells[isEarnings ? 4 : 1].innerText;
-        return 100 * text.replace(/[(),]/g, '') * (isEarnings && text.indexOf('(') == -1 ? 1 : -1);
+    function getAmount(cells, type) {
+        var column = {Earnings: 4, 'Statutory Deductions': 3, Deductions: 1},
+            text = cells[column[type]].innerText;
+
+        return 100 * text.replace(/[(),]/g, '') * (type == 'Earnings' && text.indexOf('(') == -1 ? 1 : -1);
     }
 
     function getCategory(text) {
@@ -134,11 +136,12 @@
             'Refer a Friend Bonus':      'Salary:Bonus',
             'Company Performance Bonus': 'Salary:Bonus',
             'Commitment Bonus':          'Salary:Bonus',
+            'Thank You Bonus':           'Salary:Bonus',
             'TABLETS':                   'Computing:Hardware',
             'EE Smart Pension':          'Retirement:Pension',
             'Income Tax':                'Taxes:Income Tax',
             'Employee NI':               'Insurance:NI',
-            'Pennies From Heaven':       'Donations'
+            'Pennies From Heaven':       'Donations',
         }[text] || '';
     }
 
