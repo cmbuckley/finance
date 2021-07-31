@@ -70,18 +70,21 @@ const monzo = {
         'Personal Care:Hair': 'CITY IMAGE',
         'Pet Care:Vet': 'VETERINARY',
     }, 'Personal Care'),
-    entertainment: lookup('description', {
+    entertainment: foursquareCategory({
+        'Zoo': 'Leisure:Activities',
+    }, lookup('description', {
         'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
         'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
         'Leisure:Cinema': 'CINEMA',
         'Leisure:Climbing': 'CLIMBING',
         'Leisure:Music Events': /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
         'Leisure:Snowboarding': 'SNOZONE',
-    }, 'Nights Out'),
+    }, 'Nights Out')),
     holidays: foursquareCategory({
         'Art Museum': 'Holiday:Activities',
         'Hotel': 'Holiday:Accommodation',
         'Post Office': 'Holiday',
+        'Vineyard': 'Holiday:Accommodation',
     }, lookup('description', {
         'Car:Parking': 'MANCHESTER AIRPORT CAR',
         'Food:Eating Out': 'HMSHOST',
@@ -101,6 +104,7 @@ const monzo = {
         'Board Shop': 'Shopping:Clothing',
         'Bookstore': 'Shopping:Books & Magazines',
         'Boutique': 'Shopping:Clothing',
+        'Candy Store': 'Food',
         'Clothing Store': 'Shopping:Clothing',
         'Convenience Store': 'House', // not groceries
         'Cosmetics Shop': 'Gifts',
@@ -111,6 +115,7 @@ const monzo = {
         'Garden Center': 'House:Garden',
         'Gift Shop': 'Gifts',
         'Grocery Store': 'Food:Groceries',
+        'Hardware Store': 'House:Improvement',
         'Jewelry Store': 'Gifts',
         'Miscellaneous Shop': 'House',
         'Post Office': 'Shopping:Stationery',
@@ -118,12 +123,13 @@ const monzo = {
         'Supermarket': 'House', // not groceries
         'Warehouse Store': 'House',
         'Women\'s Store': 'Shopping:Clothing',
+        'Zoo': 'Gifts',
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
-        'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q/,
+        'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q|STAX TRADE|WICKES/,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC/i,
+        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK/i,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
@@ -140,24 +146,26 @@ const monzo = {
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE/i,
-        'Car:Petrol': /EG HOLLINWOOD|MFG  PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
-        'Car:Service & MOT': 'R H SIRRELL',
+        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK/i,
+        'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
+        'Car:Service & MOT': /R H SIRRELL|ALBA TYRES/,
         'Holiday:Travel': /RYANAIR/,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
         'Travel:Rail': /GVB|Trainline|TFL.gov|E\/TUNNEL/i,
-        'Travel:Taxi': /UBER|bolt\.eu|AMBER/i,
+        'Travel:Taxi': /UBER|bolt\.eu|AMBER|STREAMLINE/i,
         'Travel:Toll': /DART-CHARGE|^PPO /,
     })),
     family: foursquareCategory({
         'Convenience Store': 'House',
+        'Furniture / Home Store': 'House:Furniture',
         'Garden Center': 'House:Garden',
         'Hardware Store': 'House:Improvement',
         'Pet Store': 'Pet Care',
         'Supermarket': 'House',
         'Warehouse Store': 'House',
     }, lookup('description', {
-        'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED/,
+        'House:Garden': 'LANGLANDS',
+        'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES/,
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': 'VETERINARY',
