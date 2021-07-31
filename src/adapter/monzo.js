@@ -26,12 +26,18 @@ class MonzoAdapter extends Adapter {
 
     async getTransactions(from, to) {
         let accessToken = this.getAccessToken(),
-            accountsResponse = await monzo.accounts(accessToken),
             accountMap = this.accountMap,
-            accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type)),
-            adapter = this;
+            adapter = this,
+            accounts, transactions;
 
-        let transactions = await accounts.reduce(async function (previousPromise, account) {
+        try {
+            let accountsResponse = await monzo.accounts(accessToken);
+            accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type));
+        } catch (err) {
+            throw err.error || err;
+        }
+
+        transactions = await accounts.reduce(async function (previousPromise, account) {
             let transactions = await previousPromise,
                 accountLogger = adapter.logger.child({module: accountMap[account.type].module});
 
