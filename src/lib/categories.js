@@ -18,6 +18,10 @@ function search(transaction) {
     ) {
         return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1]];
     }
+
+    if (transaction.transaction_category && truelayer[transaction.transaction_category]) {
+        return truelayer[transaction.transaction_category];
+    }
 }
 
 function lookup(key, matches, defaultResponse) {
@@ -164,7 +168,7 @@ const monzo = {
         'Supermarket': 'House',
         'Warehouse Store': 'House',
     }, lookup('description', {
-        'House:Garden': 'LANGLANDS',
+        'House:Garden': /LANGLANDS|GARDEN CENTRE/,
         'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES/,
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
@@ -305,7 +309,9 @@ const truelayer = {
         'Life insurance': '',
         'Buildings and contents insurance': 'House:Insurance',
         'Health insurance': ''
-    }
+    },
+
+    'INTEREST': 'Bank Charges:Interest',
 };
 
 module.exports = {search};
