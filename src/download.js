@@ -75,7 +75,7 @@ const logger = winston.createLogger({
             await adapter.login({forceLogin: args.login});
         } catch (err) {
             adapter.logger.error('Error logging in:', {message: err.message || err});
-            return Promise.reject(err);
+            return Promise.resolve(previousTransactions);
         }
 
         return new Promise(async function (res, rej) {

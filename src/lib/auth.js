@@ -18,12 +18,21 @@ class AuthClient {
         let self = this;
         return new Promise(function (res, rej) {
             function done() {
-                self.logger.info('Please visit the following link in your browser to authorise the application:');
-                self.logger.info(self.oauth.authorizationCode.authorizeURL({
+                let params = {
                     redirect_uri: self.adapterConfig.redirect_uri,
                     state: self.config.state,
                     scope: self.adapterConfig.scope || '',
-                }));
+                };
+
+                // Truelayer supports multiple providers - force a specific selection
+                if (self.config.provider) {
+                    params.providers = self.config.provider;
+                    // need to disable challenger banks if using an Open Banking provider, and vice versa
+                    params.disable_providers = 'uk-' + {ob: 'oauth', oauth: 'ob'}[self.config.provider.split('-')[1]] + '-all';
+                }
+
+                self.logger.info('Please visit the following link in your browser to authorise the application:');
+                self.logger.info(self.oauth.authorizationCode.authorizeURL(params));
 
                 res(self.config);
             }
@@ -67,20 +76,23 @@ class AuthClient {
                     const authUrl = url.parse(req.url, true);
                     self.logger.info('Received OAuth callback', authUrl.query);
 
-                    function error(err) {
-                        response.statusCode = 500;
-                        response.end(err.message || err);
-                        rej(err);
+                    // any errors before the server is closed
+                    function closeAndError(err) {
+                        server.close(() => rej(err));
                     }
 
                     if (authUrl.query.state != self.config.state) {
                         response.statusCode = 400;
                         response.end('State does not match requested state');
-                        return rej('State does not match requested state');
+                        return closeAndError('State does not match requested state');
                     }
 
                     response.end('Thanks, you may close this window');
                     self.logger.verbose('Closing HTTP server');
+
+                    if (authUrl.query.error) {
+                        return closeAndError(authUrl.query.error);
+                    }
 
                     server.close(() => {
                         self.logger.verbose('Retrieving access token');
@@ -99,9 +111,9 @@ class AuthClient {
                                 }
 
                                 if (!self.adapterConfig.must_approve_token) { return done(); }
-                                question('Hit enter when you have approved the login in the app: ').then(done).catch(error);
-                            }).catch(error);
-                        }).catch(error);
+                                question('Hit enter when you have approved the login in the app: ').then(done).catch(rej);
+                            }).catch(rej);
+                        }).catch(rej);
                     });
                 });
 
