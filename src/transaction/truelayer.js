@@ -34,7 +34,9 @@ class TruelayerTransaction extends Transaction {
     }
 
     getLocalAmount() {
-        return this._getAmount(this.raw.amount);
+        // flip amount for credit cards, where DEBIT is a positive amount
+        let factor = (this.isDebit() == (this.raw.amount > 0) ? -1 : 1);
+        return this._getAmount(this.raw.amount * factor);
     }
 
     // @todo
