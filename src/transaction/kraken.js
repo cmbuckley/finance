@@ -5,10 +5,10 @@ const accountMap = {
     XXDG: {name: 'Dogecoin', currency: 'DOGE', symbol: 'Ð'},
 
     //  temp 3-letter code until Money supports these currencies
-    NANO: {name: 'Nano', currency: 'BTC', symbol: '𝑁'},
-    XXLM: {name: 'Lumen', currency: 'BTC', symbol: '*'},
-    ATOM: {name: 'Cosmos', currency: 'BTC', symbol: '⚛'},
-    XTZ:  {name: 'Tezos', currency: 'BTC', symbol: 'ꜩ'},
+    NANO: {name: 'Nano', currency: 'NAD', symbol: '𝑁'},
+    XXLM: {name: 'Lumen', currency: 'MNT', symbol: '*'},
+    ATOM: {name: 'Cosmos', currency: 'AZN', symbol: '⚛'},
+    XTZ:  {name: 'Tezos', currency: 'TZS', symbol: 'ꜩ'},
 };
 
 function getAccount(asset) {

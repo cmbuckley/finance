@@ -13,9 +13,21 @@ class KrakenAdapter extends Adapter {
     }
 
     async getTransactions(from, to) {
-        let response = await kraken.api('Ledgers', {start: from.unix(), end: to.unix()}),
-            ids = Object.keys(response.result.ledger),
-            values = Object.values(response.result.ledger),
+        async function getLedgers(offset) {
+            return await kraken.api('Ledgers', {start: from.unix(), end: to.unix(), ofs: offset || 0});
+        }
+
+        let response = await getLedgers(),
+            ledger = response.result.ledger;
+
+        // query further pages
+        while (Object.keys(ledger).length < response.result.count) {
+            let nextResponse = await getLedgers(Object.keys(ledger).length);
+            ledger = Object.assign(ledger, nextResponse.result.ledger);
+        }
+
+        let ids = Object.keys(ledger),
+            values = Object.values(ledger),
             trades = {},
             adapter = this;
 
@@ -37,7 +49,7 @@ class KrakenAdapter extends Adapter {
             // add details about the trade if found
             if (trades[raw.refid]) {
                 let other = trades[raw.refid].find(i => i != raw.id);
-                raw.trade = response.result.ledger[other];
+                raw.trade = ledger[other];
             }
 
             if (raw.fee > 0) {
