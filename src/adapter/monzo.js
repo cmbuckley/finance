@@ -47,13 +47,16 @@ class MonzoAdapter extends Adapter {
                 try {
                     let potsResponse = await monzo.pots(account.id, accessToken);
 
-                    potsResponse.pots.map(function (pot) {
+                    potsResponse.pots.map(async function (pot) {
                         adapter.pots[pot.id] = pot;
 
                         if (!pot.deleted && pot.round_up) {
+                            let accountBalance = await monzo.balance(account.id, accessToken);
+
                             accountLogger.info('Your Monzo balance includes a pot', {
                                 pot: pot.name,
                                 amount: helpers.numberFormat(pot.balance, pot.currency),
+                                total: helpers.numberFormat(pot.balance + accountBalance.balance, accountBalance.currency),
                                 currency: pot.currency,
                             });
                         }
