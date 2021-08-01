@@ -1,5 +1,5 @@
 const moment = require('moment-timezone'),
-    categories = require('./categories'),
+    categories = require('./lib/categories'),
     decimalExceptions = {JPY: 0, BTC: 8, NAN: 5};
 
 class Transaction {
