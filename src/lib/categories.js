@@ -184,30 +184,30 @@ const truelayer = {
         'Check': ''
     },
     'Entertainment': {
-        'Arts': 'Entertainment:Arts & Culture',
+        'Arts': 'Leisure:Arts & Culture',
         'Music': 'Leisure:Music Events',
         'Dating': '',
-        'Movies & DVDs': 'Entertainment:Movies & DVDs',
-        'Newspaper & Magazines': 'Entertainment:Newspaper & Magazines',
+        'Movies & DVDs': 'Leisure:Movies & Video Rentals',
+        'Newspaper & Magazines': 'Shopping:Books & Magazines',
         'Social Club': '',
-        'Sport': 'Entertainment:Sport & Games',
-        'Games': 'Entertainment:Sport & Games'
+        'Sport': 'Leisure:Sporting Events',
+        'Games': 'Leisure:Toys & Games'
     },
     'Education': {
-        'Tuition': '',
-        'Student Loan': '',
-        'Books & Supplies': ''
+        'Tuition': 'Education:Tuition',
+        'Student Loan': 'Education:Student Loan',
+        'Books & Supplies': 'Shopping:Books & Magazines'
     },
     'Shopping': {
         'Pets': 'Pet Care',
         'Groceries': 'Food:Groceries',
         'General': 'Shopping',
         'Clothing': 'Shopping:Clothing',
-        'Home': '',
+        'Home': 'Home',
         'Books': 'Shopping:Books & Magazines',
-        'Electronics & Software': '',
-        'Hobbies': '',
-        'Sporting Goods': ''
+        'Electronics & Software': 'Computing:Electronics',
+        'Hobbies': 'Shopping:Hobbies',
+        'Sporting Goods': 'Shopping:Sporting Goods'
     },
     'Personal Care': {
         'Hair': 'Personal Care:Hair',
@@ -246,7 +246,7 @@ const truelayer = {
     },
     'Bills and Utilities': {
         'Television': 'Bills:TV Licence',
-        'Home Phone': '',
+        'Home Phone': 'Bills:Phone',
         'Internet': 'Bills:Internet',
         'Mobile Phone': 'Bills:Phone',
         'Utilities': 'Utilities'
@@ -255,24 +255,24 @@ const truelayer = {
         'Auto Insurance': 'Car:Insurance',
         'Auto Payment': 'Car:Purchase',
         'Parking': 'Car:Parking',
-        'Public transport': '',
-        'Service & Auto Parts': '',
+        'Public transport': 'Travel:Bus',
+        'Service & Auto Parts': 'Car:Service & MOT',
         'Taxi': 'Travel:Taxi',
         'Gas & Fuel': 'Car:Petrol'
     },
     'Travel': {
-        'Air Travel': '',
-        'Hotel': '',
-        'Rental Car & Taxi': '',
-        'Vacation': ''
+        'Air Travel': 'Holiday:Travel',
+        'Hotel': 'Holiday:Accomodation',
+        'Rental Car & Taxi': 'Holiday:Travel',
+        'Vacation': 'Holiday'
     },
     'Fees & Charges': {
-        'Service Fee': '',
-        'Late Fee': '',
-        'Finance Charge': '',
-        'ATM Fee': '',
-        'Bank Fee': '',
-        'Commissions': ''
+        'Service Fee': 'Bank Charges:Service Charge',
+        'Late Fee': 'Bank Charges:Service Charge',
+        'Finance Charge': 'Bank Charges:Service Charge',
+        'ATM Fee': 'Bank Charges:ATM Charge',
+        'Bank Fee': 'Bank Charges:Service Charge',
+        'Commissions': 'Bank Charges:Service Charge'
     },
     'Business Services': {
         'Advertising': '',
