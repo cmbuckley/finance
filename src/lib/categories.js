@@ -39,11 +39,17 @@ function lookup(key, matches, defaultResponse) {
     };
 }
 
-function foursquareCategory(matches, defaultValue) {
+function merchantCategory(matches, defaultValue) {
     return function (transaction) {
-        if (transaction.merchant && transaction.merchant.metadata) {
-            if (matches[transaction.merchant.metadata.foursquare_category]) {
+        if (transaction.merchant) {
+            if (transaction.merchant.metadata &&
+                matches[transaction.merchant.metadata.foursquare_category]
+            ) {
                 return matches[transaction.merchant.metadata.foursquare_category];
+            }
+
+            if (transaction.merchant.category && matches[transaction.merchant.category]) {
+                return matches[transaction.merchant.category];
             }
         }
 
@@ -51,12 +57,42 @@ function foursquareCategory(matches, defaultValue) {
     };
 }
 
+// reusable patterns
+const patterns = {
+    accommodation:    /MOXY STRATFORD|HOTEL|Booking\.com/,
+    betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
+    houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES/,
+    flights:          /RYANAIR/,
+    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK/i,
+    rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS/i,
+    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK/i,
+};
+
 const monzo = {
     mondo:         '', // legacy
     general:       '', // TODO inspect
-    expenses:      'Job Expenses', // TODO expand
     groceries:     'Food:Groceries',
 
+    expenses: merchantCategory({
+        'Bus Line': 'Job Expenses:Rail',
+        'Gourmet Shop': 'Job Expenses:Food',
+        'Hotel': 'Job Expenses:Accommodation',
+        'Parking': 'Job Expenses:Parking',
+        'Train': 'Job Expenses:Rail',
+        'Train Station': 'Job Expenses:Rail',
+        'Supermarket': 'Job Expenses:Food',
+
+        entertainment: 'Job Expenses:Entertainment',
+        holidays: 'Job Expenses:Flights',
+        eating_out: 'Job Expenses:Food',
+        groceries: 'Job Expenses:Food',
+    }, lookup('description', {
+        'Job Expenses:Accommodation': patterns.accommodation,
+        'Job Expenses:Flights': patterns.flights,
+        'Job Expenses:Parking': patterns.parking,
+        'Job Expenses:Rail': patterns.rail,
+        'Job Expenses:Taxi': patterns.taxi,
+    }, 'Job Expenses')),
     bills: lookup('description', {
         'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
@@ -64,7 +100,7 @@ const monzo = {
         'Donations': /JUSTGIVING/i,
         'House:Improvement': /TIMPSON/,
         'House:Insurance': /SIMPLY BUSINESS/,
-        'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE/,
+        'Leisure:Betting': patterns.betting,
         'Taxes': 'HMRC',
         'Utilities:Gas': 'BRITISH GAS',
     }, 'Bills'),
@@ -74,37 +110,37 @@ const monzo = {
         'Personal Care:Hair': 'CITY IMAGE',
         'Pet Care:Vet': 'VETERINARY',
     }, 'Personal Care'),
-    entertainment: foursquareCategory({
+    entertainment: merchantCategory({
         'Zoo': 'Leisure:Activities',
     }, lookup('description', {
         'Leisure:Activities': /ACTIVE NETWORK|TOUGH MUDDER/,
-        'Leisure:Betting': /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
+        'Leisure:Betting': patterns.betting,
         'Leisure:Cinema': 'CINEMA',
         'Leisure:Climbing': 'CLIMBING',
         'Leisure:Music Events': /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
         'Leisure:Snowboarding': 'SNOZONE',
     }, 'Nights Out')),
-    holidays: foursquareCategory({
+    holidays: merchantCategory({
         'Art Museum': 'Holiday:Activities',
         'Hotel': 'Holiday:Accommodation',
         'Post Office': 'Holiday',
         'Vineyard': 'Holiday:Accommodation',
     }, lookup('description', {
-        'Car:Parking': 'MANCHESTER AIRPORT CAR',
+        'Car:Parking': patterns.parking,
         'Food:Eating Out': 'HMSHOST',
-        'Holiday:Accommodation': /MOXY STRATFORD|HOTEL|Booking\.com/,
+        'Holiday:Accommodation': patterns.accomodation,
         'Holiday:Souvenirs': 'WDFG',
         'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
         'Nights Out:Stag Do': 'GROUPIA',
     })),
-    eating_out: foursquareCategory({
+    eating_out: merchantCategory({
         'Fast Food Restaurant': 'Food:Takeaway',
         'Fried Chicken Joint':  'Food:Takeaway',
     }, lookup('description', {
         'Food': /CENTRE FILLING|UPTON GROUP|SESAME +LEEDS|MARKS&SPENCER/,
         'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
     }, 'Food:Eating Out')),
-    shopping: foursquareCategory({
+    shopping: merchantCategory({
         'Board Shop': 'Shopping:Clothing',
         'Bookstore': 'Shopping:Books & Magazines',
         'Boutique': 'Shopping:Clothing',
@@ -131,7 +167,7 @@ const monzo = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
-        'House:Improvement': /BARGAIN TOOLS|SCREWFIX|B & Q|STAX TRADE|WICKES/,
+        'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
         'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK/i,
         'Shopping:Music': /VINYL|HMV UK/i,
@@ -141,7 +177,7 @@ const monzo = {
             return 'Loan';
         }
     },
-    transport: foursquareCategory({
+    transport: merchantCategory({
         'Automotive Shop': 'Car',
         'Gas Station': 'Car:Petrol',
         'Gas Station / Garage': 'Car:Petrol',
@@ -150,16 +186,16 @@ const monzo = {
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
-        'Car:Parking': /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK/i,
+        'Car:Parking': patterns.parking,
         'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
         'Car:Service & MOT': /R H SIRRELL|ALBA TYRES/,
-        'Holiday:Travel': /RYANAIR/,
+        'Holiday:Travel': patterns.flights,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
-        'Travel:Rail': /GVB|Trainline|TFL.gov|E\/TUNNEL/i,
-        'Travel:Taxi': /UBER|bolt\.eu|AMBER|STREAMLINE/i,
+        'Travel:Rail': patterns.rail,
+        'Travel:Taxi': patterns.taxi,
         'Travel:Toll': /DART-CHARGE|^PPO /,
     })),
-    family: foursquareCategory({
+    family: merchantCategory({
         'Convenience Store': 'House',
         'Furniture / Home Store': 'House:Furniture',
         'Garden Center': 'House:Garden',
@@ -169,7 +205,7 @@ const monzo = {
         'Warehouse Store': 'House',
     }, lookup('description', {
         'House:Garden': /LANGLANDS|GARDEN CENTRE/,
-        'House:Improvement': /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES/,
+        'House:Improvement': patterns.houseImprovement,
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': 'VETERINARY',
