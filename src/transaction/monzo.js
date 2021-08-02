@@ -3,7 +3,7 @@ const Transaction = require('../transaction');
 class MonzoTransaction extends Transaction {
     constructor(account, raw, adapter, logger, accountConfig) {
         super(account, raw, adapter, logger, {isMinorCurrency: true});
-        this.accountConfig = accountConfig;
+        this.accountConfig = accountConfig || {};
     }
 
     isValid() {

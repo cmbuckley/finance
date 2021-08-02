@@ -1,4 +1,5 @@
-const moment = require('moment-timezone'),
+const fs = require('fs'),
+    moment = require('moment-timezone'),
     Yargs = require('yargs'),
     winston = require('winston'),
     Adapter = require('./adapter'),
@@ -11,15 +12,15 @@ function coerceDate(d) {
 }
 
 const args = Yargs.options({
-        account:    {alias: 'a', describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'kraken', 'all'], type: 'array'},
-        format:     {alias: 'o', describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
-        from:       {alias: 'f', describe: 'Earliest date for transactions', default: 0},
-        to:         {alias: 't', describe: 'Latest date for transactions',   default: undefined},
-        login:      {alias: 'l', describe: 'Force OAuth re-login'},
-        dump:       {alias: 'd', describe: 'Dump transactions to specified file'},
-        load:       {alias: 'u', describe: 'Load from a specified dump file'},
-        quiet:      {alias: 'q', describe: 'Suppress output'},
-        verbose:    {alias: 'v', describe: 'Verbose output'},
+        account:    {alias: 'a', type: 'array',   describe: 'Which account to load',          default: 'all', choices: ['fd', 'hsbc', 'revolut', 'starling', 'mc', 'mj', 'mp', 'kraken', 'all']},
+        format:     {alias: 'o', type: 'string',  describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
+        from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', default: 0},
+        to:         {alias: 't', type: 'string',  describe: 'Latest date for transactions',   default: undefined},
+        login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login'},
+        dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file'},
+        load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file'},
+        quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
+        verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output'},
     }).coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
@@ -29,9 +30,13 @@ const args = Yargs.options({
 
             return account;
         },
+        load: function (file) {
+            if (fs.existsSync(file)) { return file; }
+            throw new Error('File does not exist: ' + file);
+        },
         from: coerceDate,
         to:   coerceDate,
-    }).count('verbose').help('help').argv;
+    }).help('help').argv;
 
 const logger = winston.createLogger({
     transports: [
