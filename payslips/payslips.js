@@ -162,7 +162,10 @@
     if (test) {
         test.value = output;
         var expected = document.getElementById('expected-output').innerText.trim();
-        test.classList.add(output.trim() == expected ? 'pass' : 'fail');
+        if (output.trim() == expected) {
+            test.classList.remove('fail');
+            test.classList.add('pass');
+        }
     } else {
         var a = document.createElement('a');
         a.download = 'payslips-' + date + '.' + type;
