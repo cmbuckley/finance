@@ -18,7 +18,7 @@
             };
 
             // get unique account names
-            return [...new Set(rows.map(t => t.n))].reduce(function (i, name) {
+            return [...new Set(rows.map(t => t.n))].reduce(function (output, name) {
                 var head = [
                     '!Account',
                     'N' + name,
@@ -27,8 +27,10 @@
                     '!Type:Bank'
                 ];
 
-                return rows.reduce(function (data, row) {
-                    return data.concat([
+                return output + rows.reduce(function (accountData, row) {
+                    if (row.n != name) { return accountData; }
+
+                    return accountData.concat([
                         'D' + row.d,
                         'T' + (row.a / 100).toFixed(2),
                         'M' + row.m,
@@ -36,7 +38,7 @@
                         'P' + row.p,
                         '^'
                     ]);
-                }, head).join('\n');
+                }, head).join('\n') + '\n';
             }, '');
         }
     };
@@ -127,19 +129,22 @@
     }
 
     function getCategory(text) {
-        if (text.indexOf('Overtime') > -1) {
-            return 'Salary:Overtime';
+        let map = {
+            Overtime: 'Salary:Overtime',
+            Bonus:    'Salary:Bonus',
+            Pension:  'Retirement:Pension',
+        }
+
+        for (var k of Object.keys(map)) {
+            if (~text.indexOf(k)) {
+                return map[k];
+            }
         }
 
         return {
             'Monthly Salary':            'Salary:Gross Pay',
             'Call Out':                  'Salary:Gross Pay',
-            'Refer a Friend Bonus':      'Salary:Bonus',
-            'Company Performance Bonus': 'Salary:Bonus',
-            'Commitment Bonus':          'Salary:Bonus',
-            'Thank You Bonus':           'Salary:Bonus',
             'TABLETS':                   'Computing:Hardware',
-            'EE Smart Pension':          'Retirement:Pension',
             'Income Tax':                'Taxes:Income Tax',
             'Employee NI':               'Insurance:NI',
             'Pennies From Heaven':       'Donations',
@@ -148,6 +153,10 @@
 
     function getPayee(text) {
         if (getCategory(text).split(':')[0] == 'Salary') {
+            return 'Sky Bet';
+        }
+
+        if (text == 'ER Smart Pension') {
             return 'Sky Bet';
         }
 

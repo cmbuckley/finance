@@ -147,6 +147,20 @@ textarea { border: 5px solid; }
             <td></td>
         </tr></tbody>
     </table></div>
+    <div data-automation-id="rivaWidget">
+        <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Employer Costs</span></div>
+        <table><thead><tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>YTD</th>
+        </tr></thead>
+        <tbody class="grid-body-row"><tr tabindex="0">
+            <td>ER Smart Pension</td>
+            <td>151.51</td>
+            <td></td>
+            <td></td>
+        </tr></tbody>
+    </table></div>
 </div>
 
 <script type="text/plain" id="expected-output">
@@ -220,6 +234,17 @@ T-0.01
 MPennies From Heaven
 LDonations
 PPennies From Heaven
+^
+!Account
+NPension
+TBank
+^
+!Type:Bank
+D2013-06-27
+T-151.51
+MER Smart Pension
+LRetirement:Pension
+PSky Bet
 ^
 </script>
 <textarea class="fail" ws="20" cols="100" id="test-output"></textarea>
