@@ -86,7 +86,7 @@
                 // add all transactions to file
                 Array.prototype.forEach.call(transactions, function (transaction) {
                     var cells = transaction.querySelectorAll('td'),
-                        description = getDescription(cells, type == 'Earnings'),
+                        description = getDescription(cells, type),
                         amount = getAmount(cells, type);
 
                     if (description && cells.length > 2 && amount != 0) {
@@ -115,17 +115,18 @@
         }
     }
 
-    function getDescription(cells, hasHours) {
+    function getDescription(cells, type) {
         var description = cells[0].innerText.trim().replace("'", ''),
             hours = cells[2] ? cells[2].innerText.trim() * 1 : 0;
 
-        return description + (hasHours && hours > 0 ? ': ' + hours: '');
+        if (type == 'Employer Costs' && description != 'ER Smart Pension') { return ''; }
+        return description + (type =='Earnings' && hours > 0 ? ': ' + hours: '');
     }
 
     function getAmount(cells, type) {
         var text = cells[amountPositions[type]].innerText;
 
-        return 100 * text.replace(/[(),]/g, '') * (type == 'Earnings' && text.indexOf('(') == -1 ? 1 : -1);
+        return 100 * text.replace(/[(),]/g, '') * (['Earnings', 'Employer Costs'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
     }
 
     function getCategory(text) {
