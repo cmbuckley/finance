@@ -11,20 +11,20 @@ textarea { border: 5px solid; }
 </table>
 
 <div class="date">
-    <div><table>
-        <tr aria-label="row"><td></td><td>
+    <div><table><thead>
+        <tr data-automation-id="tableHeaderRow"><th></th><th>
             <span>Payment Date</span>
-        </td></tr>
-    </table></div>
-    <div><table>
+            <span>Other text</span>
+        </th></tr>
+    </thead><tbody>
         <tr><td></td><td>
             <span>27-June-2013</span>
         </td></tr>
-    </table></div>
+    </tbody></table></div>
 </div>
 
 <div data-automation-id="fieldSetBody">
-    <div class="wd-SuperGrid">
+    <div data-automation-id="rivaWidget">
         <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Earnings</span></div>
         <table><thead><tr>
             <th>Description</th>
@@ -58,7 +58,7 @@ textarea { border: 5px solid; }
             <td>5,432.10</td>
             <td></td>
         </tr><tr tabindex="0">
-            <td>Commitment Bonus</td>
+            <td>Thank You Bonus</td>
             <td></td>
             <td></td>
             <td></td>
@@ -101,31 +101,39 @@ textarea { border: 5px solid; }
             <td></td>
         </tr></tbody>
     </table></div>
-    <div class="wd-SuperGrid">
+    <div data-automation-id="rivaWidget">
         <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Statutory Deductions</span></div>
         <table><thead><tr>
             <th>Description</th>
+            <th>NI Category</th>
+            <th>Dates</th>
             <th>Amount</th>
             <th>YTD</th>
         </tr></thead>
         <tbody class="grid-body-row"><tr tabindex="0">
             <td>Employee NI</td>
+            <td></td>
+            <td></td>
             <td>333.33</td>
             <td></td>
             <td></td>
         </tr><tr tabindex="0">
             <td>Income Tax</td>
+            <td></td>
+            <td></td>
             <td>567.89</td>
             <td></td>
             <td></td>
         </tr><tr tabindex="0">
+            <td></td>
+            <td></td>
             <td></td>
             <td>Total: 1,111.11</td>
             <td></td>
             <td></td>
         </tr></tbody>
     </table></div>
-    <div class="wd-SuperGrid">
+    <div data-automation-id="rivaWidget">
         <div data-automation-id="gridToolbar"><span class="gwt-InlineLabel">Deductions</span></div>
         <table><thead><tr>
             <th>Description</th>
@@ -167,7 +175,7 @@ PSky Bet
 ^
 D2013-06-27
 T5999.10
-MCommitment Bonus
+MThank You Bonus
 LSalary:Bonus
 PSky Bet
 ^
