@@ -3,10 +3,9 @@
         csv: function (rows) {
             return rows.map(function(row) {
                 return [
+                    row.n,
                     row.d.replace(/\d\d(\d\d)$/, '$1'),
                     row.p,
-                    ,
-                    ,
                     row.m,
                     (row.a / 100).toFixed(2),
                     row.c
@@ -14,30 +13,31 @@
             }).join('\n');
         },
         qif: function (rows) {
-            var name = 'Payslips';
-            var type = 'Bank';
             var transfers = {
                 'EE Smart Pension': 'Pension'
             };
 
-            var head = [
-                '!Account',
-                'N' + name,
-                'T' + type,
-                '^',
-                '!Type:' + type
-            ];
+            // get unique account names
+            return [...new Set(rows.map(t => t.n))].reduce(function (i, name) {
+                var head = [
+                    '!Account',
+                    'N' + name,
+                    'TBank',
+                    '^',
+                    '!Type:Bank'
+                ];
 
-            return rows.reduce(function (data, row) {
-                return data.concat([
-                    'D' + row.d,
-                    'T' + (row.a / 100).toFixed(2),
-                    'M' + row.m,
-                    'L' + (transfers[row.m] ? '[' + transfers[row.m] + ']' : row.c),
-                    'P' + row.p,
-                    '^'
-                ]);
-            }, head).join('\n');
+                return rows.reduce(function (data, row) {
+                    return data.concat([
+                        'D' + row.d,
+                        'T' + (row.a / 100).toFixed(2),
+                        'M' + row.m,
+                        'L' + (transfers[row.m] ? '[' + transfers[row.m] + ']' : row.c),
+                        'P' + row.p,
+                        '^'
+                    ]);
+                }, head).join('\n');
+            }, '');
         }
     };
 
@@ -69,9 +69,10 @@
 
     // find all the table headings
     var headings = document.querySelectorAll('[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
+        amountPositions = {Earnings: 4, 'Statutory Deductions': 3, Deductions: 1, 'Employer Costs': 1},
         file = [];
 
-    ['Earnings', 'Statutory Deductions', 'Deductions'].forEach(function (type) {
+    Object.keys(amountPositions).forEach(function (type) {
         // find the table and grab all transactions for that type
         Array.prototype.some.call(headings, function (heading) {
             var transactions;
@@ -92,7 +93,8 @@
                             p: getPayee(description),
                             m: description,
                             a: amount,
-                            c: getCategory(description)
+                            c: getCategory(description),
+                            n: getAccount(description),
                         });
                     }
                 });
@@ -119,8 +121,7 @@
     }
 
     function getAmount(cells, type) {
-        var column = {Earnings: 4, 'Statutory Deductions': 3, Deductions: 1},
-            text = cells[column[type]].innerText;
+        var text = cells[amountPositions[type]].innerText;
 
         return 100 * text.replace(/[(),]/g, '') * (type == 'Earnings' && text.indexOf('(') == -1 ? 1 : -1);
     }
@@ -155,6 +156,10 @@
         }
 
         return '';
+    }
+
+    function getAccount(description) {
+        return (description == 'ER Smart Pension' ? 'Pension' : 'Payslips');
     }
 
     var type = 'qif';
