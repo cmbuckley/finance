@@ -14,7 +14,8 @@
         },
         qif: function (rows) {
             var transfers = {
-                'EE Smart Pension': 'Pension'
+                'EE Smart Pension': 'Pension',
+                'Shares':           'Shares',
             };
 
             // get unique account names
@@ -55,7 +56,7 @@
 
             date = parentNode(cell, 'thead').nextElementSibling
                     .querySelector('td:nth-child(' + index + ')')
-                    .innerText.trim().replace(/\//g, '-');
+                    .innerText.trim().split('/').reverse().join('-');
             return true;
         }
     });
@@ -143,12 +144,13 @@
         }
 
         return {
-            'Monthly Salary':            'Salary:Gross Pay',
-            'Call Out':                  'Salary:Gross Pay',
-            'TABLETS':                   'Computing:Hardware',
-            'Income Tax':                'Taxes:Income Tax',
-            'Employee NI':               'Insurance:NI',
-            'Pennies From Heaven':       'Donations',
+            'Miscellaneous Deduction (Net)': 'Salary:Bonus',
+            'Monthly Salary':                'Salary:Gross Pay',
+            'Call Out':                      'Salary:Gross Pay',
+            'TABLETS':                       'Computing:Hardware',
+            'Income Tax':                    'Taxes:Income Tax',
+            'Employee NI':                   'Insurance:NI',
+            'Pennies From Heaven':           'Donations',
         }[text] || '';
     }
 
@@ -157,7 +159,7 @@
             return 'Sky Bet';
         }
 
-        if (text == 'ER Smart Pension') {
+        if (['ER Smart Pension', 'Shares', 'Miscellaneous Deduction (Net)'].includes(text)) {
             return 'Sky Bet';
         }
 

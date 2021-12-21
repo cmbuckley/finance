@@ -2,10 +2,11 @@
 dl { width: 20em; }
 dt { float: left; margin-right: 2em; }
 dd { text-align: right; }
-textarea { border: 5px solid; }
+textarea { border: 5px solid; float: right; height: 90%; }
 .pass { border-color: green; }
 .fail { border-color: red; }
 </style>
+<textarea class="fail" ws="20" cols="100" id="test-output"></textarea>
 <table class="ignore-this-table">
 <tr><td></td></tr>
 </table>
@@ -70,6 +71,13 @@ textarea { border: 5px solid; }
             <td></td>
             <td></td>
             <td>1,000.00</td>
+            <td></td>
+        </tr><tr tabindex="0">
+            <td>Shares</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>8,000.00</td>
             <td></td>
         </tr><tr tabindex="0">
             <td>Overtime x 1.5</td>
@@ -145,6 +153,11 @@ textarea { border: 5px solid; }
             <td>0.01</td>
             <td></td>
             <td></td>
+        </tr><tr tabindex="0">
+            <td>Miscellaneous Deduction (Net)</td>
+            <td>4,123.45</td>
+            <td></td>
+            <td></td>
         </tr></tbody>
     </table></div>
     <div data-automation-id="rivaWidget">
@@ -205,6 +218,12 @@ LSalary:Bonus
 PSky Bet
 ^
 D2013-06-27
+T8000.00
+MShares
+L[Shares]
+PSky Bet
+^
+D2013-06-27
 T234.56
 MOvertime x 1.5: 10
 LSalary:Overtime
@@ -240,6 +259,12 @@ MPennies From Heaven
 LDonations
 PPennies From Heaven
 ^
+D2013-06-27
+T-4123.45
+MMiscellaneous Deduction (Net)
+LSalary:Bonus
+PSky Bet
+^
 !Account
 NPension
 TBank
@@ -252,5 +277,4 @@ LRetirement:Pension
 PSky Bet
 ^
 </script>
-<textarea class="fail" ws="20" cols="100" id="test-output"></textarea>
 <script src="payslips.js"></script>
