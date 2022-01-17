@@ -81,6 +81,8 @@ class MonzoAdapter extends Adapter {
                 }
 
                 resolve(transactions.concat(transactionsResponse.transactions.map(function (raw) {
+
+                    adapter.logger.silly('Raw transaction', raw);
                     return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
                 })));
             });

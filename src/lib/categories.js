@@ -41,6 +41,12 @@ function lookup(key, matches, defaultResponse) {
 
 function merchantCategory(matches, defaultValue) {
     return function (transaction) {
+        if (transaction.category) {
+            if (matches[transaction.category]) {
+                return matches[transaction.category];
+            }
+        }
+
         if (transaction.merchant) {
             if (transaction.merchant.metadata &&
                 matches[transaction.merchant.metadata.foursquare_category]
