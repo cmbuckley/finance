@@ -40,15 +40,17 @@
     }
 
     function button(type) {
-        var listItem = document.createElement('li');
-        listItem.classList.add('WGCN');
+        var listItem = document.createElement('li'),
+            existingListItem = document.querySelector('[data-automation-id="buttonBar"] > li');
+
+        listItem.classList.add(...existingListItem.classList.values());
 
         var button = document.createElement('button');
-        button.classList.add('WNJN', 'WBKN', 'WMVO', 'WN2N', 'WIIN');
+        button.classList.add(...existingListItem.querySelector('button').classList.values());
         button.addEventListener('click', download(type));
 
         var span = document.createElement('span');
-        span.classList.add('WPJN');
+        span.classList.add(...existingListItem.querySelector('button span[title]').classList.values());
         span.innerText = 'Download ' + type;
 
         button.appendChild(span);
