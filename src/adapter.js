@@ -43,13 +43,13 @@ function getAdapter(account, logger) {
             return monzoAdapter;
 
         case 'kraken':
-            const KrakenAdapter = require('./adapter/kraken');
-            return new KrakenAdapter(adapterPath, adapterConfig, logger.child({module: 'kraken'}));
-
+        case 'pokerstars':
         case 'starling':
         case 'truelayer':
             const Adapter = require('./adapter/' + accountConfig.type);
             return new Adapter(accountPath, adapterConfig, logger.child({module: account}));
+
+        default: logger.error('Unrecognised adapter: ' + accountConfig.type);
     }
 }
 
@@ -64,7 +64,7 @@ Adapter.getAll = function (accounts, logger) {
     accounts.forEach(function (account) {
         try {
             const adapter = getAdapter(account, logger);
-            if (!adapters.includes(adapter)) { adapters.push(adapter); }
+            if (adapter && !adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }
             logger.error('Cannot find config for module ' + account, err);
