@@ -36,7 +36,7 @@ const args = Yargs.options({
         },
         from: coerceDate,
         to:   coerceDate,
-    }).help('help').argv;
+    }).alias('help', 'h').help().argv;
 
 const logger = winston.createLogger({
     transports: [
