@@ -14,6 +14,7 @@ function search(transaction) {
 
     // truelayer
     if (transaction.transaction_classification &&
+        transaction.transaction_classification.length == 2 &&
         truelayer[transaction.transaction_classification[0]]
     ) {
         return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1]];
@@ -22,6 +23,14 @@ function search(transaction) {
     if (transaction.transaction_category && truelayer[transaction.transaction_category]) {
         return truelayer[transaction.transaction_category];
     }
+
+    return Object.keys(truelayer.descriptions).find(function (match) {
+        return matchesPattern(transaction.description, truelayer.descriptions[match]);
+    });
+}
+
+function matchesPattern(value, pattern) {
+    return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
 }
 
 function lookup(key, matches, defaultResponse) {
@@ -31,10 +40,7 @@ function lookup(key, matches, defaultResponse) {
             defaultValue = (isFunction ? null : defaultResponse);
 
         return Object.keys(matches).find(function (match) {
-            let pattern = matches[match],
-                value = transaction[key];
-
-            return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
+            return matchesPattern(transaction[key], matches[match]);
         }) || defaultFunc(transaction) || defaultValue || '';
     };
 }
@@ -77,6 +83,7 @@ const patterns = {
 const monzo = {
     mondo:         '', // legacy
     general:       '', // TODO inspect
+    transfers:     '',
     groceries:     'Food:Groceries',
 
     expenses: merchantCategory({
@@ -194,7 +201,7 @@ const monzo = {
     }, lookup('description', {
         'Car:Parking': patterns.parking,
         'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
-        'Car:Service & MOT': /R H SIRRELL|ALBA TYRES/,
+        'Car:Service & MOT': /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
         'Holiday:Travel': patterns.flights,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
         'Travel:Rail': patterns.rail,
@@ -214,7 +221,7 @@ const monzo = {
         'House:Improvement': patterns.houseImprovement,
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
-        'Pet Care:Vet': 'VETERINARY',
+        'Pet Care:Vet': /VETERINARY|VETS4P/,
     })),
     charity: 'Donations',
     gifts: 'Gifts',
@@ -354,6 +361,16 @@ const truelayer = {
     },
 
     'INTEREST': 'Bank Charges:Interest',
+
+    descriptions: {
+        'Bills:Security': 'SKY DIGITAL',
+        'Car:Insurance': 'MOTOR INSURANCE',
+        'Car:Tax': 'DVLA-',
+        'House:Council Tax': 'LEEDS CITY COUNCIL',
+        'House:Rent': 'PRESTON BAKER',
+        'House:Security': 'ADT - OIN ACCOUNT',
+        'Utilities:Water': 'YORKSHIRE WATER',
+    }
 };
 
 module.exports = {search};
