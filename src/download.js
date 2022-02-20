@@ -85,7 +85,7 @@ const logger = winston.createLogger({
         name:    'download',
     });
 
-    const adapters = Adapter.getAll(args.load || args.account, logger);
+    const adapters = Adapter.getAll(args.load || args.account, logger, args);
     const transactions = await adapters.reduce(async function (previousPromise, adapter) {
         let previousTransactions = await previousPromise;
 

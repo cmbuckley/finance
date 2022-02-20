@@ -11,8 +11,9 @@ class Transaction {
         this._options = transactionOptions || {};
     }
 
-    _getDate(value, format) {
-        return moment(value).tz('Europe/London').format(format);
+    _getDate(value, outFormat, inFormat, inTimezone) {
+        const date = (inTimezone ? moment.tz(value, inFormat, inTimezone) : moment(value, inFormat));
+        return date.tz('Europe/London').format(outFormat);
     }
 
     _numDecimals(currency) {

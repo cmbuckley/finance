@@ -29,7 +29,7 @@ function getConfig(file) {
     return require(getConfigPath(file));
 }
 
-function getAdapter(account, logger) {
+function getAdapter(account, logger, options) {
     const accountPath = getConfigPath(account),
         accountConfig = require(accountPath),
         adapterPath   = getConfigPath(accountConfig.type),
@@ -42,8 +42,10 @@ function getAdapter(account, logger) {
             monzoAdapter.addConfig(Object.assign({module: account}, accountConfig));
             return monzoAdapter;
 
-        case 'kraken':
         case 'pokerstars':
+            adapterConfig.source = options.pokerstarsSource;
+
+        case 'kraken':
         case 'starling':
         case 'truelayer':
             const Adapter = require('./adapter/' + accountConfig.type);
@@ -53,7 +55,7 @@ function getAdapter(account, logger) {
     }
 }
 
-Adapter.getAll = function (accounts, logger) {
+Adapter.getAll = function (accounts, logger, options) {
     let adapters = [];
 
     if (!Array.isArray(accounts)) {
@@ -63,7 +65,7 @@ Adapter.getAll = function (accounts, logger) {
 
     accounts.forEach(function (account) {
         try {
-            const adapter = getAdapter(account, logger);
+            const adapter = getAdapter(account, logger, options);
             if (adapter && !adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }
