@@ -97,8 +97,9 @@ const logger = winston.createLogger({
         }
 
         return new Promise(async function (res, rej) {
-            let transactions = [];
-            adapter.logger.info('Retrieving transactions', {from: args.from, to: args.to});
+            let transactions = [],
+                format = 'YYYY-MM-DD HH:mm';
+            adapter.logger.info('Retrieving transactions', {from: args.from.format(format), to: args.to.format(format)});
 
             try {
                 transactions = await adapter.getTransactions(args.from, args.to);

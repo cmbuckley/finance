@@ -44,7 +44,10 @@ class PokerStarsAdapter extends Adapter {
                 raw.transfer = this.getTransfer(raw);
             }
 
-            return new Transaction(this.getAccountName(raw), raw, this, this.logger);
+            const transaction = new Transaction(this.getAccountName(raw), raw, this, this.logger);
+            if (transaction.getDate().isBetween(from, to, 'seconds', '[]')) {
+                return transaction;
+            }
         });
     }
 

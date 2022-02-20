@@ -26,7 +26,8 @@ class TruelayerTransaction extends Transaction {
     }
 
     getDate(format) {
-        return this._getDate(this.raw.timestamp, format.replace(/ HH:mm/, ''));
+        // truelayer dates don't have times; don't provide HH:mm even if requested
+        return this._getDate(this.raw.timestamp, format ? format.replace(/ HH:mm/, '') : format);
     }
 
     getCurrency() {
