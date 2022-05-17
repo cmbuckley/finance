@@ -1,4 +1,5 @@
 const {DataAPIClient} = require('truelayer-client'),
+    moment = require('moment'),
     Adapter = require('../adapter'),
     Transaction = require('../transaction/truelayer');
 
@@ -29,7 +30,7 @@ class TruelayerAdapter extends Adapter {
                         accessToken,
                         account.account_id,
                         from.format('YYYY-MM-DD'),
-                        to.format('YYYY-MM-DD')
+                        moment.min(moment(), to).format('YYYY-MM-DD')
                     );
                 } catch (err) {
                     return rej(err);
