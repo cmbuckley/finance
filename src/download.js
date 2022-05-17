@@ -40,7 +40,7 @@ const args = Yargs.options({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
                 // remove 'all' option and send the rest
-                return Yargs.getOptions().choices.account.slice(0, -1);
+                return Yargs.getOptions().choices.account.slice(1);
             }
 
             return account;
