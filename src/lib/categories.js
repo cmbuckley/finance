@@ -252,7 +252,7 @@ const truelayer = {
         'Groceries': 'Food:Groceries',
         'General': 'Shopping',
         'Clothing': 'Shopping:Clothing',
-        'Home': 'Home',
+        'Home': 'House',
         'Books': 'Shopping:Books & Magazines',
         'Electronics & Software': 'Computing:Electronics',
         'Hobbies': 'Shopping:Hobbies',
