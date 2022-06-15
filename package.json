@@ -18,7 +18,7 @@
     "monzo-bank": "git://github.com/cmbuckley/monzo-bank.git#pots",
     "neat-csv": "^5.2.0",
     "nonce": "^1.0.4",
-    "simple-oauth2": "^2.5.2",
+    "simple-oauth2": "^4.3.0",
     "starling-developer-sdk": "^1.0.3",
     "truelayer-client": "^1.3.2",
     "winston": "^3.3.3",
