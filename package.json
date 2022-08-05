@@ -16,7 +16,7 @@
     "kraken-api": "^1.0.1",
     "moment-timezone": "^0.5.31",
     "monzo-bank": "git://github.com/cmbuckley/monzo-bank.git#pots",
-    "neat-csv": "^5.2.0",
+    "neat-csv": "^7.0.0",
     "nonce": "^1.0.4",
     "simple-oauth2": "^4.3.0",
     "starling-developer-sdk": "^1.0.3",
