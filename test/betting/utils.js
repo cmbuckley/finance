@@ -2,7 +2,7 @@ var fs = require('fs');
 var jsdom = require('jsdom');
 var assert = require('assert');
 
-describe('Utils', function () {
+describe.skip('Utils', function () {
     before(function (done) {
         var context = this;
 

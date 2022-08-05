@@ -14,7 +14,7 @@ function create(done, context, options) {
     jsdom.env(options);
 }
 
-describe('BetVictor', function () {
+describe.skip('BetVictor', function () {
     describe('handler', function () {
         before(function (done) {
             create(done, this);
