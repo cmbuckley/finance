@@ -1,141 +1,150 @@
-const fs = require('fs'),
+const fs = require('fs').promises,
+    { once } = require('events'),
     http = require('http'),
     readline = require('readline'),
     url = require('url'),
     nonce = require('nonce')(),
-    Oauth = require('simple-oauth2');
+    { AuthorizationCode } = require('simple-oauth2');
 
 class AuthClient {
     constructor(configPath, adapterConfig, logger) {
         this.configPath = configPath;
         this.config = require(configPath);
         this.adapterConfig = adapterConfig;
-        this.oauth = Oauth.create(adapterConfig.credentials);
+        this.client = new AuthorizationCode(adapterConfig.credentials);
         this.logger = logger;
     }
 
-    getAuthLink(options) {
-        let self = this;
-        return new Promise(function (res, rej) {
-            function done() {
-                let params = {
-                    redirect_uri: self.adapterConfig.redirect_uri,
-                    state: self.config.state,
-                    scope: self.adapterConfig.scope || '',
-                };
+    /**
+     * Get URL to authorise application to bank
+     *
+     * @return string
+     */
+    async getAuthLink(options) {
+        if (!this.config.state || options.forceLogin) {
+            this.config.state = nonce();
+            delete this.config.token;
+            await this.saveConfig();
+        }
 
-                // Truelayer supports multiple providers - force a specific selection
-                if (self.config.provider) {
-                    params.providers = self.config.provider;
-                    // need to disable challenger banks if using an Open Banking provider, and vice versa
-                    params.disable_providers = 'uk-' + {ob: 'oauth', oauth: 'ob'}[self.config.provider.split('-')[1]] + '-all';
-                }
+        let params = {
+            redirect_uri: this.adapterConfig.redirect_uri,
+            state: this.config.state,
+            scope: this.adapterConfig.scope || '',
+        };
 
-                self.logger.info('Please visit the following link in your browser to authorise the application:');
-                self.logger.info(self.oauth.authorizationCode.authorizeURL(params));
+        // Truelayer supports multiple providers - force a specific selection
+        if (this.config.provider) {
+            params.providers = this.config.provider;
 
-                res(self.config);
-            }
+            // need to disable challenger banks if using an Open Banking provider, and vice versa
+            let providerType = this.config.provider.split('-')[1];
+            params.disable_providers = 'uk-' + {ob: 'oauth', oauth: 'ob'}[providerType] + '-all';
+        }
 
-            if (self.config.state && !options.forceLogin) {
-                return done();
-            }
-
-            self.config.state = nonce();
-            delete self.config.token;
-
-            saveConfig(self).then(done).catch(rej);
-        });
+        return this.client.authorizeURL(params);
     }
 
-    login(options) {
-        let self = this;
+    /**
+     * Log in to the bank
+     */
+    async login(options) {
+        let accessToken;
         options = options || {};
 
-        return new Promise(async function (resolve, rej) {
-            if (self.config.token && !options.forceLogin) {
-                const accessToken = self.oauth.accessToken.create(self.config.token);
+        if (this.config.token && !options.forceLogin) {
+            accessToken = await this.client.createToken(this.config.token);
 
-                if (!accessToken.expired() && !options.forceRefresh) {
-                    return resolve(self.config);
-                }
-
-                self.logger.info('Access token has expired, refreshing');
-
-                try {
-                    let newToken = await accessToken.refresh();
-                    self.config.token = newToken.token;
-                    return saveConfig(self).then(resolve, rej);
-                } catch (err) {
-                    self.logger.info('Refresh token has expired too, requesting new login');
-                }
+            if (!accessToken.expired() && !options.forceRefresh) {
+                return this.config;
             }
 
-            self.getAuthLink(options).then(function () {
-                const server = http.createServer(function(req, response) {
-                    const authUrl = url.parse(req.url, true);
-                    self.logger.info('Received OAuth callback', authUrl.query);
+            this.logger.info('Access token has expired, refreshing');
 
-                    // any errors before the server is closed
-                    function closeAndError(err) {
-                        server.close(() => rej(err));
-                    }
+            try {
+                let newToken = await accessToken.refresh();
+                this.config.token = newToken.token;
+                return await this.saveConfig();
+            } catch (err) {
+                this.logger.info('Refresh token has expired too, requesting new login');
+            }
+        }
 
-                    if (authUrl.query.state != self.config.state) {
-                        response.statusCode = 400;
-                        response.end('State does not match requested state');
-                        return closeAndError('State does not match requested state');
-                    }
+        this.logger.info('Please visit the following link in your browser to authorise the application:');
+        this.logger.info(await this.getAuthLink(options));
 
-                    response.end('Thanks, you may close this window');
-                    self.logger.verbose('Closing HTTP server');
+        this.logger.info('Creating HTTP server for callback');
+        this.server = http.createServer();
 
-                    if (authUrl.query.error) {
-                        return closeAndError(authUrl.query.error);
-                    }
-
-                    server.close(() => {
-                        self.logger.verbose('Retrieving access token');
-
-                        self.oauth.authorizationCode.getToken({
-                            code: authUrl.query.code,
-                            redirect_uri: self.adapterConfig.redirect_uri
-                        }).then(function (result) {
-                            const accessToken = self.oauth.accessToken.create(result);
-                            self.config.token = accessToken.token;
-                            delete self.config.state;
-
-                            saveConfig(self).then(function () {
-                                function done() {
-                                    resolve(self.config);
-                                }
-
-                                if (!self.adapterConfig.must_approve_token) { return done(); }
-                                question('Hit enter when you have approved the login in the app: ').then(done).catch(rej);
-                            }).catch(rej);
-                        }).catch(rej);
-                    });
-                });
-
-                self.logger.info('Creating HTTP server for callback');
-                server.listen(8000, function () {
-                    self.logger.verbose('HTTP server listening', {port: this.address().port});
-                });
-            }).catch(rej);
+        this.server.listen(8000, () => {
+            this.logger.verbose('HTTP server listening', {port: this.server.address().port});
         });
+
+        const [request, response] = await once(this.server, 'request');
+        return await this.oauthCallback(request, response);
     }
-}
 
-function saveConfig(auth) {
-    return new Promise(function (res, rej) {
-        fs.writeFile(auth.configPath, JSON.stringify(auth.config, null, 2), 'utf-8', function (err) {
-            if (err) {
-                return rej(err);
-            }
+    /**
+     * Close the callback server
+     *
+     * @param error Optional error to throw after closing
+     */
+    async closeServer(error) {
+        await this.server.close();
+        if (error) { throw error; }
+    }
 
-            res(auth.config);
+    /**
+     * Handler for bank's callback
+     *
+     * @param request  HTTP request
+     * @param reqponse HTTP response
+     */
+    async oauthCallback(request, response) {
+        const authUrl = url.parse(request.url, true);
+        let accessToken;
+
+        this.logger.info('Received OAuth callback', authUrl.query);
+
+        if (authUrl.query.state != this.config.state) {
+            response.statusCode = 400;
+            response.end('State does not match requested state');
+            return await this.closeServer('State does not match requested state');
+        }
+
+        response.end('Thanks, you may close this window');
+        this.logger.verbose('Closing HTTP server');
+
+        if (authUrl.query.error) {
+            return await this.closeServer(authUrl.query.error);
+        }
+
+        await this.closeServer();
+        this.logger.verbose('Retrieving access token');
+
+        accessToken = await this.client.getToken({
+            code: authUrl.query.code,
+            redirect_uri: this.adapterConfig.redirect_uri
         });
-    });
+
+        this.config.token = accessToken.token;
+        delete this.config.state;
+        await this.saveConfig();
+
+        if (this.adapterConfig.must_approve_token) {
+            await question('Hit enter when you have approved the login in the app: ')
+        }
+
+        return this.config;
+    }
+
+    /**
+     * Save config to file
+     */
+    async saveConfig() {
+        await fs.writeFile(this.configPath, JSON.stringify(this.config, null, 2), 'utf-8');
+        return this.config;
+    }
 }
 
 function question(query) {

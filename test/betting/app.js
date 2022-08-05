@@ -3,7 +3,7 @@ var jsdom = require('jsdom');
 var assert = require('assert');
 var provider = require('./examples.json');
 
-describe('Betting app', function () {
+describe.skip('Betting app', function () {
     before(function (done) {
         var context = this;
 
