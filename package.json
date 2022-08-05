@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "jsdom": "~16.4.0",
-    "mocha": "~2.2.1"
+    "mocha": "~2.2.1",
+    "sinon": "^14.0.0"
   }
 }
