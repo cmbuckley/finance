@@ -824,9 +824,9 @@
     exports.App = App;
 
     // find appropriate handler
-    if (exports.location) {
+    if (exports.location && exports.location.hostname) {
         if (!Object.keys(handlers).some(function (handlerName) {
-            if (window.location.hostname.match(new RegExp(handlerName))) {
+            if (exports.location.hostname.match(new RegExp(handlerName))) {
                 new App(handlerName).download();
                 return true;
             }
