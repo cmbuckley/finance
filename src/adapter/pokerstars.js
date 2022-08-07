@@ -1,6 +1,4 @@
-const fs = require('fs'),
-    util = require('util');
-
+const fs = require('fs').promises;
 const csv = require('neat-csv');
 
 const Adapter = require('../adapter'),
@@ -14,7 +12,7 @@ class PokerStarsAdapter extends Adapter {
     }
 
     async login(options) {
-        const file = await util.promisify(fs.readFile)(this.config.source, 'utf8');
+        const file = await fs.readFile(this.config.source, 'utf8');
         transactions = await csv(file, {
             skipLines: 2,
             mapHeaders: ({ header }) => ({
