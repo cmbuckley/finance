@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const csv = require('neat-csv');
+const csv = (...args) => import('neat-csv').then(({default: neatCsv}) => neatCsv(...args));
 
 const Adapter = require('../adapter'),
     Transaction = require('../transaction/pokerstars');
