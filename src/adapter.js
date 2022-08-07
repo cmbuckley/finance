@@ -6,7 +6,7 @@ class Adapter {
     constructor(accountPath, config, logger) {
         this.accountPath = accountPath;
         this.config = config;
-        this.data = getConfig('data');
+        this.data = getConfig('data', {});
         this.logger = logger;
     }
 
@@ -25,8 +25,13 @@ function getConfigPath(file) {
     return __dirname + '/../config/' + file + '.json';
 }
 
-function getConfig(file) {
-    return require(getConfigPath(file));
+function getConfig(file, defaultConfig) {
+    try {
+        return require(getConfigPath(file));
+    } catch (err) {
+        if (defaultConfig) { return defaultConfig; }
+        throw err;
+    }
 }
 
 function getAdapter(account, logger, options) {
