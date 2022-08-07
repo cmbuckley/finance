@@ -6,7 +6,7 @@ class Adapter {
     constructor(accountPath, config, logger) {
         this.accountPath = accountPath;
         this.config = config;
-        this.data = getConfig('data', {});
+        this.data = getConfig('data', {payees: [], transfers: []});
         this.logger = logger;
     }
 
