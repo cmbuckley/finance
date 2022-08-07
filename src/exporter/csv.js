@@ -1,4 +1,4 @@
-var stringify = require('csv-stringify');
+const { stringify } = require('csv-stringify');
 
 module.exports = function csv(transactions, options, callback) {
     var head = [
