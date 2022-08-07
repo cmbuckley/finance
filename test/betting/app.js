@@ -1,48 +1,49 @@
-var fs = require('fs');
-var jsdom = require('jsdom');
-var assert = require('assert');
-var provider = require('./examples.json');
+const fs = require('fs').promises;
+const { JSDOM, VirtualConsole } = require('jsdom');
+const assert = require('assert');
+const provider = require('./examples.json');
 
-describe.skip('Betting app', function () {
-    before(function (done) {
-        var context = this;
+describe('Betting app', () => {
+    before((done) => {
+        const file = __dirname + '/../../betting/app.js';
+        const { window } = new JSDOM(`<script src="file:///${file}"></script>`, {
+            runScripts: 'dangerously',
+            resources: 'usable',
+            virtualConsole: new VirtualConsole,
+        });
 
-        jsdom.env({
-            html: '',
-            src: fs.readFileSync(__dirname + '/../../betting/app.js', 'utf-8'),
-            done: function (err, window) {
-                context.App = window.App;
-                done();
-            }
+        window.document.addEventListener('DOMContentLoaded', () => {
+            this.App = window.App;
+            done();
         });
     });
 
-    describe('interface', function () {
-        it('should be exported', function () {
+    describe('interface', () => {
+        it('should be exported', () => {
             assert.ok(this.App);
         });
 
-        it('should complain for invalid handler', function () {
-            assert.throws(function () {
+        it('should complain for invalid handler', () => {
+            assert.throws(() => {
                 new this.App('missing');
-            }.bind(this), /Invalid handler/);
+            }, /Invalid handler/);
         });
     });
 
-    describe('#getTransaction', function () {
-        before(function () {
+    describe('#getTransaction', () => {
+        before(() => {
             this.fixture = new this.App('bet365');
         });
 
-        provider.forEach(function (example) {
-            it('should handle ' + example.name, function () {
+        provider.forEach((example) => {
+            it('should handle ' + example.name, () => {
                 assert.deepEqual(example.transaction, this.fixture.getTransaction(example.data));
             });
         });
     });
 
-    describe('#getDescription', function () {
-        before(function () {
+    describe('#getDescription', () => {
+        before(() => {
             this.fixture = new this.App('bet365');
         });
     });

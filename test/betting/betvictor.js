@@ -1,32 +1,30 @@
-var fs = require('fs');
-var jsdom = require('jsdom');
-var assert = require('assert');
+const fs = require('fs').promises;
+const { JSDOM, VirtualConsole } = require('jsdom');
+const assert = require('assert');
 
-function create(done, context, options) {
-    options = options || {};
-    options.html = options.html || '';
-    options.src = fs.readFileSync(__dirname + '/../../betting/app.js', 'utf-8');
-    options.done = function (err, window) {
-        context.App = window.App;
-        done();
-    };
-
-    jsdom.env(options);
-}
-
-describe.skip('BetVictor', function () {
-    describe('handler', function () {
-        before(function (done) {
-            create(done, this);
+describe('BetVictor', () => {
+    before((done) => {
+        const file = __dirname + '/../../betting/app.js';
+        const { window } = new JSDOM(`<script src="file:///${file}"></script>`, {
+            runScripts: 'dangerously',
+            resources: 'usable',
+            virtualConsole: new VirtualConsole,
         });
 
-        it('should load', function () {
+        window.document.addEventListener('DOMContentLoaded', () => {
+            this.App = window.App;
+            done();
+        });
+    });
+
+    describe('handler', () => {
+        it('should load', () => {
             assert.ok(new this.App('betvictor'));
         });
 
-        it('should return [] transactions with no html', function (done) {
+        it('should return [] transactions with no html', (done) => {
             var app = new this.App('betvictor');
-            app.getTransactions(function (transactions) {
+            app.getTransactions((transactions) => {
                 assert.deepEqual([], transactions);
                 done();
             });
