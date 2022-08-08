@@ -367,6 +367,7 @@ const truelayer = {
         'Car:Insurance': 'MOTOR INSURANCE',
         'Car:Tax': 'DVLA-',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
+        'House:Garden': 'LANGLANDS GARDEN',
         'House:Rent': 'PRESTON BAKER',
         'House:Security': 'ADT - OIN ACCOUNT',
         'Utilities:Water': 'YORKSHIRE WATER',
