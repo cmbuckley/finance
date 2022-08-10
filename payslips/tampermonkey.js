@@ -22,8 +22,10 @@
         }, false);
         return realXHR;
     };
+    window.XMLHttpRequest.tampered = true;
 
     function payslipLoaded() {
+        console.log('Payslip loaded');
         addButton('QIF');
     }
 
@@ -36,7 +38,7 @@
 
         const span = document.createElement('span');
         span.classList.add('button-text');
-        span.innerText = 'Download ' + type;
+        span.innerHTML = 'Download ' + type;
 
         btn.appendChild(span);
         pdf.parentNode.insertBefore(btn, pdf);
@@ -93,10 +95,10 @@
 
             // find the payment date header cell and get the date from the table
             document.querySelectorAll('.modal-content th').forEach(header => {
-                if (header.innerText == 'Process date') {
+                if (header.textContent == 'Process date') {
                     const index = Array.prototype.indexOf.call(header.parentNode.children, header) + 1;
                     const cell = parentNode(header, 'table').querySelector('tbody tr td:nth-child(' + index + ')');
-                    date = cell.innerText.trim().split('/').reverse().join('-');
+                    date = cell.textContent.trim().split('/').reverse().join('-');
                 }
             });
 
@@ -113,17 +115,17 @@
             // check each table for transactions
             document.querySelectorAll('.modal-content table.listings').forEach(table => {
                 const firstHeading = table.querySelector('th');
-                if (firstHeading && Object.keys(amountPositions).includes(firstHeading.innerText)) {
+                if (firstHeading && Object.keys(amountPositions).includes(firstHeading.textContent)) {
                     table.querySelectorAll('tbody tr').forEach(row => {
                         const cells = row.querySelectorAll('td');
-                        const memo = cells[0].innerText;
+                        const memo = cells[0].textContent;
                         if (memo == 'Total') { return; }
 
                         transactions.push({
                             date,
                             memo,
                             payee:    getPayee(memo),
-                            amount:   getAmount(cells, firstHeading.innerText),
+                            amount:   getAmount(cells, firstHeading.textContent),
                             category: getCategory(memo),
                             account: 'Payslips',
                         });
@@ -141,7 +143,7 @@
             }
 
             function getAmount(cells, type) {
-                const text = cells[amountPositions[type] - 1].innerText;
+                const text = cells[amountPositions[type] - 1].textContent;
 
                 return 100 * text.replace(/[(),]/g, '') * (['Payments'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
             }
@@ -165,19 +167,13 @@
             }
 
             const output = formatters[type](transactions);
-            const test = document.getElementById('test-output');
-
             console.log('Transactions:', transactions);
 
-            if (test) {
-                test.value = output;
-            } else {
-                const a = document.createElement('a');
-                a.download = 'payslips-' + date + '.' + type;
-                a.href = 'data:text/' + type + ';base64,' + btoa(output);
-                document.body.appendChild(a);
-                a.click();
-            }
+            const a = document.createElement('a');
+            a.download = 'payslips-' + date + '.' + type;
+            a.href = 'data:text/' + type + ';base64,' + btoa(output);
+            document.body.appendChild(a);
+            a.click();
         };
     }
 })();
