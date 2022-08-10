@@ -1,0 +1,23 @@
+!Account
+NPayslips
+TBank
+^
+!Type:Bank
+D2022-06-24
+T1234.56
+MSalary1
+LSalary:Gross Pay
+PAnswer Digital
+^
+D2022-06-24
+T-876.54
+MPAYE tax
+LTaxes:Income Tax
+P
+^
+D2022-06-24
+T-234.56
+MNational Insurance
+LInsurance:NI
+P
+^
