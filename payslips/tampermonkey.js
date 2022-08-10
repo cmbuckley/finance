@@ -1,87 +1,69 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      0.1
+// @version      2.0
 // @description  add button to download payslip as QIF
 // @author       You
-// @match        https://wd3.myworkday.com/sbgpeople/*
+// @match        https://answerdigitalltd.sage.hr/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
 
 (function() {
     'use strict';
-    var oldXHR = window.XMLHttpRequest;
+    const oldXHR = window.XMLHttpRequest;
 
-    function newXHR() {
-        var realXHR = new oldXHR();
+    window.XMLHttpRequest = function newXHR() {
+        const realXHR = new oldXHR();
         realXHR.addEventListener('readystatechange', function() {
-            if (realXHR.readyState == 4 && realXHR.status == 200) {
-                complete();
+            if (realXHR.readyState == 4 && realXHR.status == 200 && /directory\/\d+\/payslips/.test(this.responseURL)) {
+                setTimeout(payslipLoaded);
             }
         }, false);
         return realXHR;
+    };
+
+    function payslipLoaded() {
+        addButton('QIF');
     }
 
-    window.XMLHttpRequest = newXHR;
+    function addButton(type) {
+        const pdf = document.querySelector('.download-payslips-modal-btn');
 
-    function complete() {
-        var pageTitle = document.querySelector('[data-automation-id="pageHeaderTitleText"]');
-        if (pageTitle && pageTitle.innerText.trim() == 'Payslip') {
-            var buttonBar = document.querySelector('[data-automation-id="buttonBar"]');
+        const btn = document.createElement('a');
+        btn.classList.add('btn');
+        btn.addEventListener('click', download(type.toLowerCase()));
 
-            if (!buttonBar) {
-                return console.error('Could not find button bar');
-            }
-
-            buttonBar.appendChild(button('QIF'));
-            buttonBar.appendChild(button('CSV'));
-        }
-    }
-
-    function button(type) {
-        var listItem = document.createElement('li'),
-            existingListItem = document.querySelector('[data-automation-id="buttonBar"] > li');
-
-        listItem.classList.add(...existingListItem.classList.values());
-
-        var button = document.createElement('button');
-        button.classList.add(...existingListItem.querySelector('button').classList.values());
-        button.addEventListener('click', download(type));
-
-        var span = document.createElement('span');
-        span.classList.add(...existingListItem.querySelector('button span[title]').classList.values());
+        const span = document.createElement('span');
+        span.classList.add('button-text');
         span.innerText = 'Download ' + type;
 
-        button.appendChild(span);
-        listItem.appendChild(button);
-        return listItem;
+        btn.appendChild(span);
+        pdf.parentNode.insertBefore(btn, pdf);
     }
 
     function download(type) {
         return function () {
-            var formatters = {
+            const formatters = {
                 csv: function (rows) {
                     return rows.map(function(row) {
                         return [
-                            row.n,
-                            row.d.replace(/\d\d(\d\d)$/, '$1'),
-                            row.p,
-                            row.m,
-                            (row.a / 100).toFixed(2),
-                            row.c
-                        ].join(';');
+                            row.account,
+                            row.date,
+                            row.payee,
+                            row.memo,
+                            (row.amount / 100).toFixed(2),
+                            row.category
+                        ].join(',');
                     }).join('\n');
                 },
                 qif: function (rows) {
-                    var transfers = {
-                        'EE Smart Pension': 'Pension',
-                        'Shares':           'Shares',
+                    const transfers = {
                     };
 
                     // get unique account names
-                    return [...new Set(rows.map(t => t.n))].reduce(function (output, name) {
-                        var head = [
+                    return [...new Set(rows.map(t => t.account))].reduce(function (output, name) {
+                        const head = [
                             '!Account',
                             'N' + name,
                             'TBank',
@@ -90,14 +72,14 @@
                         ];
 
                         return output + rows.reduce(function (accountData, row) {
-                            if (row.n != name) { return accountData; }
+                            if (row.account != name) { return accountData; }
 
                             return accountData.concat([
-                                'D' + row.d,
-                                'T' + (row.a / 100).toFixed(2),
-                                'M' + row.m,
-                                'L' + (transfers[row.m] ? '[' + transfers[row.m] + ']' : row.c),
-                                'P' + row.p,
+                                'D' + row.date,
+                                'T' + (row.amount / 100).toFixed(2),
+                                'M' + row.memo,
+                                'L' + (transfers[row.memo] ? '[' + transfers[row.memo] + ']' : row.category),
+                                'P' + row.payee,
                                 '^'
                             ]);
                         }, head).join('\n') + '\n';
@@ -105,20 +87,16 @@
                 }
             };
 
-            // find all the header cells
-            var cells = document.querySelectorAll('tr[data-automation-id="tableHeaderRow"] th span'),
-                date;
+            let transactions = [];
+            const amountPositions = {Payments: 4, Deductions: 2};
+            let date;
 
-            // find the Payment Date header cell and get the date from the info table
-            Array.prototype.some.call(cells, function (cell) {
-                if (cell.innerText.trim() == 'Payment Date') {
-                    var header = parentNode(cell, 'th'),
-                        index = Array.prototype.indexOf.call(header.parentNode.children, header) + 1;
-
-                    date = parentNode(cell, 'thead').nextElementSibling
-                        .querySelector('td:nth-child(' + index + ')')
-                        .innerText.trim().split('/').reverse().join('-');
-                    return true;
+            // find the payment date header cell and get the date from the table
+            document.querySelectorAll('.modal-content th').forEach(header => {
+                if (header.innerText == 'Process date') {
+                    const index = Array.prototype.indexOf.call(header.parentNode.children, header) + 1;
+                    const cell = parentNode(header, 'table').querySelector('tbody tr td:nth-child(' + index + ')');
+                    date = cell.innerText.trim().split('/').reverse().join('-');
                 }
             });
 
@@ -132,41 +110,25 @@
                 return;
             }
 
-            // find all the table headings
-            var headings = document.querySelectorAll('[data-automation-id="gridToolbar"] span.gwt-InlineLabel'),
-                amountPositions = {Earnings: 4, 'Statutory Deductions': 3, Deductions: 1, 'Employer Costs': 1},
-                file = [];
+            // check each table for transactions
+            document.querySelectorAll('.modal-content table.listings').forEach(table => {
+                const firstHeading = table.querySelector('th');
+                if (firstHeading && Object.keys(amountPositions).includes(firstHeading.innerText)) {
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        const memo = cells[0].innerText;
+                        if (memo == 'Total') { return; }
 
-            Object.keys(amountPositions).forEach(function (type) {
-                // find the table and grab all transactions for that type
-                Array.prototype.some.call(headings, function (heading) {
-                    var transactions;
-
-                    if (heading.innerText == type) {
-                        transactions = parentNode(heading, '[data-automation-id="rivaWidget"]').querySelectorAll('tbody tr');
-                        console.debug(type, ':', transactions);
-
-                        // add all transactions to file
-                        Array.prototype.forEach.call(transactions, function (transaction) {
-                            var cells = transaction.querySelectorAll('td'),
-                                description = getDescription(cells, type),
-                                amount = getAmount(cells, type);
-
-                            if (description && cells.length > 2 && amount != 0) {
-                                file.push({
-                                    d: date,
-                                    p: getPayee(description),
-                                    m: description,
-                                    a: amount,
-                                    c: getCategory(description),
-                                    n: getAccount(description),
-                                });
-                            }
+                        transactions.push({
+                            date,
+                            memo,
+                            payee:    getPayee(memo),
+                            amount:   getAmount(cells, firstHeading.innerText),
+                            category: getCategory(memo),
+                            account: 'Payslips',
                         });
-
-                        return true;
-                    }
-                });
+                    });
+                }
             });
 
             function parentNode(el, selector) {
@@ -178,73 +140,39 @@
                 }
             }
 
-            function getDescription(cells, type) {
-                var description = cells[0].innerText.trim().replace("'", ''),
-                    hours = cells[2] ? cells[2].innerText.trim() * 1 : 0;
-
-                if (type == 'Employer Costs' && description != 'ER Smart Pension') { return ''; }
-                return description + (type =='Earnings' && hours > 0 ? ': ' + hours: '');
-            }
-
             function getAmount(cells, type) {
-                var text = cells[amountPositions[type]].innerText;
+                const text = cells[amountPositions[type] - 1].innerText;
 
-                return 100 * text.replace(/[(),]/g, '') * (['Earnings', 'Employer Costs'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
+                return 100 * text.replace(/[(),]/g, '') * (['Payments'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
             }
 
             function getCategory(text) {
-                let map = {
-                    Overtime: 'Salary:Overtime',
-                    Bonus:    'Salary:Bonus',
-                    Pension:  'Retirement:Pension',
-                }
-
-                for (var k of Object.keys(map)) {
-                    if (~text.indexOf(k)) {
-                        return map[k];
-                    }
-                }
-
                 return {
-                    'Miscellaneous Deduction (Net)': 'Salary:Bonus',
-                    'Monthly Salary':                'Salary:Gross Pay',
-                    'Call Out':                      'Salary:Gross Pay',
-                    'TABLETS':                       'Computing:Hardware',
-                    'Income Tax':                    'Taxes:Income Tax',
-                    'Employee NI':                   'Insurance:NI',
-                    'Pennies From Heaven':           'Donations',
+                    'Salary1':            'Salary:Gross Pay',
+                    'PAYE tax':           'Taxes:Income Tax',
+                    'National Insurance': 'Insurance:NI',
                 }[text] || '';
             }
 
             function getPayee(text) {
-                if (getCategory(text).split(':')[0] == 'Salary') {
-                    return 'Sky Bet';
-                }
-
-                if (['ER Smart Pension', 'Shares', 'Miscellaneous Deduction (Net)'].includes(text)) {
-                    return 'Sky Bet';
-                }
-
-                if (text == 'Pennies From Heaven') {
-                    return 'Pennies From Heaven';
-                }
-
-                return '';
+                return {
+                    'Salary1': 'Answer Digital',
+                }[text] || '';
             }
 
-            function getAccount(description) {
-                return (description == 'ER Smart Pension' ? 'Pension' : 'Payslips');
+            function getAccount(text) {
+                return 'Payslips';
             }
 
-            var output = formatters[type.toLowerCase()](file);
-            var test = document.getElementById('test-output');
+            const output = formatters[type](transactions);
+            const test = document.getElementById('test-output');
 
-            console.log('Transactions:', file);
+            console.log('Transactions:', transactions);
 
             if (test) {
                 test.value = output;
             } else {
-                var a = document.createElement('a');
+                const a = document.createElement('a');
                 a.download = 'payslips-' + date + '.' + type;
                 a.href = 'data:text/' + type + ';base64,' + btoa(output);
                 document.body.appendChild(a);
