@@ -43,6 +43,32 @@ class TruelayerAdapter extends Adapter {
             });
         }, Promise.resolve([]));
     }
+
+    getDefaultConfig() {
+        return {
+            credentials: {
+                auth: {
+                    tokenHost: 'https://auth.truelayer.com',
+                    tokenPath: '/connect/token',
+                    authorizeHost: 'https://auth.truelayer.com',
+                    authorizePath: '/',
+                },
+                options: {
+                    scopeSeparator: ' ',
+                    authorizationMethod: 'body',
+                }
+            },
+            // https://docs.truelayer.com/docs/scopes
+            scope: [
+                'info',
+                'accounts',
+                'balance',
+                'transactions',
+                'offline_access',
+                'cards',
+            ],
+        };
+    }
 }
 
 module.exports = TruelayerAdapter;

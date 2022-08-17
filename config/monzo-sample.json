@@ -3,24 +3,7 @@
     "client": {
       "id": "oauthclient_XXX",
       "secret": ""
-    },
-    "auth": {
-      "tokenHost": "https://api.monzo.com/",
-      "tokenPath": "/oauth2/token",
-      "authorizeHost": "https://auth.monzo.com/",
-      "authorizePath": "/"
-    },
-    "options": {
-      "authorizationMethod": "body"
     }
   },
-  "redirect_uri": "https://example.com/monzo/",
-  "payees": {
-    "user_XXX": "Alice",
-    "merch_YYY": "Merchant Y",
-    "grp_ZZZ": "Merchant Z"
-  },
-  "transfers": {
-    "00-00-00 00000000": "Current Account"
-  }
+  "redirect_uri": "https://example.com/monzo/"
 }

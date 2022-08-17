@@ -90,6 +90,23 @@ class MonzoAdapter extends Adapter {
 
         return transactions;
     }
+
+    getDefaultConfig() {
+        return {
+            credentials: {
+                auth: {
+                    tokenHost: 'https://api.monzo.com/',
+                    tokenPath: '/oauth2/token',
+                    authorizeHost: 'https://auth.monzo.com/',
+                    authorizePath: '/',
+                },
+                options: {
+                    authorizationMethod: 'body',
+                }
+            },
+            must_approve_token: true,
+        };
+    }
 }
 
 module.exports = MonzoAdapter;

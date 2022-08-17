@@ -1,3 +1,4 @@
+const merge = require('lodash.merge');
 const AuthClient = require('./lib/auth');
 
 let monzoAdapter;
@@ -11,13 +12,21 @@ class Adapter {
     }
 
     async login(options) {
-        const auth = new AuthClient(this.accountPath, this.config, this.logger);
+        const auth = new AuthClient(this.accountPath, this.getConfig(), this.logger);
         let config = await auth.login(options);
         this.token = config.token.access_token;
     }
 
     getAccessToken() {
         return this.token;
+    }
+
+    getConfig() {
+        return merge(this.getDefaultConfig(), this.config);
+    }
+
+    getDefaultConfig() {
+        return {};
     }
 }
 

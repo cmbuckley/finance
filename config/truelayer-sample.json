@@ -3,14 +3,7 @@
     "client": {
       "id": "",
       "secret": ""
-    },
-    "auth": {
-      "tokenHost": "https://auth.truelayer.com",
-      "tokenPath": "/connect/token",
-      "authorizeHost": "https://auth.truelayer.com",
-      "authorizePath": "/"
     }
   },
-  "redirect_uri": "https://example.com/truelayer/",
-  "scope": "info accounts balance transactions offline_access"
+  "redirect_uri": "https://example.com/truelayer/"
 }
