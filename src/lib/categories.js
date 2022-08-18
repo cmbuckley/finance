@@ -368,8 +368,9 @@ const truelayer = {
         'Car:Tax': 'DVLA-',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
-        'House:Rent': 'PRESTON BAKER',
+        'House:Rent': /PRESTON BAKER|LINLEY & SIMPSON/,
         'House:Security': 'ADT - OIN ACCOUNT',
+        'Nights Out': 'HOS HEADINGLEY',
         'Utilities:Water': 'YORKSHIRE WATER',
     }
 };
