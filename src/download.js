@@ -49,7 +49,7 @@ const args = Yargs.options({
         from: coerceDate,
         to:   coerceDate,
         'pokerstars-source': coerceFile,
-    }).alias('help', 'h').help().argv;
+    }).help().alias('help', 'h').argv;
 
 const logger = winston.createLogger({
     transports: [
