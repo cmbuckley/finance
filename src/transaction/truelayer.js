@@ -26,7 +26,16 @@ class TruelayerTransaction extends Transaction {
     }
 
     getDate(format, timezone) {
-        return super.getDate(format ? format.replace(' HH:mm', ''), timezone);
+        if (format) {
+            const date = super.getDate();
+
+            // check if there's a time component (unlikely unless fixed by a transfer)
+            if (!date.diff(date.clone().startOf('day'))) {
+                format = format.replace(' HH:mm', '');
+            }
+        }
+
+        return super.getDate(format, timezone);
     }
 
     _getDate() {

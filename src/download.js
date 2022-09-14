@@ -112,5 +112,5 @@ const logger = winston.createLogger({
         });
     }, Promise.resolve([]));
 
-    await exporter.write(transactions);
+    await exporter.write(Adapter.fixTransferTimes(transactions));
 })();
