@@ -1,11 +1,12 @@
 const assert = require('assert');
 
-const Transaction = require('../../src/transaction/truelayer');
+const MonzoTransaction = require('../../src/transaction/monzo');
+const TruelayerTransaction = require('../../src/transaction/truelayer');
 const fixture = require('../../src/exporter/csv');
 
 describe('CSV exporter', () => {
     it('should export transactions', (done) => {
-        const transactions = [new Transaction('HSBC', {
+        const transactions = [new TruelayerTransaction('HSBC', {
             transaction_id: '12345',
             transaction_type: 'DEBIT',
             transaction_classification: ['Shopping', 'Groceries'],
@@ -27,8 +28,35 @@ describe('CSV exporter', () => {
         });
     });
 
+    it('should export times', (done) => {
+        const transactions = [new MonzoTransaction('Monzo Current', {
+            category: 'groceries',
+            counterparty: {},
+            created: '2022-01-01T07:56:11.987Z',
+            currency: 'GBP',
+            description: 'TESTING',
+            id: 'tx_1234567890',
+            local_amount: -420,
+            local_currency: 'GBP',
+            merchant: {},
+            metadata: {},
+            notes: 'Testing',
+        }, {data: {transfers: {}}}, {})];
+
+        fixture(transactions, {}, (err, csv) => {
+            const expected = [
+                'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
+                'Monzo Current,2022-01-01 07:56,,-4.20,Food:Groceries,GBP,1,Testing,tx_1234567890',
+            ].join('\n') + '\n';
+
+            assert.ifError(err);
+            assert.equal(csv, expected);
+            done();
+        });
+    });
+
     it('should export transfers', (done) => {
-        const transactions = [new Transaction('HSBC', {
+        const transactions = [new TruelayerTransaction('HSBC', {
             transaction_id: '12345',
             transaction_type: 'DEBIT',
             transaction_classification: ['Uncategorized', 'Cash & ATM'],
