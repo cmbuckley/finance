@@ -19,8 +19,12 @@ class PokerStarsTransaction extends Transaction {
         return (this.raw.Amount < 0);
     }
 
-    getDate(format) {
-        return this._getDate(this.raw.DateTime, format, 'YYYY/MM/DD h:mm A', fileTimezone);
+    _getDate() {
+        return {
+            value:    this.raw.DateTime,
+            format:   'YYYY/MM/DD h:mm A',
+            timezone: fileTimezone,
+        };
     }
 
     /*

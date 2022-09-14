@@ -26,8 +26,8 @@ class StarlingTransaction extends Transaction {
         return (this.raw.amount.currency != this.raw.sourceAmount.currency);
     }
 
-    getDate(format) {
-        return this._getDate(this.raw.transactionTime, format);
+    _getDate() {
+        return this.raw.transactionTime;
     }
 
     getCurrency() {

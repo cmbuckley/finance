@@ -79,10 +79,11 @@ const logger = winston.createLogger({
 
 (async () => {
     const exporter = Exporter({
-        dump:    args.dump,
-        format:  args.format,
-        logger:  logger.child({module: 'export'}),
-        name:    'download',
+        dump:     args.dump,
+        format:   args.format,
+        logger:   logger.child({module: 'export'}),
+        name:     'download',
+        timezone: 'Europe/London',
     });
 
     const adapters = Adapter.getAll(args.load || args.account, logger, args);

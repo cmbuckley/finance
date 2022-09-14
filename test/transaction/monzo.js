@@ -44,7 +44,7 @@ describe('MonzoTransaction', () => {
             assert(transaction.isSettled());
             assert(!transaction.isForeign());
 
-            assert.equal(transaction.getDate('YYYY-MM-DD HH:mm'), '2022-09-05 03:10');
+            assert.equal(transaction.getDate('YYYY-MM-DD HH:mm', 'Europe/London'), '2022-09-05 03:10');
             assert.equal(transaction.getCurrency(), 'GBP');
             assert.equal(transaction.getLocalAmount(), '-23.81');
             assert.equal(transaction.getExchangeRate(), 1);

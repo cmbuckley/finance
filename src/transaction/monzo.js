@@ -45,8 +45,8 @@ class MonzoTransaction extends Transaction {
         return this.raw.local_currency !== this.raw.currency;
     }
 
-    getDate(format) {
-        return this._getDate(this.raw.created, format);
+    _getDate() {
+        return this.raw.created;
     }
 
     getCurrency() {
