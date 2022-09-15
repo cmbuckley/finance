@@ -90,7 +90,7 @@ Adapter.getAll = function (accounts, logger, options) {
     return adapters;
 };
 
-Adapter.fixTransferTimes = function (transactions) {
+Adapter.fixTransferTimes = function (transactions, timezone) {
     let transfers = transactions.filter(t => t.isTransfer());
     transfers.forEach(t => {
         const date = t.getDate(),
@@ -101,9 +101,9 @@ Adapter.fixTransferTimes = function (transactions) {
             // try find the opposite transaction
             const counterpart = transfers.find(ct => {
                 return ct !== t
-                    && ct.getDate().isSame(date, 'day')
                     && ct.getCurrency() == t.getCurrency()
                     && ct.getLocalAmount() == -t.getLocalAmount()
+                    && ct.getDate().clone().tz(timezone || 'UTC').isSame(date, 'day')
             });
 
             if (counterpart) {
@@ -111,8 +111,11 @@ Adapter.fixTransferTimes = function (transactions) {
                     counterpartMidnight = counterpartDate.clone().startOf('day');
 
                 if (counterpartDate.diff(counterpartMidnight)) {
-                    // set time component from counterpart
+                    // overwrite from counterpart
                     t.getDate().set({
+                        year:   counterpartDate.get('year'),
+                        month:  counterpartDate.get('month'),
+                        date:   counterpartDate.get('date'),
                         hour:   counterpartDate.get('hour'),
                         minute: counterpartDate.get('minute'),
                         second: counterpartDate.get('second'),
