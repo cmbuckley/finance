@@ -3,6 +3,8 @@ const moment = require('moment-timezone'),
     decimalExceptions = {JPY: 0, BTC: 8, NAN: 5};
 
 class Transaction {
+    #date;
+
     constructor(account, raw, adapter, logger, transactionOptions) {
         this.account = account;
         this.raw = raw;
@@ -11,9 +13,25 @@ class Transaction {
         this._options = transactionOptions || {};
     }
 
-    _getDate(value, outFormat, inFormat, inTimezone) {
-        const date = (inTimezone ? moment.tz(value, inFormat, inTimezone) : moment(value, inFormat)).tz('Europe/London');
-        return (outFormat ? date.format(outFormat) : date);
+    getDate(format, timezone) {
+        let date = this.#date || this._parseDate();
+        if (timezone) { date = date.tz(timezone); }
+        return (format ? date.format(format) : date);
+    }
+
+    _parseDate() {
+        let value = this._getDate(),
+            format, timezone;
+
+        if (value.value) {
+            ({value, format, timezone} = value);
+        }
+
+        this.#date = (timezone ? moment.tz(value, format, timezone) : moment(value, format)).utc();
+        return this.#date;
+    }
+
+    _getDate() {
     }
 
     _numDecimals(currency) {

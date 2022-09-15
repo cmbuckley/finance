@@ -90,4 +90,41 @@ Adapter.getAll = function (accounts, logger, options) {
     return adapters;
 };
 
+Adapter.fixTransferTimes = function (transactions, timezone) {
+    let transfers = transactions.filter(t => t.isTransfer());
+    transfers.forEach(t => {
+        const date = t.getDate(),
+            midnight = date.clone().startOf('day');
+
+        // no time component
+        if (!date.diff(midnight)) {
+            // try find the opposite transaction
+            const counterpart = transfers.find(ct => {
+                return ct !== t
+                    && ct.getCurrency() == t.getCurrency()
+                    && ct.getLocalAmount() == -t.getLocalAmount()
+                    && ct.getDate().clone().tz(timezone || 'UTC').isSame(date, 'day')
+            });
+
+            if (counterpart) {
+                const counterpartDate = counterpart.getDate(),
+                    counterpartMidnight = counterpartDate.clone().startOf('day');
+
+                if (counterpartDate.diff(counterpartMidnight)) {
+                    // overwrite from counterpart
+                    t.getDate().set({
+                        year:   counterpartDate.get('year'),
+                        month:  counterpartDate.get('month'),
+                        date:   counterpartDate.get('date'),
+                        hour:   counterpartDate.get('hour'),
+                        minute: counterpartDate.get('minute'),
+                        second: counterpartDate.get('second'),
+                    });
+                }
+            }
+        }
+    });
+    return transactions;
+};
+
 module.exports = Adapter;

@@ -16,7 +16,7 @@ module.exports = function csv(transactions, options, callback) {
     stringify(transactions.reduce(function (rows, transaction) {
         let row = [
             transaction.getAccount(),
-            transaction.getDate('YYYY-MM-DD HH:mm'),
+            transaction.getDate('YYYY-MM-DD HH:mm', options.timezone || 'Europe/London'),
             transaction.getPayee(),
             transaction.getLocalAmount(),
             transaction.getCategory(),

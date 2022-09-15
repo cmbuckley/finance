@@ -31,6 +31,7 @@ module.exports = function exporter(options) {
     ].join('.');
 
     return {
+        options,
         write: function (transactions, callback) {
             if (!options.quiet) { options.logger.info('Exporting to file', {filename, type: options.format}); }
             if (!options.dump) { transactions = transactions.filter(t => t && t.isValid && t.isValid()); }

@@ -67,8 +67,8 @@ class KrakenTransaction extends Transaction {
         return this.raw.amount < 0;
     }
 
-    getDate(format) {
-        return this._getDate(this.raw.time * 1000, format);
+    _getDate() {
+        return this.raw.time * 1000;
     }
 
     getCurrency() {

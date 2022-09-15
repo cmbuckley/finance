@@ -49,7 +49,7 @@ const args = Yargs.options({
         from: coerceDate,
         to:   coerceDate,
         'pokerstars-source': coerceFile,
-    }).alias('help', 'h').help().argv;
+    }).help().alias('help', 'h').argv;
 
 const logger = winston.createLogger({
     transports: [
@@ -79,10 +79,11 @@ const logger = winston.createLogger({
 
 (async () => {
     const exporter = Exporter({
-        dump:    args.dump,
-        format:  args.format,
-        logger:  logger.child({module: 'export'}),
-        name:    'download',
+        dump:     args.dump,
+        format:   args.format,
+        logger:   logger.child({module: 'export'}),
+        name:     'download',
+        timezone: 'Europe/London',
     });
 
     const adapters = Adapter.getAll(args.load || args.account, logger, args);
@@ -111,5 +112,5 @@ const logger = winston.createLogger({
         });
     }, Promise.resolve([]));
 
-    await exporter.write(transactions);
+    await exporter.write(Adapter.fixTransferTimes(transactions, exporter.options.timezone));
 })();
