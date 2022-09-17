@@ -158,7 +158,9 @@
 
             function getPayee(text) {
                 return {
-                    'Salary1': 'Answer Digital',
+                    'Salary1':            'Answer Digital',
+                    'PAYE tax':           'HMRC',
+                    'National Insurance': 'HMRC',
                 }[text] || '';
             }
 

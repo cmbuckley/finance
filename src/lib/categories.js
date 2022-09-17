@@ -73,7 +73,7 @@ function merchantCategory(matches, defaultValue) {
 const patterns = {
     accommodation:    /MOXY STRATFORD|HOTEL|Booking\.com/,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
-    houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES/,
+    houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
     parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK/i,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS/i,
@@ -182,7 +182,7 @@ const monzo = {
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /ASOS\.COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK/i,
+        'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK/i,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
@@ -219,6 +219,7 @@ const monzo = {
     }, lookup('description', {
         'House:Garden': /LANGLANDS|GARDEN CENTRE/,
         'House:Improvement': patterns.houseImprovement,
+        'Pet Care': 'PETS AT HOME',
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': /VETERINARY|VETS4P/,

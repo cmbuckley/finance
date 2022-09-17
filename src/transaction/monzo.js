@@ -185,7 +185,7 @@ class MonzoTransaction extends Transaction {
 
             if (!this.isTransfer()) {
                 this.logger.warn('Unknown merchant', {
-                    online: this.raw.online ? 'yes' : 'no',
+                    online: this.raw.merchant.online ? 'yes' : 'no',
                     merchant: this.raw.merchant.id,
                     group: this.raw.merchant.group_id,
                     date: this.getDate('YYYY-MM-DD'),
