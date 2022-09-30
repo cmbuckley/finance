@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.0
+// @version      2.1
 // @description  add button to download payslip as QIF
 // @author       You
 // @match        https://answerdigitalltd.sage.hr/*
@@ -61,6 +61,7 @@
                 },
                 qif: function (rows) {
                     const transfers = {
+                        'Salary sacrifice': 'Pension',
                     };
 
                     // get unique account names

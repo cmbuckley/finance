@@ -44,7 +44,7 @@ describe('Payslips', () => {
             const [type, b64] = download.href.split(',');
             assert.equal(type, 'data:text/qif;base64');
 
-            const expected = await fs.readFile(__dirname + '/expected.qif');
+            const expected = await fs.readFile(__dirname + '/expected.qif', 'utf8');
             assert.equal(Buffer.from(b64, 'base64').toString('ascii'), expected);
         })
     });
