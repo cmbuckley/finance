@@ -5,7 +5,8 @@
   "private": true,
   "author": "Chris Buckley <chris@cmbuckley.co.uk>",
   "engines": {
-    "npm": ">2.0.0"
+    "node": ">17.0.0",
+    "npm": ">8.0.0"
   },
   "scripts": {
     "test": "mocha --recursive test",
