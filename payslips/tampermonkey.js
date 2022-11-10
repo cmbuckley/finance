@@ -7,6 +7,7 @@
 // @match        https://answerdigitalltd.sage.hr/*
 // @grant        none
 // @run-at       document-end
+// @downloadURL  https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
 // ==/UserScript==
 
 (function() {
