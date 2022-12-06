@@ -75,9 +75,10 @@ const patterns = {
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
-    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK/i,
+    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK/i,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS/i,
-    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK/i,
+    takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
+    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi/i,
 };
 
 const monzo = {
@@ -151,7 +152,7 @@ const monzo = {
         'Fried Chicken Joint':  'Food:Takeaway',
     }, lookup('description', {
         'Food': /CENTRE FILLING|UPTON GROUP|SESAME +LEEDS|MARKS&SPENCER/,
-        'Food:Takeaway': /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
+        'Food:Takeaway': patterns.takeaway,
     }, 'Food:Eating Out')),
     shopping: merchantCategory({
         'Board Shop': 'Shopping:Clothing',
@@ -180,9 +181,10 @@ const monzo = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
+        'House:Decorations': 'FLORA POINT',
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK/i,
+        'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA/i,
         'Shopping:Music': /VINYL|HMV UK/i,
     })),
     cash: function (transaction) {
@@ -200,10 +202,10 @@ const monzo = {
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car:Parking': patterns.parking,
-        'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO/,
+        'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP /,
         'Car:Service & MOT': /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
         'Holiday:Travel': patterns.flights,
-        'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE/,
+        'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE|First Bus/,
         'Travel:Rail': patterns.rail,
         'Travel:Taxi': patterns.taxi,
         'Travel:Toll': /DART-CHARGE|^PPO /,
@@ -365,13 +367,21 @@ const truelayer = {
 
     descriptions: {
         'Bills:Security': 'SKY DIGITAL',
-        'Car:Insurance': 'MOTOR INSURANCE',
+        'Car:Breakdown': 'AA MEMBERSHIP',
+        'Car:Insurance': /(MOTOR|ADMIRAL) INSURANCE/,
         'Car:Tax': 'DVLA-',
+        'Education:Fees': 'Pluralsight',
+        'Food:Takeaway': patterns.takeaway,
+        'Food:Eating Out': /Culto/,
+        'Gifts': 'Vestiaire Collecti',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
+        'House:Insurance': 'LV INSURANCE',
         'House:Rent': /PRESTON BAKER|LINLEY & SIMPSON/,
         'House:Security': 'ADT - OIN ACCOUNT',
-        'Nights Out': 'HOS HEADINGLEY',
+        'Nights Out':  /HOS HEADINGLEY|MANAHATTA|EAST OF ARCADIA/,
+        'Pet Care:Accommodation': 'KENNELS',
+        'Pet Care:Vet': 'LEEDS KIRKSTALL VE',
         'Utilities:Water': 'YORKSHIRE WATER',
     }
 };

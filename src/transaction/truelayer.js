@@ -76,8 +76,8 @@ class TruelayerTransaction extends Transaction {
 
     getTransfer() {
         const transfers = {
-            'Current Account':    /^404401 [0-9]{4}5471|BUCKLEY CM|DIRECT DEBIT PAYMENT|Chris HSBC/,
             'ISA':                /^404401 [0-9]{4}3752|LYP ISA TRANSFER/,
+            'Current Account':    /^404401 [0-9]{4}5471|BUCKLEY C|DIRECT DEBIT PAYMENT|Chris HSBC/,
             'Online Bonus Saver': /^404401 [0-9]{4}8681/,
             'Premier Saver':      /^404401 [0-9]{4}6646|RSB REGULAR SAVER/,
             'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
@@ -85,7 +85,7 @@ class TruelayerTransaction extends Transaction {
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
             'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
             'PayPal':             /^PAYPAL/,
-            'Payslips':           /HESTVIEW|ANSWER DIGITAL/,
+            'Payslips':           /HESTVIEW|ANSWER DIGITAL LIM336/,
             'Starling':           /^Starling/,
             'Cash':               /^CASH/,
         };
