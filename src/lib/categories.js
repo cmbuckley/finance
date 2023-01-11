@@ -113,7 +113,7 @@ const monzo = {
         'Computing:VPS': /AWS|52B2222845CPN/,
         'Donations': /JUSTGIVING/i,
         'House:Improvement': /TIMPSON/,
-        'House:Insurance': /SIMPLY BUSINESS/,
+        'Insurance:Landlord': /SIMPLY BUSINESS|DL 4 BUSINESS/,
         'Leisure:Betting': patterns.betting,
         'Taxes': 'HMRC',
         'Utilities:Gas': 'BRITISH GAS',
