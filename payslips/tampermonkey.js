@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.2
+// @version      2.3
 // @description  add button to download payslip as QIF
 // @author       You
 // @match        https://answerdigitalltd.sage.hr/*
@@ -153,6 +153,7 @@
             function getCategory(text) {
                 return {
                     'Salary1':            'Salary:Gross Pay',
+                    'EOT Bonus':          'Salary:Bonus',
                     'Holiday Pay':        'Salary:Gross Pay',
                     'PAYE tax':           'Taxes:Income Tax',
                     'National Insurance': 'Insurance:NI',
@@ -162,6 +163,7 @@
             function getPayee(text) {
                 return {
                     'Salary1':            'Answer Digital',
+                    'EOT Bonus':          'Answer Digital',
                     'Holiday Pay':        'Answer Digital',
                     'PAYE tax':           'HMRC',
                     'National Insurance': 'HMRC',

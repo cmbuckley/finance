@@ -39,6 +39,7 @@ describe('Payslips', () => {
             btn.click();
 
             const download = this.dom.window.document.querySelector('a[download]');
+            assert.ok(download);
             assert.equal(download.download, 'payslips-2022-06-24.qif');
 
             const [type, b64] = download.href.split(',');
