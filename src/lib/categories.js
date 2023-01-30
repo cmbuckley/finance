@@ -144,7 +144,7 @@ const monzo = {
     }, lookup('description', {
         'Car:Parking': patterns.parking,
         'Food:Eating Out': 'HMSHOST',
-        'Holiday:Accommodation': patterns.accomodation,
+        'Holiday:Accommodation': patterns.accommodation,
         'Holiday:Souvenirs': 'WDFG',
         'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
         'Nights Out:Stag Do': 'GROUPIA',
@@ -316,7 +316,7 @@ const truelayer = {
     },
     'Travel': {
         'Air Travel': 'Holiday:Travel',
-        'Hotel': 'Holiday:Accomodation',
+        'Hotel': 'Holiday:Accommodation',
         'Rental Car & Taxi': 'Holiday:Travel',
         'Vacation': 'Holiday'
     },
