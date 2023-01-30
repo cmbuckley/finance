@@ -76,9 +76,10 @@ const patterns = {
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
     parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK/i,
+    carService:       /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
-    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi/i,
+    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER/i,
 };
 
 const monzo = {
@@ -203,9 +204,9 @@ const monzo = {
     }, lookup('description', {
         'Car:Parking': patterns.parking,
         'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP /,
-        'Car:Service & MOT': /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
+        'Car:Service & MOT': patterns.carService,
         'Holiday:Travel': patterns.flights,
-        'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE|First Bus/,
+        'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE|First Bus|FIRST WEST YORKSHIRE|TRANSDEV/,
         'Travel:Rail': patterns.rail,
         'Travel:Taxi': patterns.taxi,
         'Travel:Toll': /DART-CHARGE|^PPO /,
@@ -367,8 +368,10 @@ const truelayer = {
 
     descriptions: {
         'Bills:Security': 'SKY DIGITAL',
+        'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': 'AA MEMBERSHIP',
         'Car:Insurance': /(MOTOR|ADMIRAL) INSURANCE/,
+        'Car:Service & MOT': patterns.carService,
         'Car:Tax': 'DVLA-',
         'Education:Fees': 'Pluralsight',
         'Food:Takeaway': patterns.takeaway,
@@ -376,6 +379,7 @@ const truelayer = {
         'Gifts': 'Vestiaire Collecti',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
+        'House:Improvement': patterns.houseImprovement,
         'House:Insurance': 'LV INSURANCE',
         'House:Rent': /PRESTON BAKER|LINLEY & SIMPSON/,
         'House:Security': 'ADT - OIN ACCOUNT',

@@ -75,16 +75,20 @@ class TruelayerTransaction extends Transaction {
     }
 
     getTransfer() {
+        if (/^\d{6} \d{8}/.test(this.raw.description)) {
+            let [sortCode, account] = this.raw.description.match(/^(\d{6}) (\d{8})/).slice(1);
+            return this._getTransfer(this._getBank(sortCode, account)) || '';
+        }
+
         const transfers = {
-            'ISA':                /^404401 [0-9]{4}3752|LYP ISA TRANSFER/,
-            'Current Account':    /^404401 [0-9]{4}5471|BUCKLEY C|DIRECT DEBIT PAYMENT|Chris HSBC/,
-            'Online Bonus Saver': /^404401 [0-9]{4}8681/,
-            'Premier Saver':      /^404401 [0-9]{4}6646|RSB REGULAR SAVER/,
+            'ISA':                /LYP ISA TRANSFER/,
+            'PayPal':             /^PAYPAL/,
+            'Current Account':    /DIRECT DEBIT PAYMENT|Chris HSBC|BUCKLEY CM Bills/,
+            'Premier Saver':      /RSB REGULAR SAVER/,
             'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
-            'First Direct':       /BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account|Buckley C/,
+            'First Direct':       /^BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -/,
             'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
-            'PayPal':             /^PAYPAL/,
             'Payslips':           /HESTVIEW|ANSWER DIGITAL LIM336/,
             'Starling':           /^Starling/,
             'Cash':               /^CASH/,
