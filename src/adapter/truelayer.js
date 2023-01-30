@@ -14,13 +14,23 @@ class TruelayerAdapter extends Adapter {
         let accountMap = this.accountMap,
             accessToken = this.getAccessToken(),
             accountsResponse = await DataAPIClient.getAccounts(accessToken),
-            cardsResponse = await DataAPIClient.getCards(accessToken),
-            adapter = this;
+            adapter = this,
+            cardsResults;
+
+        try {
+            let cardsResponse = await DataAPIClient.getCards(accessToken);
+            cardsResults = cardsResponse.results;
+        } catch (err) {
+            this.logger.warn('Error getting cards: ' + err);
+            cardsResults = [];
+        }
 
         // get transactions for normal accounts and card accounts
-        return await accountsResponse.results.concat(cardsResponse.results).reduce(async function (previousPromise, account) {
+        return await accountsResponse.results.concat(cardsResults).reduce(async function (previousPromise, account) {
             let previousTransactions = await previousPromise,
                 apiMethod = (account.card_type ? 'getCardTransactions' : 'getTransactions');
+
+            adapter.logger.verbose('Getting transactions for account', account);
 
             return new Promise(async function (res, rej) {
                 let transactionsResponse;
