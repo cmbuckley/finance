@@ -6,7 +6,7 @@ class TruelayerTransaction extends Transaction {
     }
 
     isValid() {
-        return true;
+        return !!this.raw.amount;
     }
 
     isDebit() {
