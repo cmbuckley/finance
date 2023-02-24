@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.4
+// @version      2.5
 // @description  add button to download payslip as QIF
 // @author       You
 // @match        https://answerdigitalltd.sage.hr/*
 // @grant        none
-// @run-at       document-end
+// @run-at       document-start
 // @downloadURL  https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
 // @updateURL    https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
 // ==/UserScript==
@@ -18,7 +18,7 @@
     window.XMLHttpRequest = function newXHR() {
         const realXHR = new oldXHR();
         realXHR.addEventListener('readystatechange', function() {
-            if (realXHR.readyState == 4 && realXHR.status == 200 && /directory\/\d+\/payslips/.test(this.responseURL)) {
+            if (realXHR.readyState == 4 && realXHR.status == 200 && /directory\/\d+\/payslips\//.test(this.responseURL)) {
                 setTimeout(payslipLoaded);
             }
         }, false);

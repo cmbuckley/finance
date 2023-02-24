@@ -24,7 +24,7 @@ describe('Payslips', () => {
     describe('loaded', () => {
         beforeEach(done => {
             const xhr = new this.dom.window.XMLHttpRequest;
-            xhr.open('GET', 'test.html?fake=directory/12345/payslips');
+            xhr.open('GET', 'test.html?fake=directory/12345/payslips/abcde');
             xhr.send();
             setTimeout(done, 250); // @todo improve
         });
