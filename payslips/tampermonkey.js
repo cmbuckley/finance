@@ -8,6 +8,7 @@
 // @grant        none
 // @run-at       document-end
 // @downloadURL  https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
+// @updateURL    https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
 // ==/UserScript==
 
 (function() {
