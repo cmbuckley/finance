@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.3
+// @version      2.4
 // @description  add button to download payslip as QIF
 // @author       You
 // @match        https://answerdigitalltd.sage.hr/*
