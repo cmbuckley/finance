@@ -5,10 +5,13 @@ const assert = require('assert');
 
 describe('Payslips', () => {
     before(done => {
+        let vc = new VirtualConsole;
+        vc.on('jsdomError', e => console.error(e.detail));
+
         JSDOM.fromFile(__dirname + '/test.html', {
             runScripts: 'dangerously',
             resources: 'usable',
-            virtualConsole: new VirtualConsole,
+            virtualConsole: vc,
         }).then(dom => {
             this.dom = dom;
             dom.window.document.addEventListener('DOMContentLoaded', () => {

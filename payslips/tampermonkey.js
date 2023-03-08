@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.5
+// @version      2.6
 // @description  add button to download payslip as QIF
 // @author       You
 // @match        https://answerdigitalltd.sage.hr/*
@@ -44,6 +44,18 @@
 
         btn.appendChild(span);
         pdf.parentNode.insertBefore(btn, pdf);
+    }
+
+    function getPayDate(dateString) {
+        let date = new Date(dateString + ' 00:00:00+00:00'),
+            lastFridayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+        if (lastFridayOfMonth.getDay() < 5) {
+            lastFridayOfMonth.setDate(lastFridayOfMonth.getDate() - 7);
+        }
+
+        lastFridayOfMonth.setDate(lastFridayOfMonth.getDate() - (lastFridayOfMonth.getDay() - 5));
+        return lastFridayOfMonth;
     }
 
     function download(type) {
@@ -106,7 +118,7 @@
             });
 
             if (date) {
-                date = new Date(date + ' 00:00:00+00:00').toISOString().substr(0, 10);
+                date = getPayDate(date).toISOString().substr(0, 10);
                 console.log('Payment date:', date);
             }
             else {
