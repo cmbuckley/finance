@@ -2,12 +2,13 @@ const sinon = require('sinon');
 const assert = require('assert');
 
 const fs = require('fs').promises;
+const origReadFile = fs.readFile;
 
 const Fixture = require('../../src/adapter/pokerstars');
 
 describe('PokerStars adapter', () => {
     it('should parse the CSV', async () => {
-        sinon.stub(fs, 'readFile').resolves([
+        sinon.stub(fs, 'readFile').callsFake(origReadFile).withArgs('fixsource').resolves([
             ["Playing History Audit 'username' from 2020/01/04 12:00 AM to 2022/02/19 11:59 PM"],
             ['Transaction Details', 'Individual Transaction Amounts', 'Running Balance'],
             [
@@ -42,7 +43,7 @@ describe('PokerStars adapter', () => {
         ].map(r => r.join(',')).join('\r\n'));
 
         const fixture = new Fixture('', {
-            source: '',
+            source: 'fixsource',
             name: 'PokerStars'
         }, {
             silly: () => {},
