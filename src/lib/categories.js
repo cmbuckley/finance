@@ -77,8 +77,8 @@ const patterns = {
     flights:          /RYANAIR/,
     parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK/i,
     carService:       /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
-    rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS/i,
-    takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER/i,
+    rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS/i,
+    takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER/i,
 };
 
@@ -368,7 +368,7 @@ const truelayer = {
     'INTEREST': 'Bank Charges:Interest',
 
     descriptions: {
-        'Bills:Security': 'SKY DIGITAL',
+        'Bills:Sky': 'SKY DIGITAL',
         'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': 'AA MEMBERSHIP',
         'Car:Insurance': /(MOTOR|ADMIRAL) INSURANCE/,
@@ -376,8 +376,9 @@ const truelayer = {
         'Car:Tax': 'DVLA-',
         'Education:Fees': 'Pluralsight',
         'Food:Takeaway': patterns.takeaway,
-        'Food:Eating Out': /Culto/,
+        'Food:Eating Out': /Culto|THE OWL/,
         'Gifts': 'Vestiaire Collecti',
+        'Healthcare:Dental': 'DENTAL',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
         'House:Improvement': patterns.houseImprovement,
@@ -387,6 +388,7 @@ const truelayer = {
         'Nights Out':  /HOS HEADINGLEY|MANAHATTA|EAST OF ARCADIA/,
         'Pet Care:Accommodation': 'KENNELS',
         'Pet Care:Vet': 'LEEDS KIRKSTALL VE',
+        'Travel:Rail': patterns.rail,
         'Utilities:Water': 'YORKSHIRE WATER',
     }
 };
