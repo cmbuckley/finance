@@ -28,6 +28,7 @@ module.exports = function csv(transactions, options, callback) {
 
         if (transaction.isTransfer()) {
             row[head.indexOf('Category')] = 'Transfer ' + (transaction.isDebit() ? 'to' : 'from') + ':' + transaction.getTransfer();
+            row[head.indexOf('Payee')] = '';
         }
 
         rows.push(row);
