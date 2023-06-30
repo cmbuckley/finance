@@ -14,10 +14,9 @@ function search(transaction) {
 
     // truelayer
     if (transaction.transaction_classification &&
-        transaction.transaction_classification.length == 2 &&
         truelayer[transaction.transaction_classification[0]]
     ) {
-        return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1]];
+        return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1] || ''];
     }
 
     if (transaction.transaction_category && truelayer[transaction.transaction_category]) {
@@ -75,7 +74,7 @@ const patterns = {
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
-    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK/i,
+    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE/i,
     carService:       /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
@@ -253,6 +252,7 @@ const truelayer = {
         'Books & Supplies': 'Shopping:Books & Magazines'
     },
     'Shopping': {
+        '': 'Shopping',
         'Pets': 'Pet Care',
         'Groceries': 'Food:Groceries',
         'General': 'Shopping',
@@ -279,6 +279,7 @@ const truelayer = {
         'Sports': ''
     },
     'Food & Dining': {
+        '': 'Food',
         'Catering': '',
         'Coffee shops': 'Food:Eating Out',
         'Delivery': 'Food:Takeaway',
