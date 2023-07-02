@@ -14,7 +14,8 @@ function search(transaction) {
 
     // truelayer
     if (transaction.transaction_classification &&
-        truelayer[transaction.transaction_classification[0]]
+        truelayer[transaction.transaction_classification[0]] &&
+        truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1] || '']
     ) {
         return truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1] || ''];
     }
