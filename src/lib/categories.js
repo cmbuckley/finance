@@ -305,7 +305,6 @@ const truelayer = {
         'Home Phone': 'Bills:Phone',
         'Internet': 'Bills:Internet',
         'Mobile Phone': 'Bills:Phone',
-        'Utilities': 'Utilities'
     },
     'Auto & Transport': {
         'Auto Insurance': 'Car:Insurance',
@@ -370,6 +369,7 @@ const truelayer = {
     'INTEREST': 'Bank Charges:Interest',
 
     descriptions: {
+        'Bank Charges:Service Charge': 'Transaction Fee',
         'Bills:Sky': 'SKY DIGITAL',
         'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': 'AA MEMBERSHIP',
