@@ -98,7 +98,6 @@ const monzo = {
         'Supermarket': 'Job Expenses:Food',
 
         entertainment: 'Job Expenses:Entertainment',
-        holidays: 'Job Expenses:Flights',
         eating_out: 'Job Expenses:Food',
         groceries: 'Job Expenses:Food',
     }, lookup('description', {
@@ -123,6 +122,7 @@ const monzo = {
     personal_care: lookup('description', {
         'Healthcare:Dental': 'DENTAL',
         'Healthcare:Eyecare': 'CONTACT LENSES',
+        'Healthcare:Pharmacy': 'PHARMACY',
         'Personal Care:Hair': 'CITY IMAGE',
         'Pet Care:Vet': 'VETERINARY',
     }, 'Personal Care'),
@@ -308,7 +308,6 @@ const truelayer = {
     },
     'Auto & Transport': {
         'Auto Insurance': 'Car:Insurance',
-        'Auto Payment': 'Car:Purchase',
         'Parking': 'Car:Parking',
         'Public transport': 'Travel:Bus',
         'Service & Auto Parts': 'Car:Service & MOT',
@@ -376,6 +375,7 @@ const truelayer = {
         'Car:Insurance': /(MOTOR|ADMIRAL) INSURANCE/,
         'Car:Service & MOT': patterns.carService,
         'Car:Tax': 'DVLA-',
+        'Car:Toll': /DART-CHARGE|TOLL|^PPO/,
         'Education:Fees': 'Pluralsight',
         'Food:Takeaway': patterns.takeaway,
         'Food:Eating Out': /Culto|THE OWL/,
