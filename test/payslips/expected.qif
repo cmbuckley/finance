@@ -39,3 +39,14 @@ MNational Insurance
 LInsurance:NI
 PHMRC
 ^
+!Account
+NPentelow Pension
+TBank
+^
+!Type:Bank
+D2022-06-24
+T690.00
+MEmployer pension
+LRetirement:Pension
+PAnswer Digital
+^

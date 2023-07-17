@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.7
+// @version      2.8
 // @description  add button to download payslip as QIF
-// @author       You
+// @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
 // @grant        none
 // @run-at       document-start
@@ -105,7 +105,8 @@
             };
 
             let transactions = [];
-            const amountPositions = {Payments: 4, Deductions: 2};
+            const amountPositions = {Payments: 4, Deductions: 2, 'This period': 2};
+            const memoFilter = {'This period': ['Employer pension']};
             let date;
 
             // find the payment date header cell and get the date from the table
@@ -134,19 +135,26 @@
                     table.querySelectorAll('tbody tr').forEach(row => {
                         const cells = row.querySelectorAll('td');
                         const memo = cells[0].textContent;
-                        if (memo == 'Total') { return; }
 
-                        transactions.push({
-                            date,
-                            memo,
-                            payee:    getPayee(memo),
-                            amount:   getAmount(cells, firstHeading.textContent),
-                            category: getCategory(memo),
-                            account: 'Payslips',
-                        });
+                        if (shouldInclude(memo, firstHeading.textContent)) {
+                            transactions.push({
+                                date,
+                                memo,
+                                payee:    getPayee(memo),
+                                amount:   getAmount(cells, firstHeading.textContent),
+                                category: getCategory(memo),
+                                account:  getAccount(memo),
+                            });
+                        }
                     });
                 }
             });
+
+            function shouldInclude(memo, heading) {
+                if (memo == 'Total') { return false; }
+                if (!memoFilter[heading]) { return true; }
+                return memoFilter[heading].includes(memo);
+            }
 
             function parentNode(el, selector) {
                 while (el && el.parentNode) {
@@ -160,7 +168,7 @@
             function getAmount(cells, type) {
                 const text = cells[amountPositions[type] - 1].textContent;
 
-                return 100 * text.replace(/[(),]/g, '') * (['Payments'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
+                return 100 * text.replace(/[(),]/g, '') * (['Payments', 'This period'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
             }
 
             function getCategory(text) {
@@ -171,6 +179,7 @@
                     'Holiday Pay':        'Salary:Gross Pay',
                     'PAYE tax':           'Taxes:Income Tax',
                     'National Insurance': 'Insurance:NI',
+                    'Employer pension':   'Retirement:Pension',
                 }[text] || '';
             }
 
@@ -180,13 +189,16 @@
                     'Monthly Salary':     'Answer Digital',
                     'EOT Bonus':          'Answer Digital',
                     'Holiday Pay':        'Answer Digital',
+                    'Employer pension':   'Answer Digital',
                     'PAYE tax':           'HMRC',
                     'National Insurance': 'HMRC',
                 }[text] || '';
             }
 
             function getAccount(text) {
-                return 'Payslips';
+                return {
+                    'Employer pension': 'Pentelow Pension',
+                }[text] || 'Payslips';
             }
 
             const output = formatters[type](transactions);
