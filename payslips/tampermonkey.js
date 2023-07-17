@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.9
+// @version      2.10
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -134,7 +134,7 @@
                 if (firstHeading && Object.keys(amountPositions).includes(firstHeading.textContent)) {
                     table.querySelectorAll('tbody tr').forEach(row => {
                         const cells = row.querySelectorAll('td');
-                        const memo = cells[0].textContent;
+                        const memo = cells[0].textContent.trim();
 
                         if (shouldInclude(memo, firstHeading.textContent)) {
                             transactions.push({
