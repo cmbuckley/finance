@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.10
+// @version      2.11
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -119,7 +119,8 @@
             });
 
             if (date) {
-                date = getPayDate(date).toISOString().substr(0, 10);
+                // toISOString gets UTC date. Using Sweden locale gets ISO format
+                date = getPayDate(date).toLocaleDateString('sv');
                 console.log('Payment date:', date);
             }
             else {
