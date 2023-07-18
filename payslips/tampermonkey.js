@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.11
+// @version      2.12
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -134,8 +134,8 @@
                 const firstHeading = table.querySelector('th');
                 if (firstHeading && Object.keys(amountPositions).includes(firstHeading.textContent)) {
                     table.querySelectorAll('tbody tr').forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        const memo = cells[0].textContent.trim();
+                        const cells = [...row.querySelectorAll('td')].map(c => c.textContent.trim());
+                        const memo = cells[0];
 
                         if (shouldInclude(memo, firstHeading.textContent)) {
                             transactions.push({
@@ -166,10 +166,12 @@
                 }
             }
 
+            // employer pension is actually a combination of employer and employee
+            // this only supports an equal contribution - would be better to subtract employee contribution
             function getAmount(cells, type) {
-                const text = cells[amountPositions[type] - 1].textContent;
+                const text = cells[amountPositions[type] - 1];
 
-                return 100 * text.replace(/[(),]/g, '') * (['Payments', 'This period'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
+                return 100 * text.replace(/[(),]/g, '') * (['Payments', 'This period'].includes(type) && text.indexOf('(') == -1 ? 1 : -1) / (cells[0] == 'Employer pension'  ? 2 : 1);
             }
 
             function getCategory(text) {
