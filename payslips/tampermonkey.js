@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.12
+// @version      2.13
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -79,7 +79,7 @@
                     };
 
                     // get unique account names
-                    return [...new Set(rows.map(t => t.account))].reduce(function (output, name) {
+                    return Array.from(new Set(rows.map(t => t.account))).reduce(function (output, name) {
                         const head = [
                             '!Account',
                             'N' + name,
@@ -134,7 +134,7 @@
                 const firstHeading = table.querySelector('th');
                 if (firstHeading && Object.keys(amountPositions).includes(firstHeading.textContent)) {
                     table.querySelectorAll('tbody tr').forEach(row => {
-                        const cells = [...row.querySelectorAll('td')].map(c => c.textContent.trim());
+                        const cells = Array.from(row.querySelectorAll('td')).map(c => c.textContent.trim());
                         const memo = cells[0];
 
                         if (shouldInclude(memo, firstHeading.textContent)) {
