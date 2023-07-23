@@ -7,10 +7,6 @@ const Adapter = require('../adapter'),
 let transactions;
 
 class PokerStarsAdapter extends Adapter {
-    constructor(accountPath, config, logger) {
-        super(accountPath, config, logger);
-    }
-
     async login(options) {
         const file = await fs.readFile(this.config.source, 'utf8');
         transactions = await csv(file, {

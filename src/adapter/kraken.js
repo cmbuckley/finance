@@ -4,10 +4,6 @@ const KrakenClient = require('kraken-api'),
 let kraken;
 
 class KrakenAdapter extends Adapter {
-    constructor(accountPath, config, logger) {
-        super(accountPath, config, logger);
-    }
-
     async login(options) {
         kraken = new KrakenClient(this.config.credentials.key, this.config.credentials.secret);
     }
