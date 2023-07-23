@@ -62,6 +62,7 @@ function getAdapter(account, logger, options) {
         case 'kraken':
         case 'starling':
         case 'truelayer':
+        case 'paypal':
             const Adapter = require('./adapter/' + accountConfig.type);
             return new Adapter(accountPath, adapterConfig, logger.child({module: account}));
 

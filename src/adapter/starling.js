@@ -3,10 +3,6 @@ const Starling = require('starling-developer-sdk'),
     Transaction = require('../transaction/starling');
 
 class StarlingAdapter extends Adapter {
-    constructor(accountConfigPath, adapterConfig, logger) {
-        super(accountConfigPath, adapterConfig, logger);
-    }
-
     async getTransactions(from, to) {
         let accessToken = this.getAccessToken(),
             client = new Starling({accessToken}),

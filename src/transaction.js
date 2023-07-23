@@ -23,7 +23,7 @@ class Transaction {
         let value = this._getDate(),
             format, timezone;
 
-        if (value.value) {
+        if (value?.value) {
             ({value, format, timezone} = value);
         }
 
@@ -80,8 +80,15 @@ class Transaction {
         return true;
     }
 
+    isCashWithdrawal() {
+        return false;
+    }
+
     isTransfer() {
         return !!this.getTransfer();
+    }
+
+    getTransfer() {
     }
 
     toJSON() {

@@ -24,9 +24,11 @@ function search(transaction) {
         return truelayer[transaction.transaction_category];
     }
 
-    return Object.keys(truelayer.descriptions).find(function (match) {
-        return matchesPattern(transaction.description, truelayer.descriptions[match]);
-    });
+    if (transaction.description) {
+        return Object.keys(truelayer.descriptions).find(function (match) {
+            return matchesPattern(transaction.description, truelayer.descriptions[match]);
+        });
+    }
 }
 
 function matchesPattern(value, pattern) {
