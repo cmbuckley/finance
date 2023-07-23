@@ -4,14 +4,20 @@ const fs = require('fs').promises,
     readline = require('readline'),
     url = require('url'),
     nonce = require('nonce')(),
-    { AuthorizationCode } = require('simple-oauth2');
+    { AuthorizationCode, ClientCredentials } = require('simple-oauth2');
+
+const grantTypes = {
+    client_credentials: ClientCredentials,
+    authorization_code: AuthorizationCode,
+};
 
 class AuthClient {
     constructor(configPath, adapterConfig, logger) {
         this.configPath = configPath;
         this.config = require(configPath);
         this.adapterConfig = adapterConfig;
-        this.client = new AuthorizationCode(adapterConfig.credentials);
+        const Client = grantTypes[adapterConfig.grantType || 'authorization_code'];
+        this.client = new Client(adapterConfig.credentials);
         this.logger = logger;
     }
 
@@ -67,6 +73,17 @@ class AuthClient {
                 return await this.saveConfig();
             } catch (err) {
                 this.logger.info('Refresh token has expired too, requesting new login');
+            }
+        }
+
+        if (this.client instanceof ClientCredentials) {
+            try {
+                let token = await this.client.getToken({scope: this.config.scope});
+                this.config.token = token.token;
+                return await this.saveConfig();
+            } catch (err) {
+                this.logger.error(err.message);
+                return this.config;
             }
         }
 
