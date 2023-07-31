@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.13
+// @version      2.14
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -142,7 +142,7 @@
                                 date,
                                 memo,
                                 payee:    getPayee(memo),
-                                amount:   getAmount(cells, firstHeading.textContent),
+                                amount:   getAmount(cells, firstHeading.textContent, transactions),
                                 category: getCategory(memo),
                                 account:  getAccount(memo),
                             });
@@ -166,12 +166,17 @@
                 }
             }
 
-            // employer pension is actually a combination of employer and employee
-            // this only supports an equal contribution - would be better to subtract employee contribution
-            function getAmount(cells, type) {
+            function getAmount(cells, type, transactions) {
                 const text = cells[amountPositions[type] - 1];
 
-                return 100 * text.replace(/[(),]/g, '') * (['Payments', 'This period'].includes(type) && text.indexOf('(') == -1 ? 1 : -1) / (cells[0] == 'Employer pension'  ? 2 : 1);
+                let amount = 100 * text.replace(/[(),]/g, '') * (['Payments', 'This period'].includes(type) && text.indexOf('(') == -1 ? 1 : -1);
+
+                // "Employer pension" is actually a combination of employer and employee
+                if (cells[0] == 'Employer pension') {
+                    amount += transactions.find(t => t.memo == 'Salary sacrifice').amount;
+                }
+
+                return amount;
             }
 
             function getCategory(text) {
