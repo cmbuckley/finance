@@ -27,7 +27,13 @@ class PayPalAdapter extends Adapter {
         } catch (err) {
             this.logger.debug('Request params', err.config.params);
             this.logger.debug(err.response.data);
-            throw new Error(err.response.data.message);
+
+            let message = err.response.data.message;
+            if (err.response.data.details.length == 1) {
+                message = err.response.data.details[0].issue;
+            }
+
+            throw new Error(message);
         }
 
         if (!response.data.transaction_details) {
