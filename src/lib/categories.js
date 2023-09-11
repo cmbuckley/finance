@@ -110,6 +110,7 @@ const monzo = {
         'Job Expenses:Taxi': patterns.taxi,
     }, 'Job Expenses')),
     bills: lookup('description', {
+        'Bills:HomeCare': '910010492987',
         'Bills:Phone': 'giffgaff',
         'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
