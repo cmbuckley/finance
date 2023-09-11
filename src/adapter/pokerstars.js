@@ -42,7 +42,7 @@ class PokerStarsAdapter extends Adapter {
             if (transaction.getDate().isBetween(from, to, 'seconds', '[]')) {
                 return transaction;
             }
-        });
+        }).filter(Boolean);
     }
 
     /*
