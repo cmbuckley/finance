@@ -30,6 +30,6 @@
   "devDependencies": {
     "jsdom": "~22.1.0",
     "mocha": "~10.2.0",
-    "sinon": "^15.0.0"
+    "sinon": "^16.1.0"
   }
 }
