@@ -73,13 +73,13 @@ function merchantCategory(matches, defaultValue) {
 
 // reusable patterns
 const patterns = {
-    accommodation:    /MOXY STRATFORD|HOTEL|Booking\.com/,
+    accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB/,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
-    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE/i,
+    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN/i,
     carService:       /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
-    rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS/i,
+    rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER/i,
 };
@@ -123,6 +123,7 @@ const monzo = {
         'Utilities:Gas': 'BRITISH GAS',
     }, 'Bills'),
     personal_care: lookup('description', {
+        'Healthcare': 'Mental Health',
         'Healthcare:Dental': 'DENTAL',
         'Healthcare:Eyecare': 'CONTACT LENSES',
         'Healthcare:Pharmacy': 'PHARMACY',
@@ -149,7 +150,7 @@ const monzo = {
         'Food:Eating Out': 'HMSHOST',
         'Holiday:Accommodation': patterns.accommodation,
         'Holiday:Souvenirs': 'WDFG',
-        'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND/,
+        'Holiday:Travel': /Trainline|WIZZ AIR|LOT INTERNET POLAND|RYANAIR/i,
         'Nights Out:Stag Do': 'GROUPIA',
     })),
     eating_out: merchantCategory({
@@ -186,11 +187,12 @@ const monzo = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
-        'House:Decorations': 'FLORA POINT',
+        'House:Decorations': /FLORA POINT|PLANTS/,
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
-        'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA/i,
+        'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX/i,
         'Shopping:Music': /VINYL|HMV UK/i,
+        'Shopping:Stationery': 'POST OFFICE',
     })),
     cash: function (transaction) {
         if (transaction.counterparty.user_id) {
