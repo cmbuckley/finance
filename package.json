@@ -28,7 +28,7 @@
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "jsdom": "~23.2.0",
+    "jsdom": "~24.0.0",
     "mocha": "~10.2.0",
     "sinon": "^17.0.0"
   }
