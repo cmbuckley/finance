@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.14
+// @version      2.15
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -185,6 +185,7 @@
                     'Monthly Salary':     'Salary:Gross Pay',
                     'EOT Bonus':          'Salary:Bonus',
                     'Holiday Pay':        'Salary:Gross Pay',
+                    'Holiday Sold':       'Salary:Gross Pay',
                     'PAYE tax':           'Taxes:Income Tax',
                     'National Insurance': 'Insurance:NI',
                     'Employer pension':   'Retirement:Pension',
@@ -197,6 +198,7 @@
                     'Monthly Salary':     'Answer Digital',
                     'EOT Bonus':          'Answer Digital',
                     'Holiday Pay':        'Answer Digital',
+                    'Holiday Sold':       'Answer Digital',
                     'Employer pension':   'Answer Digital',
                     'PAYE tax':           'HMRC',
                     'National Insurance': 'HMRC',
