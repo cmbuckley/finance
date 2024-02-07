@@ -91,6 +91,9 @@ class Transaction {
     getTransfer() {
     }
 
+    setTransfer(account) {
+    }
+
     toJSON() {
         return {account: this.account, raw: this.raw};
     }

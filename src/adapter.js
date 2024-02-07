@@ -100,7 +100,7 @@ Adapter.fixTransferTimes = function (transactions, timezone) {
         // no time component
         if (!date.diff(midnight)) {
             // try find the opposite transaction
-            const counterpart = transfers.find(ct => {
+            const counterpart = transactions.find(ct => {
                 return ct !== t
                     && ct.getCurrency() == t.getCurrency()
                     && ct.getLocalAmount() == -t.getLocalAmount()
@@ -110,6 +110,10 @@ Adapter.fixTransferTimes = function (transactions, timezone) {
             if (counterpart) {
                 const counterpartDate = counterpart.getDate(),
                     counterpartMidnight = counterpartDate.clone().startOf('day');
+
+                if (!counterpart.isTransfer()) {
+                    counterpart.setTransfer(t.getAccount());
+                }
 
                 if (counterpartDate.diff(counterpartMidnight)) {
                     // overwrite from counterpart
