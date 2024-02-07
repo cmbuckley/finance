@@ -65,29 +65,43 @@ class MonzoAdapter extends Adapter {
                     reject(err.error);
                 }
 
-                try {
-                    transactionsResponse = await monzo.transactions({
-                      account_id: account.id,
-                      expand:     'merchant',
-                      since:      from.toISOString(),
-                      before:     to.toISOString(),
-                    }, accessToken);
-                } catch (resp) {
-                    if (resp.error && resp.error.code == 'forbidden.verification_required') {
-                        return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
+                const limit = 100;
+                let since = from.toISOString();
+
+                do {
+                    if (since.startsWith('tx_')) {
+                        adapter.logger.verbose('Retrieving subsequent page', {since, limit});
                     }
 
-                    reject(resp.error);
-                }
+                    try {
+                        transactionsResponse = await monzo.transactions({
+                          account_id: account.id,
+                          expand:     'merchant',
+                          since:      since,
+                          before:     to.toISOString(),
+                          limit:      limit,
+                        }, accessToken);
+                    } catch (resp) {
+                        if (resp.error && resp.error.code == 'forbidden.verification_required') {
+                            return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
+                        }
 
-                resolve(transactions.concat(transactionsResponse.transactions.map(function (raw) {
+                        reject(resp.error);
+                    }
 
-                    accountLogger.silly('Raw transaction', raw);
-                    return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
-                })));
+                    since = transactionsResponse.transactions.at(-1).id;
+                    transactions = transactions.concat(transactionsResponse.transactions.map(function (raw) {
+
+                        accountLogger.silly('Raw transaction', raw);
+                        return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
+                    }));
+                } while (transactionsResponse.transactions.length == limit);
+
+                resolve(transactions);
             });
         }, Promise.resolve([]));
 
+        adapter.logger.verbose(`Retrieved ${transactions.length} transactions`);
         return transactions;
     }
 
