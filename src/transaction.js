@@ -13,6 +13,10 @@ class Transaction {
         this._options = transactionOptions || {};
     }
 
+    getModule() {
+        return this.adapter.getConfig().module;
+    }
+
     getDate(format, timezone) {
         let date = this.#date || this._parseDate();
         if (timezone) { date = date.tz(timezone); }
@@ -95,7 +99,7 @@ class Transaction {
     }
 
     toJSON() {
-        return {account: this.account, raw: this.raw};
+        return {account: this.account, raw: this.raw, module: this.getModule()};
     }
 }
 

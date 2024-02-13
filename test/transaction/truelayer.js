@@ -63,4 +63,20 @@ describe('TruelayerTransaction', () => {
             assert.equal(transaction.getTransfer(), 'Current Account');
         });
     });
+
+    describe('#toJSON', () => {
+        it('should return name and module', () => {
+            const transaction = new TruelayerTransaction('Current Account', {
+                amount: 1234,
+            }, {
+                getConfig: () => ({module: 'hsbc'})
+            });
+
+            assert.deepEqual(transaction.toJSON(), {
+                account: 'Current Account',
+                raw: {amount: 1234},
+                module: 'hsbc',
+            });
+        });
+    });
 });

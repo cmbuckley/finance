@@ -143,4 +143,18 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'Cash');
         });
     });
+
+    describe('#toJSON', () => {
+        it('should return name and module', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                amount: 1234,
+            }, {}, {}, {module: 'mc'});
+
+            assert.deepEqual(transaction.toJSON(), {
+                account: 'Monzo Current',
+                raw: {amount: 1234},
+                module: 'mc',
+            });
+        });
+    });
 });

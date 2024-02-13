@@ -6,6 +6,10 @@ class MonzoTransaction extends Transaction {
         this.accountConfig = accountConfig || {};
     }
 
+    getModule() {
+        return this.accountConfig.module;
+    }
+
     isValid() {
         if (
             this.raw.decline_reason // failed
