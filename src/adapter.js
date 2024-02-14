@@ -92,41 +92,36 @@ Adapter.getAll = function (accounts, logger, options) {
     return adapters;
 };
 
-Adapter.fixTransferTimes = function (transactions, timezone) {
-    let transfers = transactions.filter(t => t.isTransfer());
+Adapter.detectTransfers = function (transactions, timezone) {
+    let transfers = transactions.filter(t => t.isTransfer() && t.isValid());
     transfers.forEach(t => {
-        const date = t.getDate(),
-            midnight = date.clone().startOf('day');
+        // try find the opposite transaction
+        const counterpart = transactions.find(ct => {
+            return ct !== t
+                && ct.getAccount() == t.getTransfer()
+                && ct.getCurrency() == t.getCurrency()
+                && ct.getLocalAmount() == -t.getLocalAmount()
+                && Math.abs(ct.getDate().clone().tz(timezone || 'UTC').diff(t.getDate(), 'days')) <= 1
+        });
 
-        // no time component
-        if (!date.diff(midnight)) {
-            // try find the opposite transaction
-            const counterpart = transactions.find(ct => {
-                return ct !== t
-                    && ct.getCurrency() == t.getCurrency()
-                    && ct.getLocalAmount() == -t.getLocalAmount()
-                    && ct.getDate().clone().tz(timezone || 'UTC').isSame(date, 'day')
-            });
+        if (counterpart) {
+            const counterpartDate = counterpart.getDate(),
+                counterpartMidnight = counterpartDate.clone().startOf('day');
 
-            if (counterpart) {
-                const counterpartDate = counterpart.getDate(),
-                    counterpartMidnight = counterpartDate.clone().startOf('day');
+            if (!counterpart.isTransfer()) {
+                counterpart.setTransfer(t.getAccount());
+            }
 
-                if (!counterpart.isTransfer()) {
-                    counterpart.setTransfer(t.getAccount());
-                }
-
-                if (counterpartDate.diff(counterpartMidnight)) {
-                    // overwrite from counterpart
-                    t.getDate().set({
-                        year:   counterpartDate.get('year'),
-                        month:  counterpartDate.get('month'),
-                        date:   counterpartDate.get('date'),
-                        hour:   counterpartDate.get('hour'),
-                        minute: counterpartDate.get('minute'),
-                        second: counterpartDate.get('second'),
-                    });
-                }
+            if (counterpartDate.diff(counterpartMidnight)) {
+                // overwrite from counterpart
+                t.getDate().set({
+                    year:   counterpartDate.get('year'),
+                    month:  counterpartDate.get('month'),
+                    date:   counterpartDate.get('date'),
+                    hour:   counterpartDate.get('hour'),
+                    minute: counterpartDate.get('minute'),
+                    second: counterpartDate.get('second'),
+                });
             }
         }
     });
