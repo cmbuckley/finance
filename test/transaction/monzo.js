@@ -142,6 +142,36 @@ describe('MonzoTransaction', () => {
 
             assert.equal(transaction.getTransfer(), 'Cash');
         });
+
+        it('should use pots', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                metadata: { pot_id: 'pot_123' },
+                scheme: 'uk_retail_pot',
+                amount: 1000,
+            }, {
+                pots: {
+                    pot_123: {name: 'Savings'}
+                }
+            });
+
+            assert.equal(transaction.getTransfer(), 'Monzo Savings');
+        });
+    });
+
+    describe('#getMemo', () => {
+        it('should label pot withdrawals', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                metadata: { pot_id: 'pot_123' },
+                scheme: 'uk_retail_pot',
+                amount: 1000,
+            }, {
+                pots: {
+                    pot_123: {name: 'Savings'}
+                }
+            });
+
+            assert.equal(transaction.getMemo(), 'Withdrew from Savings');
+        });
     });
 
     describe('#toJSON', () => {

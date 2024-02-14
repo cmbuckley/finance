@@ -67,7 +67,10 @@ class MonzoTransaction extends Transaction {
     }
 
     getMemo() {
-        if (this.raw.scheme == 'uk_retail_pot') { return 'Added to Pot'; }
+        if (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots) {
+            return (this.isDebit() ? 'Added to' : 'Withdrew from') + ' ' + this.adapter.pots[this.raw.metadata.pot_id].name;
+        }
+
         if (this.raw.scheme == 'p2p_payment' && this.raw.merchant) { return 'For ' + this.raw.merchant.name; }
         return (this.raw.notes || this.raw.description).replace(/[ \n]+/g, ' ');
     }
