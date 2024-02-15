@@ -76,5 +76,22 @@ describe('PayPalTransaction', () => {
 
             assert.equal(transaction.getMemo(), 'Cart item');
         });
+
+        it('should include fees in amount', () => {
+            const transaction = new PayPalTransaction('PayPal', {
+                transaction_info: {
+                    transaction_amount: {
+                        currency_code: 'GBP',
+                        value: '10.00'
+                    },
+                    fee_amount: {
+                        currency_code: 'GBP',
+                        value: '-1.60'
+                    },
+                },
+            });
+
+            assert.equal(transaction.getLocalAmount(), '8.40');
+        });
     });
 });

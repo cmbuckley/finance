@@ -27,7 +27,11 @@ module.exports = class PayPalTransaction extends Transaction {
     }
 
     getLocalAmount() {
-        return this.raw.transaction_info.transaction_amount.value;
+        return +this.raw.transaction_info.transaction_amount.value + +this.getFee();
+    }
+
+    getFee() {
+        return (this.raw.transaction_info.fee_amount ? this.raw.transaction_info.fee_amount.value : 0);
     }
 
     getExchangeRate() {
