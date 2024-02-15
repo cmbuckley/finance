@@ -164,17 +164,16 @@ class MonzoTransaction extends Transaction {
             }
 
             if (this.raw.counterparty.sort_code && this.raw.counterparty.account_number) {
-                let key = this.raw.counterparty.sort_code.match(/\d{2}/g).join('-')
-                        + ' ' + this.raw.counterparty.account_number;
+                const bank = this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number);
 
-                if (this.adapter.data.payees[key]) {
-                    return this.adapter.data.payees[key];
+                if (this.adapter.data.payees[bank]) {
+                    return this.adapter.data.payees[bank];
                 }
 
                 this.logger.warn('Unknown bank payee', {
                     transaction: this.raw.id,
                     user: this.raw.counterparty.user_id,
-                    account: key,
+                    account: bank,
                     name: this.raw.counterparty.name
                 });
             } else if (/^user_/.test(this.raw.counterparty.user_id)) {
