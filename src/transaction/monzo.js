@@ -121,7 +121,7 @@ class MonzoTransaction extends Transaction {
     // only considers it a PayPal transfer if the transaction was by the authenticated user
     _checkPayPal(transfer) {
         if (transfer != 'PayPal') { return transfer; }
-        return (this.raw.user_id == this.adapter.config.token.user_id ? transfer : '');
+        return (this.adapter.config && this.raw.user_id == this.adapter.config.token.user_id ? transfer : '');
     }
 
     getTransfer() {
