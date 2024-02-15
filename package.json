@@ -9,7 +9,8 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "test": "mocha --recursive test",
+    "test": "mocha --recursive",
+    "cov": "nyc mocha --recursive test",
     "download": "node src/download.js"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
   "devDependencies": {
     "jsdom": "~24.0.0",
     "mocha": "~10.3.0",
+    "nyc": "^15.1.0",
     "sinon": "^17.0.0"
   }
 }
