@@ -1,7 +1,5 @@
 const fs = require('fs'),
-    Adapter = require('../adapter'),
-    TruelayerTransaction = require('../transaction/truelayer'),
-    MonzoTransaction = require('../transaction/monzo');
+    Adapter = require('../adapter');
 
 class LoadAdapter extends Adapter {
 
@@ -14,6 +12,10 @@ class LoadAdapter extends Adapter {
         return Promise.resolve();
     }
 
+    _getTransaction(className) {
+        return require('../transaction/' + className.replace('Transaction', '').toLowerCase());
+    }
+
     async getTransactions() {
         let adapter = this;
 
@@ -23,7 +25,7 @@ class LoadAdapter extends Adapter {
                 if (err) { return rej(err); }
 
                 res(JSON.parse(contents).map(function (data) {
-                    const Transaction = (data.raw.transaction_id ? TruelayerTransaction : MonzoTransaction);
+                    const Transaction = adapter._getTransaction(data.type);
                     return new Transaction(data.account, data.raw, adapter, adapter.logger.child({module: data.module})); // @todo adapter needs Monzo pots support
                 }));
             });

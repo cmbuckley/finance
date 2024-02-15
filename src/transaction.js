@@ -99,7 +99,12 @@ class Transaction {
     }
 
     toJSON() {
-        return {account: this.account, raw: this.raw, module: this.getModule()};
+        return {
+            type:    this.constructor.name,
+            account: this.account,
+            raw:     this.raw,
+            module:  this.getModule(),
+        };
     }
 }
 
