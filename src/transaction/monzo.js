@@ -96,33 +96,46 @@ class MonzoTransaction extends Transaction {
         });
     }
 
-    getTransfer() {
+    _getCounterParty() {
         if (this.raw.counterparty) {
             if (this.raw.counterparty.sort_code &&
                 this.raw.counterparty.account_number
             ) {
-                return this._getTransfer(this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number));
+                return this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number);
             }
 
             if (this.adapter.data.transfers[this.raw.counterparty.user_id]) {
-                return this.adapter.data.transfers[this.raw.counterparty.user_id];
+                return this.raw.counterparty.user_id;
             }
 
             if (this.adapter.data.transfers[this.raw.counterparty.account_id]) {
-                return this.adapter.data.transfers[this.raw.counterparty.account_id];
+                return this.raw.counterparty.account_id;
             }
         }
 
         if (this.raw.merchant && this.adapter.data.transfers[this.raw.merchant.group_id]) {
-            return this.adapter.data.transfers[this.raw.merchant.group_id];
+            return this.raw.merchant.group_id;
+        }
+    }
+
+    // only considers it a PayPal transfer if the transaction was by the authenticated user
+    _checkPayPal(transfer) {
+        if (transfer != 'PayPal') { return transfer; }
+        return (this.raw.user_id == this.adapter.config.token.user_id ? transfer : '');
+    }
+
+    getTransfer() {
+        const counterparty = this._getCounterParty();
+        if (counterparty) {
+            return this._checkPayPal(this._getTransfer(counterparty));
+        }
+
+        if (/^PAYPAL/.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
+            return this._checkPayPal('PayPal');
         }
 
         if (this.isCashWithdrawal()) {
             return this._getTransfer(this.getCurrency());
-        }
-
-        if (this.accountConfig.paypal_transfers && /^PAYPAL/.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
-            return 'PayPal';
         }
 
         if (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots) {

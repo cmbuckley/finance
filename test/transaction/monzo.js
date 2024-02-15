@@ -76,7 +76,7 @@ describe('MonzoTransaction', () => {
         });
     });
 
-    describe('transfer', () => {
+    describe('#getTransfer', () => {
         it('should use bank account details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 counterparty: {
@@ -114,16 +114,40 @@ describe('MonzoTransaction', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 merchant: {
                     group_id: 'grp_12345',
-                }
+                },
+                user_id: 'user_123',
             }, {
                 data: {
                     transfers: {
                         'grp_12345': 'PayPal'
                     }
-                }
+                },
+                config: {
+                    token: {user_id: 'user_123'}
+                },
             });
 
             assert.equal(transaction.getTransfer(), 'PayPal');
+        });
+
+        it('should not set PayPal for different user', () => {
+            const transaction = new MonzoTransaction('Monzo Joint', {
+                merchant: {
+                    group_id: 'grp_12345',
+                },
+                user_id: 'user_456',
+            }, {
+                data: {
+                    transfers: {
+                        'grp_12345': 'PayPal'
+                    }
+                },
+                config: {
+                    token: {user_id: 'user_123'}
+                },
+            });
+
+            assert.equal(transaction.getTransfer(), '');
         });
 
         it('should use cash withdrawal', () => {

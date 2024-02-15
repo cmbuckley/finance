@@ -52,7 +52,7 @@ describe('TruelayerTransaction', () => {
         });
     });
 
-    describe('transfer', () => {
+    describe('#getTransfer', () => {
         it('should use description', () => {
             const transaction = new TruelayerTransaction('First Direct', {
                 amount: 1200,
