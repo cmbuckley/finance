@@ -94,4 +94,37 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getLocalAmount(), '8.40');
         });
     });
+
+    describe('#getExchangeRate', () => {
+        it('should parse conversion transactions', () => {
+            const transaction = new PayPalTransaction('PayPal', {
+                transaction_info: {
+                    transaction_amount: {
+                        currency_code: 'USD',
+                        value: '10.00'
+                    },
+                },
+            });
+
+            transaction.addConversion([{
+                transaction_info: {
+                    transaction_amount: {
+                        currency_code: 'USD',
+                        value: '-10.00'
+                    }
+                }
+            }, {
+                transaction_info: {
+                    transaction_amount: {
+                        currency_code: 'GBP',
+                        value: '8.50'
+                    }
+                }
+            }]);
+
+            assert.equal(transaction.getLocalAmount(), 10.00);
+            assert.equal(transaction.getCurrency(), 'USD');
+            assert.equal(transaction.getExchangeRate(), 0.85);
+        });
+    });
 });

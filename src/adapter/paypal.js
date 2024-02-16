@@ -60,8 +60,26 @@ class PayPalAdapter extends Adapter {
         } while (end.isBefore(to, 'day'));
 
         this.logger.verbose(`Retrieved ${transactions.length} transactions`);
-        return transactions;
+        return this._findConversions(transactions);
 
+    }
+
+    // See https://developer.paypal.com/docs/transaction-search/transaction-event-codes/#link-tnncurrencyconversion
+    _findConversions(transactions) {
+        const conversions = transactions.reduce((acc, curr) => {
+            if (curr.raw.transaction_info.transaction_event_code.startsWith('T02')) {
+                const ref = curr.raw.transaction_info.paypal_reference_id;
+                if (!acc[ref]) { acc[ref] = []; }
+                acc[ref].push(curr.raw);
+            }
+
+            return acc;
+        }, {}),
+            others = transactions.filter(t => !t.raw.transaction_info.transaction_event_code.startsWith('T02'));
+
+        // attach the conversions to the original transaction
+        Object.keys(conversions).forEach(id => others.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
+        return others;
     }
 
     getDefaultConfig() {
