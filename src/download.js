@@ -6,7 +6,7 @@ const fs = require('fs'),
     Exporter = require('./exporter');
 
 function coerceDate(d) {
-    const m = moment(d);
+    const m = moment(d, true);
     if (m.isValid()) { return m; }
     throw new Error('Invalid date: ' + d);
 }
