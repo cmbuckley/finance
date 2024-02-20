@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "mocha --recursive",
-    "cov": "nyc mocha --recursive test",
+    "cov": "nyc -r html -r text mocha --recursive test",
     "download": "node src/download.js"
   },
   "dependencies": {
