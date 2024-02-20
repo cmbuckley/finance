@@ -3,15 +3,32 @@ const moment = require('moment'),
     Adapter = require('../adapter'),
     Transaction = require('../transaction/paypal');
 
+// See https://developer.paypal.com/docs/transaction-search/transaction-event-codes/#link-tnncurrencyconversion
+function findConversions(transactions) {
+    const conversions = transactions.reduce((acc, curr) => {
+        if (curr.raw.transaction_info?.transaction_event_code?.startsWith('T02')) {
+            const ref = curr.raw.transaction_info.paypal_reference_id;
+            if (!acc[ref]) { acc[ref] = []; }
+            acc[ref].push(curr.raw);
+        }
+
+        return acc;
+    }, {});
+
+    // attach the conversions to the original transaction
+    Object.keys(conversions).forEach(id => transactions.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
+    return transactions;
+}
+
 class PayPalAdapter extends Adapter {
     async getTransactions(from, to) {
         const client = axios.create({
-                baseURL: this.getDefaultConfig().credentials.auth.tokenHost,
-                headers: {
-                    Authorization: 'Bearer ' + this.getAccessToken(),
-                    'Content-Type': 'application/json',
-                }
-            });
+            baseURL: this.getDefaultConfig().credentials.auth.tokenHost,
+            headers: {
+                Authorization: 'Bearer ' + this.getAccessToken(),
+                'Content-Type': 'application/json',
+            }
+        });
 
         let transactions = [],
             start = from,
@@ -61,25 +78,7 @@ class PayPalAdapter extends Adapter {
         } while (end.isBefore(to, 'day'));
 
         this.logger.verbose(`Retrieved ${transactions.length} transactions`);
-        return this._findConversions(transactions);
-
-    }
-
-    // See https://developer.paypal.com/docs/transaction-search/transaction-event-codes/#link-tnncurrencyconversion
-    _findConversions(transactions) {
-        const conversions = transactions.reduce((acc, curr) => {
-            if (curr.raw.transaction_info.transaction_event_code.startsWith('T02')) {
-                const ref = curr.raw.transaction_info.paypal_reference_id;
-                if (!acc[ref]) { acc[ref] = []; }
-                acc[ref].push(curr.raw);
-            }
-
-            return acc;
-        }, {});
-
-        // attach the conversions to the original transaction
-        Object.keys(conversions).forEach(id => transactions.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
-        return transactions;
+        return findConversions(transactions);
     }
 
     getDefaultConfig() {
