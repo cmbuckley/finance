@@ -86,20 +86,21 @@ class MonzoAdapter extends Adapter {
                           before:     to.toISOString(),
                           limit:      limit,
                         }, accessToken);
+
+                        if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
+
+                        transactions = transactions.concat(transactionsResponse.transactions.map(function (raw) {
+
+                            accountLogger.silly('Raw transaction', raw);
+                            return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
+                        }));
                     } catch (resp) {
                         if (resp.error && resp.error.code == 'forbidden.verification_required') {
                             return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
                         }
 
-                        return reject(resp.error);
+                        return reject(resp.error || resp);
                     }
-
-                    if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
-                    transactions = transactions.concat(transactionsResponse.transactions.map(function (raw) {
-
-                        accountLogger.silly('Raw transaction', raw);
-                        return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
-                    }));
                 } while (transactionsResponse.transactions && transactionsResponse.transactions.length == limit);
 
                 resolve(transactions);
