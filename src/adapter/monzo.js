@@ -24,6 +24,10 @@ class MonzoAdapter extends Adapter {
         this.accountMap[accountConfig.account] = accountConfig;
     }
 
+    getUser() {
+        return this.config.token.user_id;
+    }
+
     async getTransactions(from, to) {
         let accessToken = this.getAccessToken(),
             accountMap = this.accountMap,

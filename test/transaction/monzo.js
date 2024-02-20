@@ -122,9 +122,7 @@ describe('MonzoTransaction', () => {
                         'grp_12345': 'PayPal'
                     }
                 },
-                config: {
-                    token: {user_id: 'user_123'}
-                },
+                getUser: () => 'user_123',
             });
 
             assert.equal(transaction.getTransfer(), 'PayPal');
@@ -142,9 +140,7 @@ describe('MonzoTransaction', () => {
                         'grp_12345': 'PayPal'
                     }
                 },
-                config: {
-                    token: {user_id: 'user_123'}
-                },
+                getUser: () => 'user_123',
             });
 
             assert.equal(transaction.getTransfer(), '');
