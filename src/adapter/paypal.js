@@ -29,6 +29,7 @@ class PayPalAdapter extends Adapter {
             try {
                 response = await client.get('/v1/reporting/transactions', {
                     params: {
+                        transaction_status: 'S',
                         start_date: start.toISOString(),
                         end_date: end.toISOString(),
                         fields: ['transaction_info', 'cart_info', 'payer_info'].join(','),
