@@ -75,12 +75,11 @@ class PayPalAdapter extends Adapter {
             }
 
             return acc;
-        }, {}),
-            others = transactions.filter(t => !t.raw.transaction_info.transaction_event_code.startsWith('T02'));
+        }, {});
 
         // attach the conversions to the original transaction
-        Object.keys(conversions).forEach(id => others.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
-        return others;
+        Object.keys(conversions).forEach(id => transactions.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
+        return transactions;
     }
 
     getDefaultConfig() {
