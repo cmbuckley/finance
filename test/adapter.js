@@ -1,3 +1,4 @@
+const fs = require('fs').promises;
 const assert = require('assert');
 const sinon = require('sinon');
 const winston = require('winston');
@@ -33,7 +34,15 @@ describe('Adapter', () => {
     });
 
     describe('getAll', () => {
-        it('should create requested adapters', () => {
+        it('should create requested adapters', async function () {
+            try {
+                await fs.access('config/mc.json');
+                await fs.access('config/hsbc.json');
+            } catch (err) {
+                // @todo proxyquire
+                this.skip('Requires account config');
+            }
+
             const adapters = Adapter.getAll(['mc', 'hsbc'], winston.createLogger({
                 transports: [new winston.transports.Console({silent: true})],
             }));
