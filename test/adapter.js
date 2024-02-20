@@ -1,5 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
+const winston = require('winston');
 
 const Adapter  = require('../src/adapter');
 const AuthClient = require('../src/lib/auth');
@@ -31,7 +32,30 @@ describe('Adapter', () => {
         });
     });
 
-    describe('#detectTransfers', () => {
+    describe('getAll', () => {
+        it('should create requested adapters', () => {
+            const adapters = Adapter.getAll(['mc', 'hsbc'], winston.createLogger({
+                transports: [new winston.transports.Console({silent: true})],
+            }));
+
+            assert.equal(adapters.length, 2);
+            assert.equal(adapters[0].constructor.name, 'MonzoAdapter');
+            const accountMap = Object.values(adapters[0].accountMap);
+            assert.equal(accountMap.length, 1);
+            assert.equal(accountMap[0].module, 'mc');
+            assert.equal(adapters[1].constructor.name, 'TruelayerAdapter');
+        });
+
+        it('should create a load adapter', () => {
+            const adapters = Adapter.getAll('dump.json');
+
+            assert.equal(adapters.length, 1);
+            assert.equal(adapters[0].constructor.name, 'LoadAdapter');
+            assert.equal(adapters[0].file, 'dump.json');
+        });
+    });
+
+    describe('detectTransfers', () => {
         it('should set time on transfers', () => {
             const transactions = [
                 new TruelayerTransaction('First Direct', {
