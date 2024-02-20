@@ -1,10 +1,36 @@
 const assert = require('assert');
+const sinon = require('sinon');
 
 const Adapter  = require('../src/adapter');
+const AuthClient = require('../src/lib/auth');
 const MonzoTransaction = require('../src/transaction/monzo');
 const TruelayerTransaction = require('../src/transaction/truelayer');
 
 describe('Adapter', () => {
+    describe('#login', () => {
+        afterEach(sinon.restore);
+
+        it('gets the token from the auth client', async () => {
+            const adapter = new Adapter('assert', {
+                grantType: 'client_credentials',
+                credentials: {
+                    client: {id: 'i', secret: 's'},
+                    auth: {tokenHost: 'https://foo'},
+                },
+            });
+
+            const loginStub = sinon.stub(AuthClient.prototype, 'login').returns({
+                token: {access_token: 'abc123'},
+            });
+
+            await adapter.login({foo: 'bar'});
+
+            assert.equal(adapter.getAccessToken(), 'abc123');
+            assert(loginStub.calledOnce);
+            assert(loginStub.calledWith({foo: 'bar'}));
+        });
+    });
+
     describe('#detectTransfers', () => {
         it('should set time on transfers', () => {
             const transactions = [
