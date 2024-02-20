@@ -90,16 +90,16 @@ class MonzoAdapter extends Adapter {
                             return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
                         }
 
-                        reject(resp.error);
+                        return reject(resp.error);
                     }
 
-                    since = transactionsResponse.transactions.at(-1).id;
+                    if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
                     transactions = transactions.concat(transactionsResponse.transactions.map(function (raw) {
 
                         accountLogger.silly('Raw transaction', raw);
                         return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
                     }));
-                } while (transactionsResponse.transactions.length == limit);
+                } while (transactionsResponse.transactions && transactionsResponse.transactions.length == limit);
 
                 resolve(transactions);
             });
