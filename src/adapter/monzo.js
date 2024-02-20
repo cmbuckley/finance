@@ -10,7 +10,8 @@ var helpers = {
     numberFormat: function (amount, currency) {
         var decimals = this.decimals(currency);
         return (amount / Math.pow(10, decimals)).toFixed(decimals);
-    }
+    },
+    pick: (obj, ...keys) => Object.fromEntries(keys.map(k => [k, obj[k]])),
 };
 
 class MonzoAdapter extends Adapter {
@@ -124,6 +125,12 @@ class MonzoAdapter extends Adapter {
             },
             must_approve_token: true,
         };
+    }
+
+    toJSON() {
+        // pick only specific fields from each pot
+        const pots = Object.fromEntries(Object.entries(this.pots).map(([i, p]) => [i, helpers.pick(p, 'name', 'round_up')]));
+        return {pots, user: this.config.token.user_id};
     }
 }
 

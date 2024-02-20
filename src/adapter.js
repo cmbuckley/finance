@@ -28,6 +28,9 @@ class Adapter {
     getDefaultConfig() {
         return {};
     }
+
+    toJSON() {
+    }
 }
 
 function getConfigPath(file) {

@@ -73,7 +73,7 @@ describe('TruelayerTransaction', () => {
             });
 
             assert.deepEqual(transaction.toJSON(), {
-                type: 'TruelayerTransaction',
+                type: 'truelayer',
                 account: 'Current Account',
                 raw: {amount: 1234},
                 module: 'hsbc',

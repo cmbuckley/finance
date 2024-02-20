@@ -201,7 +201,7 @@ describe('MonzoTransaction', () => {
             }, {}, {}, {module: 'mc'});
 
             assert.deepEqual(transaction.toJSON(), {
-                type: 'MonzoTransaction',
+                type: 'monzo',
                 account: 'Monzo Current',
                 raw: {amount: 1234},
                 module: 'mc',

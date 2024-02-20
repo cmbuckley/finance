@@ -102,7 +102,7 @@ class Transaction {
 
     toJSON() {
         return {
-            type:    this.constructor.name,
+            type:    this.constructor.name.replace('Transaction', '').toLowerCase(),
             account: this.account,
             raw:     this.raw,
             module:  this.getModule(),

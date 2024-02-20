@@ -1,7 +1,9 @@
-const fs = require('fs'),
+const fs = require('fs').promises,
     Adapter = require('../adapter');
 
 class LoadAdapter extends Adapter {
+    #adapterConfig = {};
+    #delegates = {};
 
     constructor(file, logger) {
         super(null, null, logger);
@@ -13,23 +15,32 @@ class LoadAdapter extends Adapter {
     }
 
     _getTransaction(className) {
-        return require('../transaction/' + className.replace('Transaction', '').toLowerCase());
+        return require('../transaction/' + className);
+    }
+
+    delegate(adapter) {
+        if (!this.#delegates[adapter]) {
+            this.#delegates[adapter] = {
+                monzo: {
+                    pots: this.#adapterConfig.monzo.pots,
+                    getUser: () => this.#adapterConfig.monzo.user,
+                },
+            }[adapter] || {};
+
+            this.#delegates[adapter].__proto__ = this;
+        }
+
+        return this.#delegates[adapter];
     }
 
     async getTransactions() {
-        let adapter = this;
+        const data = JSON.parse(await fs.readFile(this.file, 'utf-8'));
+        this.#adapterConfig = data.adapters;
 
-        return new Promise(function (res, rej) {
-            // @todo fs.promises API in v10
-            fs.readFile(this.file, 'utf-8', function (err, contents) {
-                if (err) { return rej(err); }
-
-                res(JSON.parse(contents).map(function (data) {
-                    const Transaction = adapter._getTransaction(data.type);
-                    return new Transaction(data.account, data.raw, adapter, adapter.logger.child({module: data.module})); // @todo adapter needs Monzo pots support
-                }));
-            });
-        }.bind(this));
+        return data.transactions.map(t => {
+            const Transaction = this._getTransaction(t.type);
+            return new Transaction(t.account, t.raw, this.delegate(t.type), this.logger.child({module: t.module}));
+        });
     }
 }
 
