@@ -4,6 +4,7 @@ const moment = require('moment-timezone'),
 
 class Transaction {
     #date;
+    _transfer;
 
     constructor(account, raw, adapter, logger, transactionOptions) {
         this.account = account;
@@ -95,7 +96,8 @@ class Transaction {
     getTransfer() {
     }
 
-    setTransfer(account) {
+    setTransfer(transfer) {
+        this._transfer = transfer;
     }
 
     toJSON() {

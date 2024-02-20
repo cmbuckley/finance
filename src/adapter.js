@@ -109,7 +109,7 @@ Adapter.detectTransfers = function (transactions, timezone) {
                 counterpartMidnight = counterpartDate.clone().startOf('day');
 
             if (!counterpart.isTransfer()) {
-                counterpart.setTransfer(t.getAccount());
+                counterpart.setTransfer(t);
             }
 
             if (counterpartDate.diff(counterpartMidnight)) {

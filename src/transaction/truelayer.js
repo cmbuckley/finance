@@ -1,7 +1,6 @@
 const Transaction = require('../transaction');
 
 class TruelayerTransaction extends Transaction {
-    #transferAccount;
 
     constructor(account, raw, adapter, logger) {
         super(account, raw, adapter, logger);
@@ -77,7 +76,7 @@ class TruelayerTransaction extends Transaction {
     }
 
     getTransfer() {
-        if (this.#transferAccount) { return this.#transferAccount; }
+        if (this._transfer) { return this._transfer.getAccount(); }
 
         if (/^\d{6} \d{8}/.test(this.raw.description)) {
             let [sortCode, account] = this.raw.description.match(/^(\d{6}) (\d{8})/).slice(1);
@@ -104,10 +103,6 @@ class TruelayerTransaction extends Transaction {
                 return t;
             }
         }
-    }
-
-    setTransfer(account) {
-        this.#transferAccount = account;
     }
 
     getPayee() {

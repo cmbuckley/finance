@@ -7,9 +7,10 @@ module.exports = class PayPalTransaction extends Transaction {
         super(account, raw, adapter, logger);
     }
 
+    // https://developer.paypal.com/docs/transaction-search/transaction-event-codes/
     isValid() {
         return this.raw.transaction_info.transaction_status == 'S'
-            && /^T[01][01]/.test(this.raw.transaction_info.transaction_event_code);
+            && /^T(0[013-7]|1[01])/.test(this.raw.transaction_info.transaction_event_code);
     }
 
     isDebit() {
@@ -37,6 +38,7 @@ module.exports = class PayPalTransaction extends Transaction {
     }
 
     getExchangeRate() {
+        if (this._transfer) { return this._transfer.getExchangeRate(); }
         if (this.#conversion.length !== 2) { return 1; }
 
         // should be two transactions, one in the account currency and one in the transaction currency
@@ -70,6 +72,11 @@ module.exports = class PayPalTransaction extends Transaction {
 
         // @todo
         return this.raw.payer_info.payer_name.alternate_full_name;
+    }
+
+    getTransfer() {
+        if (this._transfer) { return this._transfer.getAccount(); }
+        // event code T0[3-7] are transfers, but we do not know where from/to
     }
 
     addConversion(conversion) {

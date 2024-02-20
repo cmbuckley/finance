@@ -126,5 +126,27 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getCurrency(), 'USD');
             assert.equal(transaction.getExchangeRate(), 0.85);
         });
+
+        it('should use rate of a known transfer', () => {
+            const transaction = new PayPalTransaction('PayPal');
+
+            transaction.setTransfer({
+                getExchangeRate: () => 0.8,
+            });
+
+            assert.equal(transaction.getExchangeRate(), 0.8);
+        });
+    });
+
+    describe('#getTransfer', () => {
+        it('should use account of a known transfer', () => {
+            const transaction = new PayPalTransaction('PayPal');
+
+            transaction.setTransfer({
+                getAccount: () => 'Other Account',
+            });
+
+            assert.equal(transaction.getTransfer(), 'Other Account');
+        });
     });
 });
