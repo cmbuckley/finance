@@ -1,4 +1,4 @@
-var fs = require('fs'),
+var fs = require('fs').promises,
     adapter, filename;
 
 module.exports = function exporter(options) {
@@ -32,16 +32,13 @@ module.exports = function exporter(options) {
 
     return {
         options,
-        write: function (transactions, callback) {
-            if (!options.quiet) { options.logger.info('Exporting to file', {filename, type: options.format}); }
+        write: async transactions => {
+            options.logger.info('Exporting to file', {filename, type: options.format});
             if (!options.dump) { transactions = transactions.filter(t => t && t.isValid && t.isValid()); }
 
-            adapter(transactions, options, function (err, contents) {
-                fs.writeFile(filename, contents, function () {
-                    options.logger.verbose('Wrote ' + transactions.length + ' transactions to ' + filename);
-                    callback && callback(contents);
-                });
-            });
+            const contents = await adapter(transactions, options);
+            await fs.writeFile(filename, contents);
+            options.logger.verbose('Wrote ' + transactions.length + ' transactions to ' + filename);
         }
     };
 };

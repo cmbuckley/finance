@@ -6,7 +6,7 @@ const MonzoTransaction = require('../../src/transaction/monzo');
 const fixture = require('../../src/exporter/json');
 
 describe('JSON exporter', () => {
-    it('should export monzo adapter config', (done) => {
+    it('should export monzo adapter config', async () => {
         const monzoAdapter = new MonzoAdapter('', {
             token: {user_id: 'user_123'},
         });
@@ -29,20 +29,18 @@ describe('JSON exporter', () => {
             module: 'testmodule',
         })];
 
-        fixture(transactions, {}, (err, output) => {
-            assert.ifError(err);
-            assert.equal(output, JSON.stringify({
-                adapters: {
-                    monzo: {pots: {}, user: 'user_123'}
-                },
-                transactions: [{
-                    type: 'monzo',
-                    account: 'Monzo Current',
-                    raw,
-                    module: 'testmodule',
-                }],
-            }, null, 2));
-            done();
-        });
+        const output = await fixture(transactions, {});
+
+        assert.equal(output, JSON.stringify({
+            adapters: {
+                monzo: {pots: {}, user: 'user_123'}
+            },
+            transactions: [{
+                type: 'monzo',
+                account: 'Monzo Current',
+                raw,
+                module: 'testmodule',
+            }],
+        }, null, 2));
     });
 });

@@ -5,7 +5,7 @@ const TruelayerTransaction = require('../../src/transaction/truelayer');
 const fixture = require('../../src/exporter/csv');
 
 describe('CSV exporter', () => {
-    it('should export transactions', (done) => {
+    it('should export transactions', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
             transaction_id: '12345',
             transaction_type: 'DEBIT',
@@ -16,19 +16,16 @@ describe('CSV exporter', () => {
             description: 'Testing',
         }, {}, {})];
 
-        fixture(transactions, {}, (err, csv) => {
-            const expected = [
-                'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
-                'HSBC,2022-01-01,,-4.20,Food:Groceries,GBP,1,Testing,12345',
-            ].join('\n') + '\n';
+        const csv = await fixture(transactions, {});
+        const expected = [
+            'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
+            'HSBC,2022-01-01,,-4.20,Food:Groceries,GBP,1,Testing,12345',
+        ].join('\n') + '\n';
 
-            assert.ifError(err);
-            assert.equal(csv, expected);
-            done();
-        });
+        assert.equal(csv, expected);
     });
 
-    it('should export times', (done) => {
+    it('should export times', async () => {
         const transactions = [new MonzoTransaction('Monzo Current', {
             category: 'groceries',
             counterparty: {},
@@ -43,19 +40,16 @@ describe('CSV exporter', () => {
             notes: 'Testing',
         }, {data: {transfers: {}}}, {})];
 
-        fixture(transactions, {}, (err, csv) => {
-            const expected = [
-                'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
-                'Monzo Current,2022-01-01 07:56,,-4.20,Food:Groceries,GBP,1,Testing,tx_1234567890',
-            ].join('\n') + '\n';
+        const csv = await fixture(transactions, {});
+        const expected = [
+            'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
+            'Monzo Current,2022-01-01 07:56,,-4.20,Food:Groceries,GBP,1,Testing,tx_1234567890',
+        ].join('\n') + '\n';
 
-            assert.ifError(err);
-            assert.equal(csv, expected);
-            done();
-        });
+        assert.equal(csv, expected);
     });
 
-    it('should export transfers', (done) => {
+    it('should export transfers', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
             transaction_id: '12345',
             transaction_type: 'DEBIT',
@@ -66,15 +60,12 @@ describe('CSV exporter', () => {
             description: 'CASH UK ATM 01JAN',
         }, {}, {})];
 
-        fixture(transactions, {}, (err, csv) => {
-            const expected = [
-                'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
-                'HSBC,2022-01-01,,-100.00,Transfer to:Cash,GBP,1,CASH UK ATM 01JAN,12345',
-            ].join('\n') + '\n';
+        const csv = await fixture(transactions, {});
+        const expected = [
+            'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
+            'HSBC,2022-01-01,,-100.00,Transfer to:Cash,GBP,1,CASH UK ATM 01JAN,12345',
+        ].join('\n') + '\n';
 
-            assert.ifError(err);
-            assert.equal(csv, expected);
-            done();
-        });
+        assert.equal(csv, expected);
     });
 });

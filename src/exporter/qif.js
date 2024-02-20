@@ -1,6 +1,7 @@
-module.exports = function qif(transactions, options, callback) {
-    if (!transactions.length) { return callback(null); }
+module.exports = async function qif(transactions, options) {
+    if (!transactions.length) { return ''; }
 
+    // @todo support multiple accounts
     var head = [
         '!Account',
         'N' + (transactions[0].getAccount() || 'Bank'),
@@ -9,7 +10,7 @@ module.exports = function qif(transactions, options, callback) {
         '!Type:Bank'
     ];
 
-    callback(null, transactions.reduce(function (file, transaction) {
+    return transactions.reduce((file, transaction) => {
         return file.concat([
             'D' + transaction.getDate('YYYY-MM-DD'),
             'T' + transaction.getLocalAmount(),
@@ -19,5 +20,5 @@ module.exports = function qif(transactions, options, callback) {
             'N' + transaction.getId(),
             '^'
         ]);
-    }, head).join('\n'));
+    }, head).join('\n');
 };

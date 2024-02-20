@@ -1,4 +1,4 @@
-module.exports = function json(transactions, options, callback) {
+module.exports = async function json(transactions, options) {
     // unique adapters
     const adapters = transactions.reduce((acc, curr) => {
         const key = curr.adapter.constructor.name.replace('Adapter', '').toLowerCase();
@@ -6,5 +6,5 @@ module.exports = function json(transactions, options, callback) {
         return acc;
     }, {});
 
-    callback(null, JSON.stringify({adapters, transactions}, null, options.indent || 2));
+    return JSON.stringify({adapters, transactions}, null, options.indent || 2);
 };
