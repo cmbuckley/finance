@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const {DataAPIClient} = require('truelayer-client');
 const moment = require('moment');
-const winston = require('winston');
+const util = require('../util');
 
 const TruelayerAdapter = require('../../src/adapter/truelayer');
 
@@ -11,9 +11,7 @@ describe('TruelayerAdapter', () => {
     describe('#getTransactions', () => {
         beforeEach(function () {
             // first param gets require()d for the account map
-            this.adapter = new TruelayerAdapter('assert', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            this.adapter = new TruelayerAdapter('assert', {}, util.logger());
 
             this.adapter.accountMap = {
                 1111: 'Current Account',

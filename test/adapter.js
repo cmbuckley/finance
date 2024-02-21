@@ -1,8 +1,8 @@
 const fs = require('fs').promises;
 const assert = require('assert');
 const sinon = require('sinon');
-const winston = require('winston');
 
+const util = require('./util');
 const Adapter  = require('../src/adapter');
 const AuthClient = require('../src/lib/auth');
 const MonzoTransaction = require('../src/transaction/monzo');
@@ -43,9 +43,7 @@ describe('Adapter', () => {
                 this.skip('Requires account config');
             }
 
-            const adapters = Adapter.getAll(['mc', 'hsbc'], winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapters = Adapter.getAll(['mc', 'hsbc'], util.logger());
 
             assert.equal(adapters.length, 2);
             assert.equal(adapters[0].constructor.name, 'MonzoAdapter');

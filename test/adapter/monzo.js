@@ -2,7 +2,7 @@ const assert = require('assert');
 const sinon = require('sinon');
 
 const monzo = require('monzo-bank');
-const winston = require('winston');
+const util = require('../util');
 
 const MonzoAdapter = require('../../src/adapter/monzo');
 
@@ -11,9 +11,7 @@ describe('MonzoAdapter', () => {
         afterEach(sinon.restore);
 
         it('should query monzo for transactions', async () => {
-            const adapter = new MonzoAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new MonzoAdapter('', {}, util.logger());
 
             adapter.token = 'test_token'; // fake login
             adapter.addConfig({
@@ -70,9 +68,7 @@ describe('MonzoAdapter', () => {
         });
 
         it('should make multiple calls when exceeding the limit', async () => {
-            const adapter = new MonzoAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new MonzoAdapter('', {}, util.logger());
 
             adapter.addConfig({
                 account: 'uk_retail',

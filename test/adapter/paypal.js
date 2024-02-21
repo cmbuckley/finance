@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const axios = require('axios');
 const moment = require('moment');
-const winston = require('winston');
+const util = require('../util');
 
 const PayPalAdapter = require('../../src/adapter/paypal');
 
@@ -12,9 +12,7 @@ describe('PayPalAdapter', () => {
         afterEach(sinon.restore);
 
         it('should query PayPal for transactions', async () => {
-            const adapter = new PayPalAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new PayPalAdapter('', {}, util.logger());
 
             const raw = {
                 transaction_info: {
@@ -44,9 +42,7 @@ describe('PayPalAdapter', () => {
         });
 
         it('should make multiple queries for a large date range', async () => {
-            const adapter = new PayPalAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().resolves({
                 data: {transaction_details: [{}]},
@@ -71,9 +67,7 @@ describe('PayPalAdapter', () => {
         });
 
         it('should collate conversions', async () => {
-            const adapter = new PayPalAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().resolves({
                 data: {transaction_details: [{
@@ -120,9 +114,7 @@ describe('PayPalAdapter', () => {
         });
 
         it('should throw the error from the API', () => {
-            const adapter = new PayPalAdapter('', {}, winston.createLogger({
-                transports: [new winston.transports.Console({silent: true})],
-            }));
+            const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().rejects({
                 response: {data: {message: 'Invalid request'}},
