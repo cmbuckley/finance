@@ -70,7 +70,7 @@ class TruelayerTransaction extends Transaction {
         this.logger.warn('Unknown category', {
             category: this.raw.transaction_classification,
             description: this.raw.description,
-            date: this.getDate('YYYY-MM-DD'),
+            date: this.getDate('YYYY-MM-DD HH:mm'),
             transaction: this.raw.id,
         });
     }

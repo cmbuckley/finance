@@ -23,7 +23,7 @@ class MonzoTransaction extends Transaction {
 
         if (!this.isSettled() && this.isForeign()) {
             this.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
-                date: this.getDate('YYYY-MM-DD'),
+                date: this.getDate('YYYY-MM-DD HH:mm'),
                 transaction: this.raw.id,
                 merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
                 note: this.raw.notes || this.raw.description,
@@ -91,7 +91,7 @@ class MonzoTransaction extends Transaction {
             merch_cat: this.raw.merchant ? this.raw.merchant.metadata.foursquare_category || '' : '',
             notes: this.raw.notes,
             description: this.raw.description,
-            date: this.getDate('YYYY-MM-DD'),
+            date: this.getDate('YYYY-MM-DD HH:mm'),
             transaction: this.raw.id,
         });
     }
@@ -207,7 +207,7 @@ class MonzoTransaction extends Transaction {
                     online: this.raw.merchant.online ? 'yes' : 'no',
                     merchant: this.raw.merchant.id,
                     group: this.raw.merchant.group_id,
-                    date: this.getDate('YYYY-MM-DD'),
+                    date: this.getDate('YYYY-MM-DD HH:mm'),
                     name: this.raw.merchant.name
                 });
             }
