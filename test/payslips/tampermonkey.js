@@ -6,7 +6,7 @@ const assert = require('assert');
 describe('Payslips', () => {
     before(done => {
         let vc = new VirtualConsole;
-        vc.on('jsdomError', e => console.error(e.detail));
+        vc.on('jsdomError', e => console.error('error:', e.detail || e));
 
         JSDOM.fromFile(__dirname + '/test.html', {
             runScripts: 'dangerously',
@@ -14,9 +14,7 @@ describe('Payslips', () => {
             virtualConsole: vc,
         }).then(dom => {
             this.dom = dom;
-            dom.window.document.addEventListener('DOMContentLoaded', () => {
-                done();
-            });
+            dom.window.document.addEventListener('DOMContentLoaded', () => done());
         });
     });
 
@@ -38,8 +36,11 @@ describe('Payslips', () => {
         });
 
         it('should download a QIF', async () => {
+            // stub out the a.click() event to avoid navigation
+            sinon.stub(this.dom.window.HTMLAnchorElement.prototype, 'click');
+
             const btn = this.dom.window.document.querySelector('.buttons .btn');
-            btn.click();
+            btn.dispatchEvent(new this.dom.window.Event('click')); // btn.click() is stubbed
 
             const download = this.dom.window.document.querySelector('a[download]');
             assert.ok(download);
