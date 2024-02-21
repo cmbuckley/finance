@@ -76,6 +76,22 @@ describe('MonzoTransaction', () => {
         });
     });
 
+    describe('#getLocalAmount', () => {
+        [['GBP', 12345, '123.45'],
+         ['EUR', 12345, '123.45'],
+         ['JPY', 12345, '12345'],
+        ].forEach(([currency, amount, expected]) => {
+            it(`should properly output ${currency} amount`, () => {
+                const transaction = new MonzoTransaction('Monzo Current', {
+                    local_amount: amount,
+                    local_currency: currency,
+                });
+
+                assert.equal(transaction.getLocalAmount(), expected);
+            });
+        });
+    });
+
     describe('#getTransfer', () => {
         it('should use bank account details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {

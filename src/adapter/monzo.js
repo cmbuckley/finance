@@ -5,7 +5,7 @@ const monzo = require('monzo-bank'),
 var helpers = {
     decimalExceptions: {JPY: 0},
     decimals: function (currency) {
-        return (this.decimalExceptions.hasOwnProperty(currency) ? this.decimalExceptions[currency] : 2);
+        return this.decimalExceptions[currency] ?? 2;
     },
     numberFormat: function (amount, currency) {
         var decimals = this.decimals(currency);

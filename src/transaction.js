@@ -40,7 +40,7 @@ class Transaction {
     }
 
     _numDecimals(currency) {
-        return (decimalExceptions.hasOwnProperty(currency) ? decimalExceptions[currency] : 2);
+        return decimalExceptions[currency] ?? 2;
     }
 
     _getAmount(amount) {
