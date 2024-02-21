@@ -84,7 +84,7 @@ class TruelayerTransaction extends Transaction {
         }
 
         const transfers = {
-            'Online Bonus Saver': /OBS SAVINGS/,
+            'Online Bonus Saver': /\*OBS /,
             'ISA':                /LYP ISA TRANSFER/,
             'PayPal':             /^PAYPAL/,
             'Current Account':    /DIRECT DEBIT PAYMENT|Chris HSBC|BUCKLEY CM Bills|SAVINGS BUCKLEY CM/,
