@@ -35,15 +35,14 @@ function matchesPattern(value, pattern) {
     return (pattern instanceof RegExp ? pattern.test(value) : value.includes(pattern));
 }
 
-function lookup(key, matches, defaultResponse) {
+function lookup(key, matches, defaultValue) {
     return function (transaction) {
-        let isFunction   = (typeof defaultResponse === 'function'),
-            defaultFunc  = (isFunction ? defaultResponse : function () {}),
-            defaultValue = (isFunction ? null : defaultResponse);
+        const lookup     = key.split('.').reduce((v, k) => v[k] || '', transaction),
+            defaultCheck = (typeof defaultValue == 'function' ? defaultValue : () => defaultValue);
 
         return Object.keys(matches).find(function (match) {
-            return matchesPattern(transaction[key], matches[match]);
-        }) || defaultFunc(transaction) || defaultValue || '';
+            return matchesPattern(lookup, matches[match]);
+        }) || defaultCheck(transaction) || '';
     };
 }
 
@@ -122,14 +121,15 @@ const monzo = {
         'Taxes': 'HMRC',
         'Utilities:Gas': 'BRITISH GAS',
     }, 'Bills'),
-    personal_care: lookup('description', {
+    personal_care: lookup('counterparty.name', {
         'Healthcare': 'Mental Health',
+    }, lookup('description', {
         'Healthcare:Dental': 'DENTAL',
         'Healthcare:Eyecare': 'CONTACT LENSES',
         'Healthcare:Pharmacy': 'PHARMACY',
         'Personal Care:Hair': 'CITY IMAGE',
         'Pet Care:Vet': 'VETERINARY',
-    }, 'Personal Care'),
+    }, 'Personal Care')),
     entertainment: merchantCategory({
         'Zoo': 'Leisure:Activities',
     }, lookup('description', {
