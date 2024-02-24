@@ -114,7 +114,7 @@ const monzo = {
         'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
         'Computing:VPS': /AWS|52B2222845CPN/,
-        'Donations': /JUSTGIVING/i,
+        'Gifts & Donations:Charity': /JUSTGIVING/i,
         'House:Improvement': /TIMPSON/,
         'Insurance:Landlord': /SIMPLY BUSINESS|DL 4 BUSINESS/,
         'Leisure:Betting': patterns.betting,
@@ -191,7 +191,7 @@ const monzo = {
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
         'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX/i,
-        'Shopping:Music': /VINYL|HMV UK/i,
+        'Entertainment:Music': /VINYL|HMV UK/i,
         'Shopping:Stationery': 'POST OFFICE',
     })),
     cash: function (transaction) {
@@ -201,15 +201,15 @@ const monzo = {
     },
     transport: merchantCategory({
         'Automotive Shop': 'Car',
-        'Gas Station': 'Car:Petrol',
-        'Gas Station / Garage': 'Car:Petrol',
+        'Gas Station': 'Car:Fuel',
+        'Gas Station / Garage': 'Car:Fuel',
         'Government Building': 'Car:Parking', // e.g. City of York parking
         'Parking': 'Car:Parking',
         'Train': 'Travel:Rail',
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car:Parking': patterns.parking,
-        'Car:Petrol': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP /,
+        'Car:Fuel': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP /,
         'Car:Service & MOT': patterns.carService,
         'Holiday:Travel': patterns.flights,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE|First Bus|FIRST WEST YORKSHIRE|TRANSDEV/,
@@ -233,8 +233,8 @@ const monzo = {
         'Pet Care:Food': /ZooPlus/i,
         'Pet Care:Vet': /VETERINARY|VETS4P/,
     })),
-    charity: 'Donations',
-    gifts: 'Gifts',
+    charity: 'Gifts & Donations:Charity',
+    gifts: 'Gifts & Donations:Gifts',
 };
 
 const truelayer = {
@@ -246,8 +246,9 @@ const truelayer = {
         'Arts': 'Leisure:Arts & Culture',
         'Music': 'Leisure:Music Events',
         'Dating': '',
-        'Movies & DVDs': 'Leisure:Movies & Video Rentals',
-        'Newspaper & Magazines': 'Shopping:Books & Magazines',
+        'Movies & DVDs': 'Entertainment:Movies & DVDs',
+        'Newspaper & Magazines': 'Entertainment:Newspaper & Magazines',
+        'Outdoors': 'Leisure:Activities',
         'Social Club': '',
         'Sport': 'Leisure:Sporting Events',
         'Games': 'Leisure:Toys & Games'
@@ -255,7 +256,7 @@ const truelayer = {
     'Education': {
         'Tuition': 'Education:Tuition',
         'Student Loan': 'Education:Student Loan',
-        'Books & Supplies': 'Shopping:Books & Magazines'
+        'Books & Supplies': 'Education:Books & Suppliers'
     },
     'Shopping': {
         '': 'Shopping',
@@ -273,7 +274,7 @@ const truelayer = {
         'Hair': 'Personal Care:Hair',
         'Laundry': '',
         'Beauty': 'Personal Care',
-        'Spa & Massage': 'Personal Care'
+        'Spa & Massage': 'Personal Care:Spa & Massage'
     },
     'Health & Fitness': {
         'Dentist': 'Healthcare:Dental',
@@ -294,8 +295,8 @@ const truelayer = {
         'Bars': 'Nights Out'
     },
     'Gifts & Donations': {
-        'Gift': 'Gifts',
-        'Charity': 'Donations'
+        'Gift': 'Gifts & Donations:Gifts',
+        'Charity': 'Gifts & Donations:Charity'
     },
     'Investments': {
         'Equities': '',
@@ -317,7 +318,7 @@ const truelayer = {
         'Public transport': 'Travel:Bus',
         'Service & Auto Parts': 'Car:Service & MOT',
         'Taxi': 'Travel:Taxi',
-        'Gas & Fuel': 'Car:Petrol'
+        'Gas & Fuel': 'Car:Fuel'
     },
     'Travel': {
         'Air Travel': 'Holiday:Travel',
