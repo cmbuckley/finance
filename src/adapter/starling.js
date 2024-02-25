@@ -28,10 +28,27 @@ class StarlingAdapter extends Adapter {
                 }
 
                 res(previousTransactions.concat(transactionsResponse.data.feedItems.map(function (raw) {
-                    return new Transaction(accountName, raw, adapter);
+                    adapter.logger.silly('Raw transaction', raw);
+                    return new Transaction(accountName, raw, adapter, adapter.logger);
                 })));
             });
         }, Promise.resolve([]));
+    }
+
+    getDefaultConfig() {
+        return {
+            credentials: {
+                auth: {
+                  tokenHost: 'https://api.starlingbank.com',
+                  tokenPath: '/oauth/access-token',
+                  authorizeHost: 'https://oauth.starlingbank.com',
+                  authorizePath: '/'
+                },
+                options: {
+                  authorizationMethod: 'body'
+                }
+            }
+        };
     }
 }
 
