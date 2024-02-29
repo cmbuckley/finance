@@ -1,12 +1,35 @@
-const fs = require('fs').promises;
 const assert = require('assert');
+const fs = require('fs').promises;
+const path = require('path');
+const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
 const util = require('./util');
-const Adapter  = require('../src/adapter');
+const Adapter = require('../src/adapter');
 const AuthClient = require('../src/lib/auth');
 const MonzoTransaction = require('../src/transaction/monzo');
 const TruelayerTransaction = require('../src/transaction/truelayer');
+
+function getProxyAdapter(stubs) {
+    // set the correct path for our stubs and add some default stubs
+    stubs = Object.entries(stubs).reduce((acc, [mod, stub]) => {
+        const modulePath = path.dirname(require.resolve('../src/adapter')) + `/../config/${mod}.json`;
+        acc[modulePath] = stub;
+        return acc;
+    }, {
+        './lib/auth': {},
+        'monzo-bank': {},
+        'truelayer-client': {},
+    });
+
+    // add the @noCallThru & @runtimeGlobal directives for all the modules
+    return proxyquire('../src/adapter', Object.entries(stubs).reduce((acc, [mod, stub]) => {
+        stub['@runtimeGlobal'] = true;
+        stub['@noCallThru'] = true;
+        acc[mod] = stub;
+        return acc;
+    }, {}));
+}
 
 describe('Adapter', () => {
     describe('#login', () => {
@@ -35,22 +58,23 @@ describe('Adapter', () => {
 
     describe('getAll', () => {
         it('should create requested adapters', async function () {
-            try {
-                await fs.access('config/mc.json');
-                await fs.access('config/hsbc.json');
-            } catch (err) {
-                // @todo proxyquire
-                this.skip('Requires account config');
-            }
+            const ProxyAdapter = getProxyAdapter({
+                mc:   {type: 'monzo'},
+                hsbc: {type: 'truelayer'},
+                monzo:     {redirect_uri: 'https://callback/monzo'},
+                truelayer: {redirect_uri: 'https://callback/truelayer'},
+            });
 
-            const adapters = Adapter.getAll(['mc', 'hsbc'], util.logger());
+            const adapters = ProxyAdapter.getAll(['mc', 'hsbc'], util.logger());
 
             assert.equal(adapters.length, 2);
             assert.equal(adapters[0].constructor.name, 'MonzoAdapter');
+            assert.equal(adapters[0].getConfig().redirect_uri, 'https://callback/monzo');
             const accountMap = Object.values(adapters[0].accountMap);
             assert.equal(accountMap.length, 1);
             assert.equal(accountMap[0].module, 'mc');
             assert.equal(adapters[1].constructor.name, 'TruelayerAdapter');
+            assert.equal(adapters[1].getConfig().redirect_uri, 'https://callback/truelayer');
         });
 
         it('should create a load adapter', () => {
