@@ -72,11 +72,11 @@ function merchantCategory(matches, defaultValue) {
 
 // reusable patterns
 const patterns = {
-    accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB/,
+    accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB/i,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
     flights:          /RYANAIR/,
-    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK COUNC|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN/i,
+    parking:          /NCP |CAR PARK|PARKING|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN/i,
     carService:       /R H SIRRELL|ALBA TYRES|STEVE SIRRELL/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
@@ -111,7 +111,7 @@ const monzo = {
     bills: lookup('description', {
         'Bills:HomeCare': '910010492987',
         'Bills:Phone': 'giffgaff',
-        'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi/,
+        'Computing:Domains': /101DOMAIN|123[ -]?REG|NAMECHEAP|KEY-SYSTEMS|Gandi|CLOUDFLARE/,
         'Computing:Software': /ITUNES|1PASSWORD|PADDLE\.COM/,
         'Computing:VPS': /AWS|52B2222845CPN/,
         'Gifts & Donations:Charity': /JUSTGIVING/i,
@@ -187,6 +187,7 @@ const monzo = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
+        'Healthcare:Pregnancy': /SERAPHINE/,
         'House:Decorations': /FLORA POINT|PLANTS/,
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
