@@ -8,7 +8,7 @@ BEGIN {
     as["PAYPAL"] = "PayPal"
     as["MONZO"] = "Monzo Current"
     as["Monzo Joint"] = "Monzo Joint"
-    as["^404401 [0-9]{4}3752"] = "ISA"
+    as["^404401 [0-9]{4}3752"] = "HSBC ISA"
     as["^404401 [0-9]{4}6458"] = "Online Saver" # Closed
     as["^404401 [0-9]{4}8681"] = "Online Bonus Saver"
     as["^404401 [0-9]{4}6646"] = "Premier Saver"
@@ -17,8 +17,8 @@ BEGIN {
     as["MORTGAGE PAYMENT"] = "Current Account"
     as["BUCKLEY CM"] = "Current Account"
     as["CAPITA IRG BUCKLE"] = "Sharesave"
-    as["BUCKLEY C   \\*LY[AP]"] = "ISA"
-    as["BUCKLEY C SHARED ACCOUNT"] = "First Direct"
+    as["BUCKLEY C   \\*LY[AP]"] = "HSBC ISA"
+    as["BUCKLEY C SHARED ACCOUNT"] = "Joint Account"
 }
 {
     x = substr($0, 1, 1)

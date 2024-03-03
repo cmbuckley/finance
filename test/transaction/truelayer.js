@@ -5,7 +5,7 @@ const TruelayerTransaction = require('../../src/transaction/truelayer');
 describe('TruelayerTransaction', () => {
     describe('domestic transaction', () => {
         it('should parse raw data', () => {
-            const transaction = new TruelayerTransaction('First Direct', {
+            const transaction = new TruelayerTransaction('Joint Account', {
                 amount: -13.37,
                 currency: 'GBP',
                 description: 'TV LICENCE MBP',
@@ -42,7 +42,7 @@ describe('TruelayerTransaction', () => {
         });
 
         it('should output time if present', () => {
-            const transaction = new TruelayerTransaction('First Direct', {
+            const transaction = new TruelayerTransaction('Joint Account', {
                 timestamp: '2022-09-01T00:00:00Z',
             });
 
@@ -54,7 +54,7 @@ describe('TruelayerTransaction', () => {
 
     describe('#getTransfer', () => {
         it('should use description', () => {
-            const transaction = new TruelayerTransaction('First Direct', {
+            const transaction = new TruelayerTransaction('Joint Account', {
                 amount: 1200,
                 description: 'BUCKLEY CM Bills',
                 transaction_type: 'CREDIT',

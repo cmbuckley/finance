@@ -89,7 +89,7 @@ describe('Adapter', () => {
     describe('detectTransfers', () => {
         it('should set time on transfers', () => {
             const transactions = [
-                new TruelayerTransaction('First Direct', {
+                new TruelayerTransaction('Joint Account', {
                     amount: -5,
                     currency: 'GBP',
                     timestamp: '2022-09-14T00:00:00Z',
@@ -105,7 +105,7 @@ describe('Adapter', () => {
                        account_number: '12345678',
                     },
                 }, {data: {transfers: {
-                    '12-34-56 12345678': 'First Direct',
+                    '12-34-56 12345678': 'Joint Account',
                 }}})
             ];
 
@@ -120,7 +120,7 @@ describe('Adapter', () => {
 
         it('should deal with date boundaries', () => {
             const transactions = [
-                new TruelayerTransaction('First Direct', {
+                new TruelayerTransaction('Joint Account', {
                     amount: -5,
                     currency: 'GBP',
                     timestamp: '2022-09-14T00:00:00Z',
@@ -136,7 +136,7 @@ describe('Adapter', () => {
                        account_number: '12345678',
                     },
                 }, {data: {transfers: {
-                    '12-34-56 12345678': 'First Direct',
+                    '12-34-56 12345678': 'Joint Account',
                 }}})
             ];
 
@@ -206,7 +206,7 @@ describe('Adapter', () => {
                 }),
             ];
 
-            assert.equal(transactions[0].getTransfer(), 'ISA');
+            assert.equal(transactions[0].getTransfer(), 'HSBC ISA');
             assert.equal(transactions[1].getTransfer(), undefined);
             const fixedTransactions = Adapter.detectTransfers(transactions);
             assert.equal(fixedTransactions[1].getTransfer(), undefined);

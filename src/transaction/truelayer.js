@@ -85,12 +85,12 @@ class TruelayerTransaction extends Transaction {
 
         const transfers = {
             'Online Bonus Saver': /\*OBS /,
-            'ISA':                /LYP ISA TRANSFER/,
+            'HSBC ISA':           /LYP ISA TRANSFER/,
             'PayPal':             /^PAYPAL/,
             'Current Account':    /DIRECT DEBIT PAYMENT|Chris HSBC|BUCKLEY CM Bills|SAVINGS BUCKLEY CM/,
             'Premier Saver':      /RSB REGULAR SAVER/,
             'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
-            'First Direct':       /^BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
+            'Joint Account':      /^BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -|MONZO TRANSFER/,
             'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
             'Payslips':           /HESTVIEW|ANSWER DIGITAL LIM/,
