@@ -5,14 +5,7 @@ const fileTimezone = 'America/Toronto';
 class PokerStarsTransaction extends Transaction {
 
     isValid() {
-        if (this.raw.Amount == 0) { return false; }
-
-        if (this.isTransfer()) {
-            // only include the debit side, except for transfers to default account where we always want the non-default side
-            return (this.raw.Currency == defaultCurrency || (this.isDebit() && this.raw.transfer.Currency != defaultCurrency));
-        }
-
-        return true;
+        return (this.raw.Amount != 0);
     }
 
     isDebit() {
@@ -60,7 +53,7 @@ class PokerStarsTransaction extends Transaction {
             game = this.raw.Table.replace(/^(\d+)/, '$1 - ');
         }
 
-        return [memo, type, game].filter(Boolean).join(' - ');
+        return [memo, type, game].filter(Boolean).join(' - ').replace(/ +/g, ' ');
     }
 
     getId() {
@@ -72,6 +65,8 @@ class PokerStarsTransaction extends Transaction {
     }
 
     getTransfer() {
+        if (this._transfer) { return this._transfer.getAccount(); }
+
         if (this.raw.transfer) {
             return 'PokerStars (' + this.raw.transfer.Currency + ')';
         }

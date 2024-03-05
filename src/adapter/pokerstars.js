@@ -18,7 +18,7 @@ class PokerStarsAdapter extends Adapter {
                 'Accrued StarsCoin': 'StarsCoin',
                 'T Money': 'TMoney',
                 'W Money': 'WMoney',
-                'Total Accrued StarsCoin After this Transaction': 'StarsCoinAccrued',
+                'Total Accrued StarsCoin After this Transaction': 'StarsCoinBalance',
             }[header] || header),
         });
     }
@@ -27,15 +27,14 @@ class PokerStarsAdapter extends Adapter {
         return transactions.map((raw, index) => {
             this.logger.silly('Raw transaction', raw);
 
-            // get the adjacent transfer
-            // always listed with crediting account first
+            // manual transfer between accounts
             if (raw.Action == 'Inter Account Transfer') {
-                raw.transfer = transactions[index + Math.sign(raw.Amount)];
+                raw.transfer = this.getTransfer(raw);
             }
 
-            // search for the transfer
+            // automatic conversion at buy-in
             if (raw.Action.includes('Currency Conversion')) {
-                raw.transfer = this.getTransfer(raw);
+                raw.transfer = this.getTransfer(raw, true);
             }
 
             const transaction = new Transaction(this.getAccountName(raw), raw, this, this.logger);
@@ -46,19 +45,21 @@ class PokerStarsAdapter extends Adapter {
     }
 
     /*
-     * Get the associated transaction for a currency conversion by searching the list.
-     * Conversions are not consistently listed in debit/credit order, so it's not possible to traverse.
+     * Get the associated transaction for a currency conversion by searching the list
+     * Manual inter-account transfers have different IDs (1 digit difference?)
+     * Auto currency conversion have the same ID (the tournament)
      */
-    getTransfer(raw) {
+    getTransfer(raw, sameTable) {
         const transfer = transactions.find(t => {
             return t.DateTime == raw.DateTime
                 && t.Action == raw.Action
-                && t.Table == raw.Table
+                && (!sameTable || t.Table == raw.Table)
+                && Math.sign(t.Amount) + Math.sign(raw.Amount) == 0
                 && t.Currency != raw.Currency;
         });
 
         if (transfer) { return transfer; }
-        this.logger.error('Cannot find transfer transaction', raw);
+        this.logger.error('Cannot find matching conversion transaction', raw);
     }
 
     getAccountName(raw) {
