@@ -54,7 +54,7 @@ class Transaction {
     }
 
     _getTransfer(key) {
-        return this.adapter.data.transfers[key] || '';
+        return this.adapter.data?.transfers?.[key] || '';
     }
 
     _getBank(sortCode, account) {

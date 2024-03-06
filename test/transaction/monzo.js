@@ -92,6 +92,94 @@ describe('MonzoTransaction', () => {
         });
     });
 
+    describe('#getPayee', () => {
+        it('should use user_id', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                counterparty: {
+                    user_id: 'user_1234'
+                }
+            }, {
+                data: {
+                    payees: {
+                        'user_1234': 'Monzo Payee'
+                    }
+                }
+            });
+
+            assert.equal(transaction.getPayee(), 'Monzo Payee');
+        });
+
+        it('should use bank account details', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                counterparty: {
+                    user_id: 'anon_1234',
+                    sort_code: '123456',
+                    account_number: '12345678',
+                }
+            }, {
+                data: {
+                    payees: {
+                        '12-34-56 12345678': 'Bank Payee'
+                    }
+                }
+            });
+
+            assert.equal(transaction.getPayee(), 'Bank Payee');
+        });
+
+        it('should use merchant details', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                merchant: {
+                    id: 'merch_1234',
+                }
+            }, {
+                data: {
+                    payees: {
+                        'merch_1234': 'Waitrose'
+                    }
+                }
+            });
+
+            assert.equal(transaction.getPayee(), 'Waitrose');
+        });
+
+        it('should use merchant group details', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                merchant: {
+                    id: 'merch_1234',
+                    group_id: 'grp_1234',
+                }
+            }, {
+                data: {
+                    payees: {
+                        'grp_1234': 'Boots'
+                    }
+                }
+            });
+
+            assert.equal(transaction.getPayee(), 'Boots');
+        });
+
+        it('should return empty for a PayPal transfer', () => {
+            const transaction = new MonzoTransaction('Monzo Current', {
+                user_id: 'user_1234',
+                merchant: {
+                    id: 'merch_1234',
+                    group_id: 'grp_1234',
+                }
+            }, {
+                getUser: () => 'user_1234',
+                data: {
+                    transfers: {
+                        'grp_1234': 'PayPal'
+                    }
+                }
+            });
+
+            assert.equal(transaction.getPayee(), '');
+        });
+    });
+
     describe('#getTransfer', () => {
         it('should use bank account details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {

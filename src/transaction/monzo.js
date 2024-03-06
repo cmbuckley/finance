@@ -104,16 +104,16 @@ class MonzoTransaction extends Transaction {
                 return this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number);
             }
 
-            if (this.adapter.data.transfers[this.raw.counterparty.user_id]) {
+            if (this.adapter.data.transfers?.[this.raw.counterparty.user_id]) {
                 return this.raw.counterparty.user_id;
             }
 
-            if (this.adapter.data.transfers[this.raw.counterparty.account_id]) {
+            if (this.adapter.data.transfers?.[this.raw.counterparty.account_id]) {
                 return this.raw.counterparty.account_id;
             }
         }
 
-        if (this.raw.merchant && this.adapter.data.transfers[this.raw.merchant.group_id]) {
+        if (this.adapter.data?.transfers?.[this.raw.merchant?.group_id]) {
             return this.raw.merchant.group_id;
         }
     }
@@ -154,19 +154,19 @@ class MonzoTransaction extends Transaction {
 
     getPayee() {
         // use known payee name if we have one
-        if (this.raw.counterparty.user_id) {
+        if (this.raw.counterparty?.user_id) {
             if (this.isTransfer()) {
                 return '';
             }
 
-            if (this.adapter.data.payees[this.raw.counterparty.user_id]) {
+            if (this.adapter.data?.payees?.[this.raw.counterparty.user_id]) {
                 return this.adapter.data.payees[this.raw.counterparty.user_id];
             }
 
             if (this.raw.counterparty.sort_code && this.raw.counterparty.account_number) {
                 const bank = this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number);
 
-                if (this.adapter.data.payees[bank]) {
+                if (this.adapter.data?.payees?.[bank]) {
                     return this.adapter.data.payees[bank];
                 }
 
@@ -194,11 +194,11 @@ class MonzoTransaction extends Transaction {
         }
 
         if (this.raw.merchant && this.raw.merchant.id) {
-            if (this.adapter.data.payees[this.raw.merchant.id]) {
+            if (this.adapter.data.payees?.[this.raw.merchant.id]) {
                 return this.adapter.data.payees[this.raw.merchant.id];
             }
 
-            if (this.adapter.data.payees[this.raw.merchant.group_id]) {
+            if (this.adapter.data.payees?.[this.raw.merchant.group_id]) {
                 return this.adapter.data.payees[this.raw.merchant.group_id];
             }
 
