@@ -186,9 +186,9 @@ const monzo = {
         'Zoo': 'Gifts',
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
-        'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS/,
+        'Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS|Etsy/,
         'Healthcare:Pregnancy': /SERAPHINE/,
-        'House:Decorations': /FLORA POINT|PLANTS/,
+        'House:Decorations': /FLORA POINT|PLANTS|Dunelm Soft/,
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
         'Shopping:Clothing': /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX/i,
