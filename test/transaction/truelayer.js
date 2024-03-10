@@ -52,6 +52,22 @@ describe('TruelayerTransaction', () => {
         });
     });
 
+    describe('foreign transaction', () => {
+        it('should detect foreign currencies in descriptions', () => {
+            const transaction = new TruelayerTransaction('Joint Account', {
+                amount: -68.94,
+                currency: 'GBP',
+                description: 'BASE BACKPACKERS SYDNEY AUD 102.00 @ 1.4795',
+                transaction_id: 'abcdef0123',
+                transaction_type: 'DEBIT'
+            });
+
+            assert.equal(transaction.getCurrency(), 'AUD');
+            assert.equal(transaction.getLocalAmount(), '-102.00');
+            assert.equal(transaction.getExchangeRate(), 102 / 68.94);
+        });
+    });
+
     describe('#getTransfer', () => {
         it('should use description', () => {
             const transaction = new TruelayerTransaction('Joint Account', {

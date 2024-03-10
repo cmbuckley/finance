@@ -2,6 +2,23 @@ const Transaction = require('../transaction');
 
 class TruelayerTransaction extends Transaction {
 
+    #getLocal() {
+        const matches = this.raw.description.match(/ ([A-Z]{3}) (\d+\.\d{2}) @ \d+\.\d+/);
+        if (matches) {
+            return {
+                currency: matches[1],
+                amount:   matches[2] * Math.sign(this.raw.amount),
+                rate:     Math.abs(matches[2] / this.raw.amount), // more accurate
+            };
+        }
+
+        return {
+            currency: this.raw.currency,
+            amount:   this.raw.amount,
+            rate:     1,
+        };
+    }
+
     constructor(account, raw, adapter, logger) {
         super(account, raw, adapter, logger);
     }
@@ -23,7 +40,7 @@ class TruelayerTransaction extends Transaction {
     }
 
     isForeign() {
-        return this.raw.currency !== 'GBP';
+        return this.getCurrency() !== 'GBP';
     }
 
     getDate(format, timezone) {
@@ -44,18 +61,17 @@ class TruelayerTransaction extends Transaction {
     }
 
     getCurrency() {
-        return this.raw.currency || '';
+        return this.#getLocal().currency || '';
     }
 
     getLocalAmount() {
         // flip amount for credit cards, where DEBIT is a positive amount
         let factor = (this.isDebit() == (this.raw.amount > 0) ? -1 : 1);
-        return this._getAmount(this.raw.amount * factor);
+        return this._getAmount(this.#getLocal().amount * factor);
     }
 
-    // @todo
     getExchangeRate() {
-        return 1;
+        return this.#getLocal().rate;
     }
 
     getMemo() {
