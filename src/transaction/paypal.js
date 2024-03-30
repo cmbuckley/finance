@@ -2,6 +2,7 @@ const Transaction = require('../transaction');
 
 module.exports = class PayPalTransaction extends Transaction {
     #conversion = [];
+    #reference;
 
     constructor(account, raw, adapter, logger) {
         super(account, raw, adapter, logger);
@@ -39,12 +40,16 @@ module.exports = class PayPalTransaction extends Transaction {
 
     getExchangeRate() {
         if (this._transfer) { return this._transfer.getExchangeRate(); }
-        if (this.#conversion.length !== 2) { return 1; }
 
         // should be two transactions, one in the account currency and one in the transaction currency
-        const localIndex = this.#conversion.findIndex(c => c.transaction_info.transaction_amount.currency_code == this.getCurrency());
-        return -this.#conversion[1 - localIndex].transaction_info.transaction_amount.value
-            / this.#conversion[localIndex].transaction_info.transaction_amount.value;
+        if (this.#conversion.length == 2) {
+            const localIndex = this.#conversion.findIndex(c => c.transaction_info.transaction_amount.currency_code == this.getCurrency());
+            return -this.#conversion[1 - localIndex].transaction_info.transaction_amount.value
+                / this.#conversion[localIndex].transaction_info.transaction_amount.value;
+        }
+
+        if (this.#reference) { return this.#reference.getExchangeRate(); }
+        return 1;
     }
 
     getMemo() {
@@ -81,5 +86,9 @@ module.exports = class PayPalTransaction extends Transaction {
 
     addConversion(conversion) {
         this.#conversion = conversion;
+    }
+
+    addReference(reference) {
+        this.#reference = reference;
     }
 };

@@ -4,7 +4,7 @@ const moment = require('moment'),
     Transaction = require('../transaction/paypal');
 
 // See https://developer.paypal.com/docs/transaction-search/transaction-event-codes/#link-tnncurrencyconversion
-function findConversions(transactions) {
+function findConversionsAndPurchases(transactions) {
     const conversions = transactions.reduce((acc, curr) => {
         if (curr.raw.transaction_info?.transaction_event_code?.startsWith('T02')) {
             const ref = curr.raw.transaction_info.paypal_reference_id;
@@ -17,6 +17,15 @@ function findConversions(transactions) {
 
     // attach the conversions to the original transaction
     Object.keys(conversions).forEach(id => transactions.find(t => t.raw.transaction_info.transaction_id == id).addConversion(conversions[id]));
+
+    // Try to pair any deposit transactions with corresponding purchase
+    transactions.forEach(t => {
+        let reference = t.raw?.transaction_info?.paypal_reference_id;
+        if (reference) {
+            transactions.find(ot => ot.raw.transaction_info.transaction_id == reference)?.addReference(t);
+        }
+    });
+
     return transactions;
 }
 
@@ -78,7 +87,7 @@ class PayPalAdapter extends Adapter {
         } while (end.isBefore(to, 'day'));
 
         this.logger.verbose(`Retrieved ${transactions.length} transactions`);
-        return findConversions(transactions);
+        return findConversionsAndPurchases(transactions);
     }
 
     getDefaultConfig() {

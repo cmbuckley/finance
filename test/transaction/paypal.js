@@ -136,6 +136,18 @@ describe('PayPalTransaction', () => {
 
             assert.equal(transaction.getExchangeRate(), 0.8);
         });
+
+        it('should use rate from the linked deposit', () => {
+            const purchase = new PayPalTransaction('PayPal');
+            const deposit = new PayPalTransaction('PayPal');
+
+            deposit.setTransfer({
+                getExchangeRate: () => 0.8,
+            });
+
+            purchase.addReference(deposit);
+            assert.equal(purchase.getExchangeRate(), 0.8);
+        });
     });
 
     describe('#getTransfer', () => {
