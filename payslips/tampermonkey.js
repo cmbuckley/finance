@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.16
+// @version      2.17
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://answerdigitalltd.sage.hr/*
@@ -138,9 +138,17 @@
                         const memo = cells[0];
 
                         if (shouldInclude(memo, firstHeading.textContent)) {
+                            let units = cells[1],
+                                memoExtra = '';
+
+                            if (firstHeading.textContent == 'Payments' && units && units != 1) {
+                                if (memo == 'Overtime') units /= 7.5;
+                                memoExtra = ' (' + Math.abs(units) + 'd)';
+                            }
+
                             transactions.push({
                                 date,
-                                memo,
+                                memo:     memo + memoExtra,
                                 payee:    getPayee(memo),
                                 amount:   getAmount(cells, firstHeading.textContent, transactions),
                                 category: getCategory(memo),
