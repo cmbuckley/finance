@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.18
+// @version      2.19
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://*.sage.hr/*
@@ -89,7 +89,7 @@
                         ];
 
                         return output + rows.reduce(function (accountData, row) {
-                            if (row.account != name) { return accountData; }
+                            if (row.account != name || !row.amount) { return accountData; }
 
                             return accountData.concat([
                                 'D' + row.date,
