@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.17
+// @version      2.18
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
-// @match        https://answerdigitalltd.sage.hr/*
+// @match        https://*.sage.hr/*
 // @grant        none
 // @run-at       document-start
 // @downloadURL  https://raw.githubusercontent.com/cmbuckley/finance/main/payslips/tampermonkey.js
