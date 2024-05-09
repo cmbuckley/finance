@@ -65,7 +65,7 @@ class AuthClient {
                 return this.config;
             }
 
-            this.logger.info('Access token has expired, refreshing');
+            this.logger.verbose('Access token has expired, refreshing');
 
             try {
                 let newToken = await accessToken.refresh();
