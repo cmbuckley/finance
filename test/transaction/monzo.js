@@ -232,12 +232,13 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'PayPal');
         });
 
-        it('should not set PayPal for different user', () => {
+        it('should not denote a transaction by another user as a PayPal transfer', () => {
             const transaction = new MonzoTransaction('Monzo Joint', {
                 merchant: {
                     group_id: 'grp_12345',
                 },
                 user_id: 'user_456',
+                local_amount: -100,
             }, {
                 data: {
                     transfers: {

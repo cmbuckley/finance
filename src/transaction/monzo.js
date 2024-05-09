@@ -119,8 +119,10 @@ class MonzoTransaction extends Transaction {
     }
 
     // only considers it a PayPal transfer if the transaction was by the authenticated user
+    // @todo this needs to properly handle withdrawals, where user_id = ''
+    // what does a withdrawal look like to joint account?
     _checkPayPal(transfer) {
-        if (transfer != 'PayPal') { return transfer; }
+        if (transfer != 'PayPal' || !this.isDebit()) { return transfer; }
         return (this.raw.user_id == this.adapter.getUser() ? transfer : '');
     }
 
