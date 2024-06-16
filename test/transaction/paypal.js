@@ -93,6 +93,23 @@ describe('PayPalTransaction', () => {
 
             assert.equal(transaction.getLocalAmount(), '8.40');
         });
+
+        it('should include properly round when there’s a fee', () => {
+            const transaction = new PayPalTransaction('PayPal', {
+                transaction_info: {
+                    transaction_amount: {
+                        currency_code: 'GBP',
+                        value: '0.69'
+                    },
+                    fee_amount: {
+                        currency_code: 'GBP',
+                        value: '-0.32'
+                    },
+                },
+            });
+
+            assert.equal(transaction.getLocalAmount(), '0.37');
+        });
     });
 
     describe('#getExchangeRate', () => {
