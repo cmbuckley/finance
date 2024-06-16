@@ -84,6 +84,18 @@ describe('Adapter', () => {
             assert.equal(adapters[0].constructor.name, 'LoadAdapter');
             assert.equal(adapters[0].file, 'dump.json');
         });
+
+        it('should create separate config objects', () => {
+            const ProxyAdapter = getProxyAdapter({
+                hsbc: {type: 'truelayer'},
+                fd:   {type: 'truelayer'},
+                truelayer: {redirect_uri: 'https://callback/truelayer'},
+            });
+
+            const adapters = ProxyAdapter.getAll(['fd', 'hsbc'], util.logger());
+            assert.equal(adapters[0].getConfig().module, 'fd');
+            assert.equal(adapters[1].getConfig().module, 'hsbc');
+        });
     });
 
     describe('detectTransfers', () => {

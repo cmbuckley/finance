@@ -67,8 +67,7 @@ function getAdapter(account, logger, options) {
         case 'truelayer':
         case 'paypal':
             const Adapter = require('./adapter/' + accountConfig.type);
-            adapterConfig.module = account;
-            return new Adapter(accountPath, adapterConfig, logger.child({module: account}));
+            return new Adapter(accountPath, Object.assign({module: account}, adapterConfig), logger.child({module: account}));
 
         default: logger.error('Unrecognised adapter: ' + accountConfig.type);
     }
