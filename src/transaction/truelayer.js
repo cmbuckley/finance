@@ -110,7 +110,7 @@ class TruelayerTransaction extends Transaction {
             'Joint Account':      /^BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
             'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -|MONZO TRANSFER/,
             'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
-            'Payslips':           /HESTVIEW|ANSWER DIGITAL LIM/,
+            'Payslips':           /HESTVIEW|Answer Digital/,
             'Starling':           /^Starling/,
             'Cash':               /^CASH/,
         };

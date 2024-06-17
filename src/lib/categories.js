@@ -388,6 +388,7 @@ const truelayer = {
         'Food:Takeaway': patterns.takeaway,
         'Food:Eating Out': /Culto|THE OWL/,
         'Gifts': 'Vestiaire Collecti',
+        'Job Expenses': 'Answer Expenses',
         'Healthcare:Dental': 'DENTAL',
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
