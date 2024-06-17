@@ -22,8 +22,8 @@ class LoadAdapter extends Adapter {
         if (!this.#delegates[adapter]) {
             this.#delegates[adapter] = {
                 monzo: {
-                    pots: this.#adapterConfig.monzo.pots,
-                    getUser: () => this.#adapterConfig.monzo.user,
+                    pots: this.#adapterConfig.monzo?.pots || {},
+                    getUser: () => this.#adapterConfig.monzo?.user,
                 },
             }[adapter] || {};
 
