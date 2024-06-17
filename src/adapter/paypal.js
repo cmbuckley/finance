@@ -45,11 +45,11 @@ class PayPalAdapter extends Adapter {
             response;
 
         do {
-            end = moment.min(to, start.clone().add(30, 'days')),
+            end = moment.min(to, start.clone().add(30, 'days').subtract(1, 'seconds')),
 
             this.logger.verbose('Searching date range', {
-                from: start.format('YYYY-MM-DD'),
-                to: end.format('YYYY-MM-DD'),
+                from: start.format('YYYY-MM-DD HH:mm'),
+                to: end.format('YYYY-MM-DD HH:mm'),
             });
 
             try {
@@ -78,7 +78,7 @@ class PayPalAdapter extends Adapter {
                 throw new Error('No transactions found', {cause: response.data});
             }
 
-            start = end.clone().add(1, 'days');
+            start = end.clone().add(1, 'seconds');
 
             transactions = transactions.concat(response.data.transaction_details.map(transaction => {
                 this.logger.silly('Raw transaction', transaction);

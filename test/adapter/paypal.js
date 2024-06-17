@@ -55,12 +55,12 @@ describe('PayPalAdapter', () => {
             sinon.assert.match(apiStub.firstCall.args[1], {
                 params: {
                     start_date: '2024-01-01T00:00:00.000Z',
-                    end_date: '2024-01-31T00:00:00.000Z',
+                    end_date: '2024-01-30T23:59:59.000Z',
                 },
             });
             sinon.assert.match(apiStub.secondCall.args[1], {
                 params: {
-                    start_date: '2024-02-01T00:00:00.000Z',
+                    start_date: '2024-01-31T00:00:00.000Z',
                     end_date: '2024-02-15T00:00:00.000Z',
                 },
             });
