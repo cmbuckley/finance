@@ -104,11 +104,11 @@ class MonzoTransaction extends Transaction {
                 return this._getBank(this.raw.counterparty.sort_code, this.raw.counterparty.account_number);
             }
 
-            if (this.adapter.data.transfers?.[this.raw.counterparty.user_id]) {
+            if (this.adapter.data?.transfers?.[this.raw.counterparty.user_id]) {
                 return this.raw.counterparty.user_id;
             }
 
-            if (this.adapter.data.transfers?.[this.raw.counterparty.account_id]) {
+            if (this.adapter.data?.transfers?.[this.raw.counterparty.account_id]) {
                 return this.raw.counterparty.account_id;
             }
         }

@@ -8,8 +8,8 @@ class Transaction {
 
     constructor(account, raw, adapter, logger, transactionOptions) {
         this.account = account;
-        this.raw = raw;
-        this.adapter = adapter;
+        this.raw = raw || {};
+        this.adapter = adapter || {};
         this.logger = logger;
         this._options = transactionOptions || {};
     }
