@@ -223,5 +223,40 @@ describe('Adapter', () => {
             const fixedTransactions = Adapter.detectTransfers(transactions);
             assert.equal(fixedTransactions[1].getTransfer(), undefined);
         });
+
+        it('should find the right transfer', () => {
+            const transactions = [
+                new TruelayerTransaction('Joint Account', {
+                    amount: -200,
+                    currency: 'GBP',
+                    timestamp: '2024-07-09T00:00:00Z',
+                    description: 'JOINT MONZO SHARED ACCOUNT',
+                    transaction_type: 'DEBIT',
+                }),
+                new TruelayerTransaction('Joint Account', {
+                    amount: -200,
+                    currency: 'GBP',
+                    timestamp: '2024-07-11T00:00:00Z',
+                    description: 'JOINT MONZO SHARED ACCOUNT',
+                    transaction_type: 'DEBIT',
+                }),
+                new MonzoTransaction('Monzo Joint', {
+                    created: '2024-07-09T08:02:54.686Z',
+                    local_amount: 20000,
+                    local_currency: 'GBP',
+                }),
+                new MonzoTransaction('Monzo Joint', {
+                    created: '2024-07-10T23:15:36.763Z',
+                    local_amount: 20000,
+                    local_currency: 'GBP',
+                }),
+            ];
+
+            const timezone = 'Europe/London';
+            const fixedTransactions = Adapter.detectTransfers(transactions, timezone);
+
+            assert.equal(fixedTransactions[0].getDate('YYYY-MM-DD HH:mm', timezone), '2024-07-09 09:02');
+            assert.equal(fixedTransactions[1].getDate('YYYY-MM-DD HH:mm', timezone), '2024-07-11 00:15');
+        });
     });
 });
