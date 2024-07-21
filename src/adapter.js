@@ -103,7 +103,7 @@ Adapter.detectTransfers = function (transactions, timezone) {
                 && ct.getAccount() == t.getTransfer()
                 && ct.getCurrency() == t.getCurrency()
                 && ct.getLocalAmount() == -t.getLocalAmount()
-                && Math.abs(ct.getDate().clone().tz(timezone || 'UTC').diff(t.getDate(), 'days', true)) <= 1
+                && ct.getDate().clone().tz(timezone || 'UTC').isSame(t.getDate(), 'day')
         });
 
         if (counterpart) {
