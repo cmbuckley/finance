@@ -74,7 +74,7 @@ function merchantCategory(matches, defaultValue) {
 const patterns = {
     accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB/i,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
-    houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA/,
+    houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA|HARDWAR/,
     flights:          /RYANAIR/,
     parking:          /NCP |CAR PARK|PARKING|Q-PARK|MANCHESTER AIRPORT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN|Manchester City Coun|North Yorkshire Coun/i,
     carService:       /R H SIRRELL|ALBA TY(RES|LEEDS)|STEVE SIRRELL/,
@@ -87,6 +87,7 @@ const monzo = {
     mondo:         '', // legacy
     general:       '', // TODO inspect
     transfers:     'Bills',
+    savings:       '', // TODO
     groceries:     'Food:Groceries',
 
     expenses: merchantCategory({
@@ -210,8 +211,9 @@ const monzo = {
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car': /HMCOURTS/,
-        'Car:Parking': patterns.parking,
         'Car:Fuel': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP |WELCOME BREAK/,
+        'Car:Parking': patterns.parking,
+        'Car:Repair': 'AUTOGLASS',
         'Car:Service & MOT': patterns.carService,
         'Holiday:Travel': patterns.flights,
         'Travel:Bus': /AUT BILET|MPSA|MEGABUS|STAGECOACH SERVICE|First Bus|FIRST WEST YORKSHIRE|TRANSDEV|BUS TICKET/,
