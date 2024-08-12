@@ -11,6 +11,11 @@ module.exports = function exporter(options) {
         options.format = 'json';
     }
 
+    if (options.store) {
+        options.file = options.store;
+        options.format = 'store';
+    }
+
     try {
         adapter = require('./exporter/' + options.format);
     } catch (e) {
@@ -37,8 +42,11 @@ module.exports = function exporter(options) {
             if (!options.dump) { transactions = transactions.filter(t => t && t.isValid && t.isValid()); }
 
             const contents = await adapter(transactions, options);
-            await fs.writeFile(filename, contents);
-            options.logger.verbose('Wrote ' + transactions.length + ' transactions to ' + filename);
+
+            if (contents) {
+                await fs.writeFile(filename, contents);
+                options.logger.verbose('Wrote ' + transactions.length + ' transactions to ' + filename);
+            }
         }
     };
 };

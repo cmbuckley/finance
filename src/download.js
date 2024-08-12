@@ -33,6 +33,7 @@ const args = Yargs.options({
         login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login'},
         dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file'},
         load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file'},
+        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder'},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output'},
 
@@ -46,11 +47,17 @@ const args = Yargs.options({
 
             return account;
         },
+        store: function (store) {
+            // empty argument sets the default folder
+            if (store === '') { store = 'db'; }
+            return store;
+        },
         load: coerceFile,
         from: coerceDate,
         to:   coerceDate,
         'pokerstars-source': coerceFile,
     }).help().alias('help', 'h').argv;
+
 
 const logger = winston.createLogger({
     transports: [
@@ -81,6 +88,7 @@ const logger = winston.createLogger({
 (async () => {
     const exporter = Exporter({
         dump:     args.dump,
+        store:    args.store,
         format:   args.format,
         logger:   logger.child({module: 'export'}),
         name:     'download',
