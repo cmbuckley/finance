@@ -20,7 +20,7 @@ const accountChoices = [
     'all',
     'fd', 'hsbc',
     'mc', 'mj', 'mp',
-    'paypal',
+    'paypal', 't212',
     'revolut', 'starling',
     'kraken', 'pokerstars',
 ];

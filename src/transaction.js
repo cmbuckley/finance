@@ -61,6 +61,14 @@ class Transaction {
         return sortCode.match(/\d{2}/g).join('-') + ' ' + account;
     }
 
+    isForeign() {
+        return false;
+    }
+
+    getExchangeRate() {
+        return 1;
+    }
+
     getCategory() {
         let category = categories.search(this.raw);
         if (category) { return category; }
