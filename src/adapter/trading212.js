@@ -18,7 +18,12 @@ class Trading212Adapter extends Adapter {
             },
         });
 
-        const response = await client.get('/rest/history/interest');
+        const response = await client.get('/rest/history/interest', {
+            params: {
+                newerThan: from.toISOString(),
+                olderThan: to.toISOString(),
+            },
+        });
 
         return response.data.data.map(raw => {
             return new Transaction(this.config.name, raw, this, this.logger);
