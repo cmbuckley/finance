@@ -250,7 +250,7 @@ const truelayer = {
         'Arts': 'Leisure:Arts & Culture',
         'Music': 'Leisure:Music Events',
         'Dating': '',
-        'Movies & DVDs': 'Entertainment:Movies & DVDs',
+        'Movies & DVDs': 'Bills:TV Subscription', // Netflix
         'Newspaper & Magazines': 'Entertainment:Newspaper & Magazines',
         'Outdoors': 'Leisure:Activities',
         'Social Club': '',
@@ -315,6 +315,7 @@ const truelayer = {
         'Home Phone': 'Bills:Phone',
         'Internet': 'Bills:Internet',
         'Mobile Phone': 'Bills:Phone',
+        'Utilities': 'Utilities',
     },
     'Auto & Transport': {
         'Auto Insurance': 'Car:Insurance',
