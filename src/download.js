@@ -18,7 +18,7 @@ function coerceFile(file) {
 
 const accountChoices = [
     'all',
-    'fd', 'hsbc',
+    'fd', 'hsbc', 'amex',
     'mc', 'mj', 'mp',
     'paypal', 't212',
     'revolut', 'starling',
