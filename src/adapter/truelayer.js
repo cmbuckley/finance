@@ -13,45 +13,43 @@ class TruelayerAdapter extends Adapter {
     async getTransactions(from, to) {
         let accountMap = this.accountMap,
             accessToken = this.getAccessToken(),
-            accountsResponse = await DataAPIClient.getAccounts(accessToken),
-            adapter = this,
-            cardsResults;
+            transactions = [],
+            accounts = [],
+            cards = [];
 
         try {
-            let cardsResponse = await DataAPIClient.getCards(accessToken);
-            cardsResults = cardsResponse.results;
+            const accountsResponse = await DataAPIClient.getAccounts(accessToken);
+            accounts = accountsResponse.results;
+        } catch (err) {
+            this.logger.warn('Error getting accounts: ' + err);
+        }
+
+        try {
+            const cardsResponse = await DataAPIClient.getCards(accessToken);
+            cards = cardsResponse.results;
         } catch (err) {
             this.logger.warn('Error getting cards: ' + err);
-            cardsResults = [];
         }
 
         // get transactions for normal accounts and card accounts
-        return await accountsResponse.results.concat(cardsResults).reduce(async function (previousPromise, account) {
-            let previousTransactions = await previousPromise,
-                apiMethod = (account.card_type ? 'getCardTransactions' : 'getTransactions');
+        for (const account of accounts.concat(cards)) {
+            let apiMethod = (account.card_type ? 'getCardTransactions' : 'getTransactions');
 
-            adapter.logger.verbose('Getting transactions for account', account);
+            this.logger.verbose('Getting transactions for account', account);
+            const transactionsResponse = await DataAPIClient[apiMethod](
+                accessToken,
+                account.account_id,
+                from.format('YYYY-MM-DD'),
+                moment.min(moment(), to).format('YYYY-MM-DD')
+            );
 
-            return new Promise(async function (res, rej) {
-                let transactionsResponse;
+            transactions = transactions.concat(transactionsResponse.results.map(raw => {
+                this.logger.silly('Raw transaction', raw);
+                return new Transaction(accountMap[account.account_id] || account.display_name, raw, this, this.logger);
+            }));
+        }
 
-                try {
-                    transactionsResponse = await DataAPIClient[apiMethod](
-                        accessToken,
-                        account.account_id,
-                        from.format('YYYY-MM-DD'),
-                        moment.min(moment(), to).format('YYYY-MM-DD')
-                    );
-                } catch (err) {
-                    return rej(err);
-                }
-
-                res(previousTransactions.concat(transactionsResponse.results.map(function (raw) {
-                    adapter.logger.silly('Raw transaction', raw);
-                    return new Transaction(accountMap[account.account_id] || account.display_name, raw, adapter, adapter.logger);
-                })));
-            });
-        }, Promise.resolve([]));
+        return transactions;
     }
 
     getDefaultConfig() {
