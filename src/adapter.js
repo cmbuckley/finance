@@ -1,6 +1,17 @@
 const merge = require('lodash.merge');
 const AuthClient = require('./lib/auth');
 
+const accountSpec = {
+    amex:    {type: 'truelayer', provider: 'uk-ob-amex'},
+    fd:      {type: 'truelayer', provider: 'uk-ob-first-direct'},
+    hsbc:    {type: 'truelayer', provider: 'uk-ob-hsbc'},
+    revolut: {type: 'truelayer', provider: 'uk-ob-revolut'},
+    mc:      {type: 'monzo', account: 'uk_retail'},
+    mj:      {type: 'monzo', account: 'uk_retail_joint'},
+    mp:      {type: 'monzo', account: 'uk_prepaid'},
+    t212:    {type: 'trading212'},
+};
+
 let monzoAdapter;
 
 class Adapter {
@@ -48,11 +59,12 @@ function getConfig(file, defaultConfig) {
 
 function getAdapter(account, logger, options) {
     const accountPath = getConfigPath(account),
-        accountConfig = require(accountPath),
-        adapterPath   = getConfigPath(accountConfig.type),
+        accountConfig = merge(accountSpec[account] || {}, require(accountPath)),
+        adapterType   = accountConfig.type || account,
+        adapterPath   = getConfigPath(adapterType),
         adapterConfig = require(adapterPath);
 
-    switch (accountConfig.type) {
+    switch (adapterType) {
         case 'monzo':
             const MonzoAdapter = require('./adapter/monzo');
             if (!monzoAdapter) { monzoAdapter = new MonzoAdapter(adapterPath, adapterConfig, logger.child({module: 'monzo'})); }
@@ -67,10 +79,10 @@ function getAdapter(account, logger, options) {
         case 'truelayer':
         case 'paypal':
         case 'trading212':
-            const Adapter = require('./adapter/' + accountConfig.type);
+            const Adapter = require('./adapter/' + adapterType);
             return new Adapter(accountPath, Object.assign({module: account}, adapterConfig), logger.child({module: account}));
 
-        default: logger.error('Unrecognised adapter: ' + accountConfig.type);
+        default: logger.error('Unrecognised adapter: ' + adapterType);
     }
 }
 

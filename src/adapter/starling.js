@@ -38,7 +38,25 @@ class StarlingAdapter extends Adapter {
                 options: {
                   authorizationMethod: 'body'
                 }
-            }
+            },
+            scope: [
+                'account:read',
+                'account-list:read',
+                'account-identifier:read',
+                'account-holder-name:read',
+                'account-holder-type:read',
+                'attachment:read',
+                'authorising-individual:read',
+                'balance:read',
+                'card:read',
+                'confirmation-of-funds:read',
+                'customer:read',
+                'merchant:read',
+                'payee:read',
+                'payee-image:read',
+                'receipts:read',
+                'transaction:read'
+            ],
         };
     }
 }
