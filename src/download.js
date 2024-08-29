@@ -96,9 +96,11 @@ const logger = winston.createLogger({
     });
 
     const adapters = Adapter.getAll(args.load || args.account, logger, args);
-    const transactions = await adapters.reduce(async function (previousPromise, adapter) {
-        let previousTransactions = await previousPromise;
 
+    let transactions = [],
+        format = 'YYYY-MM-DD HH:mm';
+
+    for (const adapter of adapters) {
         try {
             await adapter.login({forceLogin: args.login});
         } catch (err) {
@@ -106,21 +108,15 @@ const logger = winston.createLogger({
             return Promise.resolve(previousTransactions);
         }
 
-        return new Promise(async function (res, rej) {
-            let transactions = [],
-                format = 'YYYY-MM-DD HH:mm';
-            adapter.logger.info('Retrieving transactions', {from: args.from.format(format), to: args.to.format(format)});
+        adapter.logger.info('Retrieving transactions', {from: args.from.format(format), to: args.to.format(format)});
 
-            try {
-                transactions = await adapter.getTransactions(args.from, args.to);
-            } catch (err) {
-                adapter.logger.error('Error retrieving transactions:', {message: err.message || err});
-                adapter.logger.debug(err.stack || err);
-            }
-
-            res(previousTransactions.concat(transactions));
-        });
-    }, Promise.resolve([]));
+        try {
+            transactions = transactions.concat(await adapter.getTransactions(args.from, args.to));
+        } catch (err) {
+            adapter.logger.error('Error retrieving transactions:', {message: err.message || err});
+            adapter.logger.debug(err.stack || err);
+        }
+    }
 
     await exporter.write(Adapter.detectTransfers(transactions, exporter.options.timezone));
 })();

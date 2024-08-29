@@ -32,8 +32,7 @@ class MonzoAdapter extends Adapter {
     async getTransactions(from, to) {
         let accessToken = this.getAccessToken(),
             accountMap = this.accountMap,
-            adapter = this,
-            accounts, transactions;
+            accounts, transactions = [];
 
         try {
             let accountsResponse = await monzo.accounts(accessToken);
@@ -42,72 +41,61 @@ class MonzoAdapter extends Adapter {
             throw err.error || err;
         }
 
-        transactions = await accounts.reduce(async function (previousPromise, account) {
-            let transactions = await previousPromise,
-                accountLogger = adapter.logger.child({module: accountMap[account.type].module});
+        for (const account of accounts) {
+            const accountLogger = this.logger.child({module: accountMap[account.type].module}),
+                potsResponse = await monzo.pots(account.id, accessToken),
+                limit = 100;
 
-            return new Promise(async function (resolve, reject) {
-                let potsResponse, transactionsResponse;
+            potsResponse.pots.map(async pot => {
+                this.pots[pot.id] = pot;
 
-                try {
-                    let potsResponse = await monzo.pots(account.id, accessToken);
+                if (!pot.deleted && pot.round_up) {
+                    let accountBalance = await monzo.balance(account.id, accessToken);
 
-                    potsResponse.pots.map(async function (pot) {
-                        adapter.pots[pot.id] = pot;
-
-                        if (!pot.deleted && pot.round_up) {
-                            let accountBalance = await monzo.balance(account.id, accessToken);
-
-                            accountLogger.info('Your Monzo balance includes a pot', {
-                                pot: pot.name,
-                                amount: helpers.numberFormat(pot.balance, pot.currency),
-                                total: helpers.numberFormat(pot.balance + accountBalance.balance, accountBalance.currency),
-                                currency: pot.currency,
-                            });
-                        }
+                    accountLogger.info('Your Monzo balance includes a pot', {
+                        pot: pot.name,
+                        amount: helpers.numberFormat(pot.balance, pot.currency),
+                        total: helpers.numberFormat(pot.balance + accountBalance.balance, accountBalance.currency),
+                        currency: pot.currency,
                     });
-                } catch (err) {
-                    reject(err.error);
+                }
+            });
+
+            let since = from.toISOString(),
+                transactionsResponse;
+
+            do {
+                if (since.startsWith('tx_')) {
+                    this.logger.verbose('Retrieving subsequent page', {since, limit});
                 }
 
-                const limit = 100;
-                let since = from.toISOString();
+                try {
+                    transactionsResponse = await monzo.transactions({
+                      account_id: account.id,
+                      expand:     'merchant',
+                      since:      since,
+                      before:     to.toISOString(),
+                      limit:      limit,
+                    }, accessToken);
 
-                do {
-                    if (since.startsWith('tx_')) {
-                        adapter.logger.verbose('Retrieving subsequent page', {since, limit});
+                    if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
+
+                    transactions = transactions.concat(transactionsResponse.transactions.map(raw => {
+
+                        accountLogger.silly('Raw transaction', raw);
+                        return new Transaction(accountMap[account.type].name || account.display_name, raw, this, accountLogger, accountMap[account.type]);
+                    }));
+                } catch (err) {
+                    if (err.error && err.error.code == 'forbidden.verification_required') {
+                        throw 'Cannot query older transactions - please refresh permissions in the Monzo app';
                     }
 
-                    try {
-                        transactionsResponse = await monzo.transactions({
-                          account_id: account.id,
-                          expand:     'merchant',
-                          since:      since,
-                          before:     to.toISOString(),
-                          limit:      limit,
-                        }, accessToken);
+                    throw err.error || err;
+                }
+            } while (transactionsResponse.transactions && transactionsResponse.transactions.length == limit);
+        }
 
-                        if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
-
-                        transactions = transactions.concat(transactionsResponse.transactions.map(function (raw) {
-
-                            accountLogger.silly('Raw transaction', raw);
-                            return new Transaction(accountMap[account.type].name || account.display_name, raw, adapter, accountLogger, accountMap[account.type]);
-                        }));
-                    } catch (resp) {
-                        if (resp.error && resp.error.code == 'forbidden.verification_required') {
-                            return reject('Cannot query older transactions - please refresh permissions in the Monzo app');
-                        }
-
-                        return reject(resp.error || resp);
-                    }
-                } while (transactionsResponse.transactions && transactionsResponse.transactions.length == limit);
-
-                resolve(transactions);
-            });
-        }, Promise.resolve([]));
-
-        adapter.logger.verbose(`Retrieved ${transactions.length} transactions`);
+        this.logger.verbose(`Retrieved ${transactions.length} transactions`);
         return transactions;
     }
 
