@@ -98,9 +98,14 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should handle a card error', function () {
+        it('should handle a card error', async function () {
+            // should fail silently
             this.cardStub.rejects('nope');
-            assert.rejects(this.adapter.getTransactions(), 'nope');
+
+            sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []})
+            const transactions = await this.adapter.getTransactions(moment(), moment());
+
+            assert.deepEqual(transactions, []);
         });
     });
 });
