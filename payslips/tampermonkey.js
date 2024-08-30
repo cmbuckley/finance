@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.19
+// @version      2.20
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://*.sage.hr/*
@@ -96,7 +96,7 @@
                                 'T' + (row.amount / 100).toFixed(2),
                                 'M' + row.memo,
                                 'L' + (transfers[row.memo] ? '[' + transfers[row.memo] + ']' : row.category),
-                                'P' + row.payee,
+                                'P' + (transfers[row.memo] ? '' : row.payee),
                                 '^'
                             ]);
                         }, head).join('\n') + '\n';
@@ -141,9 +141,11 @@
                             let units = cells[1],
                                 memoExtra = '';
 
-                            if (firstHeading.textContent == 'Payments' && units && units != 1) {
+                            if (firstHeading.textContent == 'Payments' && units != 0 && units != 1) {
+                                units = Math.abs(units);
+                                if (units < 1) units = toFraction(units);
                                 if (memo == 'Overtime') units /= 7.5;
-                                memoExtra = ' (' + Math.abs(units) + 'd)';
+                                memoExtra = ` (${units}d)`;
                             }
 
                             transactions.push({
@@ -158,6 +160,19 @@
                     });
                 }
             });
+
+            // convert a decimal to fraction
+            // can specify the size of the num/denom matrix
+            function toFraction(decimal, size = 31) {
+                return [...Array(size)].flatMap(
+                    (_, n) => [...Array(size)].map(
+                        (_, d) => [
+                            n + 1, d + 1,
+                            Math.abs(((n + 1) / (d + 1)) - decimal)
+                        ]
+                    )
+                ).sort((a, b) => a[2] - b[2])[0].slice(0, 2).join('/');
+            }
 
             function shouldInclude(memo, heading) {
                 if (memo == 'Total') { return false; }
@@ -189,30 +204,24 @@
 
             function getCategory(text) {
                 return {
-                    'Salary1':            'Salary:Gross Pay',
-                    'Monthly Salary':     'Salary:Gross Pay',
-                    'EOT Bonus':          'Salary:Bonus',
-                    'Overtime':           'Salary:Overtime',
-                    'Holiday Pay':        'Salary:Gross Pay',
-                    'Holiday Sold':       'Salary:Gross Pay',
-                    'PAYE tax':           'Taxes:Income Tax',
-                    'National Insurance': 'Insurance:NI',
-                    'Employer pension':   'Retirement:Pension',
+                    'Salary1':              'Salary:Gross Pay',
+                    'Monthly Salary':       'Salary:Gross Pay',
+                    'Answer Paternity Pay': 'Salary:Gross Pay',
+                    'EOT Bonus':            'Salary:Bonus',
+                    'Overtime':             'Salary:Overtime',
+                    'Holiday Pay':          'Salary:Gross Pay',
+                    'Holiday Sold':         'Salary:Gross Pay',
+                    'PAYE tax':             'Taxes:Income Tax',
+                    'National Insurance':   'Insurance:NI',
+                    'Employer pension':     'Retirement:Pension',
                 }[text] || '';
             }
 
             function getPayee(text) {
                 return {
-                    'Salary1':            'Answer Digital',
-                    'Monthly Salary':     'Answer Digital',
-                    'EOT Bonus':          'Answer Digital',
-                    'Overtime':           'Answer Digital',
-                    'Holiday Pay':        'Answer Digital',
-                    'Holiday Sold':       'Answer Digital',
-                    'Employer pension':   'Answer Digital',
                     'PAYE tax':           'HMRC',
                     'National Insurance': 'HMRC',
-                }[text] || '';
+                }[text] || 'Answer Digital';
             }
 
             function getAccount(text) {

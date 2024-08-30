@@ -2,11 +2,13 @@ const fs = require('fs').promises;
 const { JSDOM, VirtualConsole } = require('jsdom');
 const sinon = require('sinon');
 const assert = require('assert');
+const debug = require('debug')('test:logs');
 
 describe('Payslips', () => {
     before(done => {
         let vc = new VirtualConsole;
         vc.on('jsdomError', e => console.error('error:', e.detail || e));
+        vc.on('log', debug);
 
         JSDOM.fromFile(__dirname + '/test.html', {
             runScripts: 'dangerously',
