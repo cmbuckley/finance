@@ -159,6 +159,7 @@ const monzo = {
         'Fried Chicken Joint':  'Food:Takeaway',
     }, lookup('description', {
         'Food': /CENTRE FILLING|UPTON GROUP|SESAME +LEEDS|MARKS&SPENCER/,
+        'Food:Coffee Shops & Bakeries': /COFFEE|STARBUCKS/,
         'Food:Takeaway': patterns.takeaway,
     }, 'Food:Eating Out')),
     shopping: merchantCategory({
