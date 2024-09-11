@@ -33,20 +33,22 @@ class TruelayerAdapter extends Adapter {
 
         // get transactions for normal accounts and card accounts
         for (const account of accounts.concat(cards)) {
-            let apiMethod = (account.card_type ? 'getCardTransactions' : 'getTransactions');
+            for (const type of ['Transactions', 'PendingTransactions']) {
+                let apiMethod = `get${account.card_type ? 'Card' : ''}${type}`;
+                this.logger.verbose(`Calling ${apiMethod} for account`, account);
 
-            this.logger.verbose('Getting transactions for account', account);
-            const transactionsResponse = await DataAPIClient[apiMethod](
-                accessToken,
-                account.account_id,
-                from.format('YYYY-MM-DD'),
-                moment.min(moment(), to).format('YYYY-MM-DD')
-            );
+                const transactionsResponse = await DataAPIClient[apiMethod](
+                    accessToken,
+                    account.account_id,
+                    from.format('YYYY-MM-DD'),
+                    moment.min(moment(), to).format('YYYY-MM-DD')
+                );
 
-            transactions = transactions.concat(transactionsResponse.results.map(raw => {
-                this.logger.silly('Raw transaction', raw);
-                return new Transaction(accountMap[account.account_id] || account.display_name, raw, this, this.logger);
-            }));
+                transactions = transactions.concat(transactionsResponse.results.map(raw => {
+                    this.logger.silly('Raw transaction', raw);
+                    return new Transaction(accountMap[account.account_id] || account.display_name, raw, this, this.logger);
+                }));
+            }
         }
 
         return transactions;

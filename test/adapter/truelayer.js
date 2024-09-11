@@ -43,7 +43,9 @@ describe('TruelayerAdapter', () => {
 
         it('should query Truelayer for accounts and cards', async function () {
             const transactionsStub = sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []});
+            const pendingTransactionsStub = sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
             const cardTransactionsStub = sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
+            const cardPendingTransactionsStub = sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
 
             const transactions = await this.adapter.getTransactions(moment(), moment());
 
@@ -51,8 +53,15 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactionsStub.firstCall.args[1], '1111');
             assert.equal(transactionsStub.secondCall.args[1], '2222');
 
+            assert.equal(pendingTransactionsStub.callCount, 2);
+            assert.equal(pendingTransactionsStub.firstCall.args[1], '1111');
+            assert.equal(pendingTransactionsStub.secondCall.args[1], '2222');
+
             assert.equal(cardTransactionsStub.callCount, 1);
             assert.equal(cardTransactionsStub.firstCall.args[1], '3333');
+
+            assert.equal(cardPendingTransactionsStub.callCount, 1);
+            assert.equal(cardPendingTransactionsStub.firstCall.args[1], '3333');
 
             assert.equal(transactions.length, 0);
         });
@@ -68,7 +77,9 @@ describe('TruelayerAdapter', () => {
 
             sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []})
                 .withArgs(undefined, '1111').resolves({results: [raw]});
+            sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
             sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
 
             const transactions = await this.adapter.getTransactions(moment(), moment());
 
@@ -88,7 +99,31 @@ describe('TruelayerAdapter', () => {
             };
 
             sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
             sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: [raw]});
+            sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
+
+            const transactions = await this.adapter.getTransactions(moment(), moment());
+
+            assert.equal(transactions.length, 1);
+            assert.equal(transactions[0].constructor.name, 'TruelayerTransaction');
+            assert.equal(transactions[0].getAccount(), 'Credit Card');
+            assert.equal(transactions[0].raw, raw);
+        });
+
+        it('should get pending card transactions', async function () {
+            const raw = {
+                description: 'DIRECT DEBIT PAYMENT',
+                transaction_type: 'CREDIT',
+                amount: 1000,
+                currency: 'GBP',
+                transaction_id: '987654321',
+            };
+
+            sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: [raw]});
 
             const transactions = await this.adapter.getTransactions(moment(), moment());
 
@@ -103,9 +138,16 @@ describe('TruelayerAdapter', () => {
             this.cardStub.rejects('nope');
 
             sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []})
+            sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
+            const cardTransactionsStub = sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
+            const cardPendingTransactionsStub = sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
+
             const transactions = await this.adapter.getTransactions(moment(), moment());
 
             assert.deepEqual(transactions, []);
+
+            sinon.assert.notCalled(cardTransactionsStub);
+            sinon.assert.notCalled(cardPendingTransactionsStub);
         });
     });
 });
