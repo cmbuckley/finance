@@ -79,7 +79,7 @@ class TruelayerTransaction extends Transaction {
     }
 
     getId() {
-        return this.raw.transaction_id;
+        return this.raw.normalised_provider_transaction_id;
     }
 
     _getCategory() {

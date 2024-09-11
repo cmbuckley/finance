@@ -36,7 +36,7 @@ describe('TruelayerTransaction', () => {
             assert.equal(transaction.getLocalAmount(), '-13.37');
             assert.equal(transaction.getExchangeRate(), 1);
             assert.equal(transaction.getMemo(), 'TV LICENCE MBP');
-            assert.equal(transaction.getId(), 'abcdef0123');
+            assert.equal(transaction.getId(), 'txn-987654321');
             assert.equal(transaction.getCategory(), 'Bills:TV Licence');
             assert(!transaction.getTransfer());
         });

@@ -7,7 +7,7 @@ const fixture = require('../../src/exporter/csv');
 describe('CSV exporter', () => {
     it('should export transactions', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
-            transaction_id: '12345',
+            normalised_provider_transaction_id: 'txn-12345',
             transaction_type: 'DEBIT',
             transaction_classification: ['Shopping', 'Groceries'],
             currency: 'GBP',
@@ -19,7 +19,7 @@ describe('CSV exporter', () => {
         const csv = await fixture(transactions, {});
         const expected = [
             'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
-            'HSBC,2022-01-01,,-4.20,Food:Groceries,GBP,1,Testing,12345',
+            'HSBC,2022-01-01,,-4.20,Food:Groceries,GBP,1,Testing,txn-12345',
         ].join('\n') + '\n';
 
         assert.equal(csv, expected);
@@ -51,7 +51,7 @@ describe('CSV exporter', () => {
 
     it('should export transfers', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
-            transaction_id: '12345',
+            normalised_provider_transaction_id: 'txn-12345',
             transaction_type: 'DEBIT',
             transaction_classification: ['Uncategorized', 'Cash & ATM'],
             currency: 'GBP',
@@ -63,7 +63,7 @@ describe('CSV exporter', () => {
         const csv = await fixture(transactions, {});
         const expected = [
             'Account,Date,Payee,Amount,Category,Currency,Rate,Notes,Number',
-            'HSBC,2022-01-01,,-100.00,Transfer to:Cash,GBP,1,CASH UK ATM 01JAN,12345',
+            'HSBC,2022-01-01,,-100.00,Transfer to:Cash,GBP,1,CASH UK ATM 01JAN,txn-12345',
         ].join('\n') + '\n';
 
         assert.equal(csv, expected);
