@@ -40,11 +40,11 @@ class AuthClient {
         };
 
         // Truelayer supports multiple providers - force a specific selection
-        if (this.config.provider) {
-            params.providers = this.config.provider;
+        if (this.adapterConfig.provider) {
+            params.providers = this.adapterConfig.provider;
 
             // need to disable challenger banks if using an Open Banking provider, and vice versa
-            let providerType = this.config.provider.split('-')[1];
+            let providerType = this.adapterConfig.provider.split('-')[1];
             params.disable_providers = 'uk-' + {ob: 'oauth', oauth: 'ob'}[providerType] + '-all';
         }
 

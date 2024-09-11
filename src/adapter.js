@@ -74,9 +74,11 @@ function getAdapter(account, logger, options) {
         case 'pokerstars':
             adapterConfig.source = options.pokerstarsSource;
 
+        case 'truelayer':
+            adapterConfig.provider = accountConfig.provider;
+
         case 'kraken':
         case 'starling':
-        case 'truelayer':
         case 'paypal':
         case 'trading212':
             const Adapter = require('./adapter/' + adapterType);
