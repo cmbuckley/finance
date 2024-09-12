@@ -7,7 +7,7 @@ class TruelayerAdapter extends Adapter {
 
     constructor(accountConfigPath, adapterConfig, logger) {
         super(accountConfigPath, adapterConfig, logger);
-        this.accountMap = require(accountConfigPath).names || {};
+        this.accountMap = this.loadConfig(accountConfigPath, {}).names || {};
     }
 
     async getTransactions(from, to) {

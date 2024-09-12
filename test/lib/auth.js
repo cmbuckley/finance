@@ -7,12 +7,16 @@ const fs = require('fs').promises;
 const http = require('http');
 const { AuthorizationCode } = require('simple-oauth2');
 
+function setupConfig(config) {
+    const origReadFile = fs.readFile;
+    sinon.stub(fs, 'readFile').callsFake(origReadFile)
+        .withArgs('fixtureconfig').resolves(JSON.stringify(config || {}));
+}
+
 describe('auth', () => {
     beforeEach(() => {
-        this.logger = {
-            info: sinon.spy(),
-            verbose: sinon.spy(),
-        };
+        this.logger = require('../util').logger();
+        sinon.spy(this.logger, 'info');
 
         this.adapterConfig = {
             credentials: {
@@ -32,12 +36,12 @@ describe('auth', () => {
         // http server for callbacks
         this.server = new EventEmitter;
         this.server.listen = sinon.spy();
-        this.server.address = sinon.stub().returns({port: 8000});
+        this.server.address = sinon.stub().returns({port: 3000});
         this.server.close = sinon.spy();
         sinon.stub(http, 'createServer').returns(this.server);
 
         this.writeStub = sinon.stub(fs, 'writeFile');
-        this.configPath = __dirname + '/../config/example.json';
+        this.configPath = 'fixtureconfig';
     });
 
     afterEach(sinon.restore);
@@ -48,6 +52,7 @@ describe('auth', () => {
 
             sinon.stub(AuthorizationCode.prototype, 'getToken').returns({token});
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
+            setupConfig();
 
             // set up the final check once logged in
             fixture.login().then(() => {
@@ -116,14 +121,15 @@ describe('auth', () => {
 
     describe('With a valid token', () => {
         it('should log in successfully', async () => {
+            // date in the future
             const expiry = new Date();
             expiry.setDate(expiry.getDate() + 7);
 
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
-            fixture.config = {token: {
-                access_token: 'access token',
+            setupConfig({token: {
+                access_token: 'valid access token',
                 expires_at: expiry.toISOString(),
-            }};
+            }});
 
             const config = await fixture.login();
             assert(this.writeStub.callCount == 0);
@@ -135,6 +141,9 @@ describe('auth', () => {
 
     describe('With an expired access token', () => {
         it('should refresh the token', async () => {
+            // date in the past
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() - 7);
             const newToken = {access_token: 'new token'};
 
             // fake expired token (rather than fake refresh API)
@@ -144,6 +153,10 @@ describe('auth', () => {
             });
 
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
+            setupConfig({token: {
+                access_token: 'expired access token',
+                expires_at: expiry.toISOString(),
+            }});
 
             const config = await fixture.login();
             assert(this.writeStub.callCount == 1);
@@ -162,6 +175,7 @@ describe('auth', () => {
 
             sinon.stub(AuthorizationCode.prototype, 'getToken').returns({token: {access_token: 'access token'}});
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
+            setupConfig();
 
             fixture.login();
 

@@ -14,11 +14,15 @@ const grantTypes = {
 class AuthClient {
     constructor(configPath, adapterConfig, logger) {
         this.configPath = configPath;
-        this.config = require(configPath);
         this.adapterConfig = adapterConfig;
+        this.logger = logger;
+
+        if (!this.adapterConfig.credentials?.client) {
+            throw new Error('Must provide client credentials');
+        }
+
         const Client = grantTypes[adapterConfig.grantType || 'authorization_code'];
         this.client = new Client(adapterConfig.credentials);
-        this.logger = logger;
     }
 
     /**
@@ -58,6 +62,12 @@ class AuthClient {
         let accessToken;
         options = options || {};
 
+        try {
+            this.config = JSON.parse(await fs.readFile(this.configPath));
+        } catch (err) {
+            this.config = {};
+        }
+
         if (this.config.token && !options.forceLogin) {
             accessToken = await this.client.createToken(this.config.token);
 
@@ -93,7 +103,7 @@ class AuthClient {
         this.logger.info('Creating HTTP server for callback');
         this.server = http.createServer();
 
-        this.server.listen(8000, () => {
+        this.server.listen(3000, () => {
             this.logger.verbose('HTTP server listening', {port: this.server.address().port});
         });
 
