@@ -123,7 +123,7 @@ class TruelayerTransaction extends Transaction {
     }
 
     getPayee() {
-        return ''; // @todo
+        return this.raw.merchant_name;
     }
 }
 
