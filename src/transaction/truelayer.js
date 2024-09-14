@@ -99,25 +99,15 @@ class TruelayerTransaction extends Transaction {
             return this._getTransfer(this._getBank(sortCode, account)) || '';
         }
 
-        const transfers = {
-            'Online Bonus Saver': /\*OBS /,
-            'HSBC ISA':           /LYP ISA TRANSFER/,
-            'Virgin ISA':         /Virgin ISA/,
-            'PayPal':             /^PAYPAL/,
-            'Current Account':    /DIRECT DEBIT PAYMENT|Chris HSBC|BUCKLEY CM Bills|SAVINGS BUCKLEY CM/,
-            'Premier Saver':      /RSB REGULAR SAVER/,
-            'Credit Card':        /HSBC CREDIT CARD|HSBC CARD PYMT/,
-            'Joint Account':      /^BUCKLEY C SHARED ACCOUNT|MR C BUCKLEY|Joint Account/,
-            'Monzo Current':      /^MONZO|Sent from Monzo|Monzo -|MONZO TRANSFER/,
-            'Monzo Joint':        /Monzo Joint|JOINT MONZO|C Buckley & Emilia/,
-            'Payslips':           /HESTVIEW|Answer Digital/,
-            'Starling':           /^Starling/,
-            'Cash':               /^CASH/,
-        };
+        if (this.adapter.data?.transfers?.patterns) {
+            const patterns = this.adapter.data.transfers.patterns;
 
-        for (let t in transfers) {
-            if (transfers[t].test && transfers[t].test(this.raw.description) || transfers[t] == this.raw.description) {
-                return t;
+            for (const p in patterns) {
+                const regex = new RegExp(patterns[p].pattern || patterns[p], patterns[p].flags);
+
+                if (regex.test(this.raw.description)) {
+                    return p;
+                }
             }
         }
     }

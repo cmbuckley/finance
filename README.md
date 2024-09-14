@@ -53,7 +53,11 @@ The following types of information can be added:
     "00-00-00 12345678": "Bank account (Monzo/TrueLayer)",
     "USD":               "Currency (Monzo cash withdrawal)",
     "grp_12335":         "Monzo merchant group",
-    "acc_12345":         "Monzo account"
+    "acc_12345":         "Monzo account",
+    "patterns": {
+      "Account Name": "Description regex (TrueLayer)",
+      "Other Account": {"pattern": "regex", "flags": "i"}
+    }
   }
 }
 ```
