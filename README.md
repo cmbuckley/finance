@@ -27,6 +27,12 @@ Options:
   -q, --quiet              Suppress output
   -v, --verbose            Verbose output (multiple options increases verbosity)
       --pokerstars-source  Source file for PokerStars input
+
+Valid accounts:
+  TrueLayer: amex, fd, hsbc, revolut, starling
+  Monzo: mc, mj, mp
+  Custom: paypal
+  Experimental: t212, kraken, pokerstars
 ```
 
 On the first use of a given account/adapter, you will need to log in using to your bank and grant permission to read information about the transactions. An access token is stored in the `config/` directory and will be reused on subsequent requests.

@@ -2,14 +2,15 @@ const merge = require('lodash.merge');
 const AuthClient = require('./lib/auth');
 
 const accountSpec = {
-    amex:    {type: 'truelayer', provider: 'uk-ob-amex'},
-    fd:      {type: 'truelayer', provider: 'uk-ob-first-direct'},
-    hsbc:    {type: 'truelayer', provider: 'uk-ob-hsbc'},
-    revolut: {type: 'truelayer', provider: 'uk-ob-revolut'},
-    mc:      {type: 'monzo', account: 'uk_retail'},
-    mj:      {type: 'monzo', account: 'uk_retail_joint'},
-    mp:      {type: 'monzo', account: 'uk_prepaid'},
-    t212:    {type: 'trading212'},
+    amex:     {type: 'truelayer', provider: 'uk-ob-amex'},
+    fd:       {type: 'truelayer', provider: 'uk-ob-first-direct'},
+    hsbc:     {type: 'truelayer', provider: 'uk-ob-hsbc'},
+    revolut:  {type: 'truelayer', provider: 'uk-ob-revolut'},
+    starling: {type: 'truelayer', provider: 'uk-ob-starling'},
+    mc:       {type: 'monzo', account: 'uk_retail'},
+    mj:       {type: 'monzo', account: 'uk_retail_joint'},
+    mp:       {type: 'monzo', account: 'uk_prepaid'},
+    t212:     {type: 'trading212'},
 };
 
 let monzoAdapter;

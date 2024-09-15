@@ -16,17 +16,24 @@ function coerceFile(file) {
     throw new Error(file + ': No such file');
 }
 
-const accountChoices = [
-    'all',
-    'fd', 'hsbc', 'amex',
-    'mc', 'mj', 'mp',
-    'paypal', 't212',
-    'revolut', 'starling',
-    'kraken', 'pokerstars',
-];
+const accountChoices = {
+    TrueLayer: [
+        'amex', 'fd', 'hsbc',
+        'revolut', 'starling',
+    ],
+    Monzo: [
+        'mc', 'mj', 'mp',
+    ],
+    Custom: [
+        'paypal',
+    ],
+    Experimental: [
+        't212', 'kraken', 'pokerstars',
+    ],
+};
 
 const args = Yargs.alias('help', 'h').options({
-        account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: accountChoices},
+        account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: ['all'].concat(Object.values(accountChoices).flat())},
         format:     {alias: 'o', type: 'string',  describe: 'Output format',                  requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', requiresArg: true, default: 0},
         to:         {alias: 't', type: 'string',  describe: 'Latest date for transactions',   requiresArg: true, default: undefined},
@@ -40,6 +47,7 @@ const args = Yargs.alias('help', 'h').options({
         'pokerstars-source': {type: 'string', describe: 'Source file for PokerStars input', requiresArg: true},
     })
     .usage('Usage: npm run download -- [options...]')
+    .epilogue(Object.entries(accountChoices).reduce((acc, [type, accounts]) => acc + `\n  ${type}: ` + accounts.join(', '), 'Valid accounts:'))
     .group(['account', 'from', 'to'], 'Filtering transactions:')
     .group(['format', 'dump', 'load', 'store'], 'Storage/retrieval:')
     .coerce({
