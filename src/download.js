@@ -49,7 +49,7 @@ const args = Yargs.alias({help: 'h', version: 'V'}).options({
     .usage('Usage: npm run download -- [options...]')
     .epilogue(Object.entries(accountChoices).reduce((acc, [type, accounts]) => acc + `\n  ${type}: ` + accounts.join(', '), 'Valid accounts:'))
     .group(['account', 'from', 'to'], 'Filtering transactions:')
-    .group(['format', 'dump', 'load', 'store'], 'Storage/retrieval:')
+    .group(['format', 'dump', 'load', 'store', 'pokerstars-source'], 'Storage/retrieval:')
     .coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {

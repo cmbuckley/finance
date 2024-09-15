@@ -15,18 +15,18 @@ Filtering transactions:
   -t, --to       Latest date for transactions
 
 Storage/retrieval:
-  -o, --format  Output format
-  -d, --dump    Dump transactions to specified file
-  -u, --load    Load from a specified dump file
-  -s, --store   Store transactions in specified folder
+  -o, --format             Output format
+  -d, --dump               Dump transactions to specified file
+  -u, --load               Load from a specified dump file
+  -s, --store              Store transactions in specified folder
+      --pokerstars-source  Source file for PokerStars input
 
 Options:
-  -h, --help               Show help
-  -V, --version            Show version number
-  -l, --login              Force OAuth re-login for selected accounts
-  -q, --quiet              Suppress output
-  -v, --verbose            Verbose output (multiple options increases verbosity)
-      --pokerstars-source  Source file for PokerStars input
+  -h, --help     Show help
+  -V, --version  Show version number
+  -l, --login    Force OAuth re-login for selected accounts
+  -q, --quiet    Suppress output
+  -v, --verbose  Verbose output (multiple options increases verbosity)
 
 Valid accounts:
   TrueLayer: amex, fd, hsbc, revolut, starling
