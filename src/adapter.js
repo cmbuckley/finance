@@ -58,8 +58,8 @@ function loadConfig(file, defaultConfig) {
     try {
         return require(file.includes('.json') ? file : getConfigPath(file));
     } catch (err) {
-        if (defaultConfig) { return defaultConfig; }
-        throw err;
+        if (err.code != 'MODULE_NOT_FOUND' || !defaultConfig) throw err;
+        return defaultConfig;
     }
 }
 
