@@ -127,7 +127,7 @@ const monzo = {
     }, lookup('description', {
         'Healthcare:Dental': 'DENTAL',
         'Healthcare:Eyecare': 'CONTACT LENSES',
-        'Healthcare:Pharmacy': 'PHARMACY',
+        'Healthcare:Pharmacy': /PHARMACY/i,
         'Personal Care:Hair': 'CITY IMAGE',
         'Pet Care:Vet': 'VETERINARY',
     }, 'Personal Care')),
