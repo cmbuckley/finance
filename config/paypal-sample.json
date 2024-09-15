@@ -1,0 +1,11 @@
+{
+  "name": "PayPal",
+  "type": "paypal",
+  "currency": "GBP",
+  "credentials": {
+    "client": {
+      "id": "",
+      "secret": ""
+    }
+  }
+}

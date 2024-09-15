@@ -35,7 +35,7 @@ The from/to dates should be specified in RFC 3339 format (yyyy-mm-dd). Certain p
 
 ## Export Configuration
 
-Payees are not akways popaulated from transaction merchant information; they must be explicitly set in `config/data.json`. This allows for more accurate payee info.
+Payees are not always populated from transaction merchant information; they must be explicitly set in `config/data.json`. This allows for more accurate payee info.
 
 The following types of information can be added:
 
@@ -128,3 +128,16 @@ The following account types use the Monzo adapter:
 #### Pots
 
 Transfers to and from savings pots will be included in the output. Transactions within savings pots (e.g. interest) cannot be downloaded via the Monzo API. Round-up pots will not be included, as this can dilute the transaction history.
+
+### PayPal
+
+PayPal transactions can be downloaded from the PayPal reporting APIs. Unfortunately you need to convert your PayPal to a Business account to use these APIs. The downside of this is that when individuals send you money on PayPal, it defaults to "for good and services" which charges you a merchant fee. Make sure you tell them to switch to "for friends and family"!
+
+To create a PayPal client:
+
+1. Copy `config/paypal-sample.json` to `config/paypal.json`.
+2. Head to https://developer.paypal.com/dashboard/.
+3. Log in using your PayPal Business account.
+4. Switch the dashboard from Sandbox to Live.
+5. Click Apps & Credentials, then Create App and give it a name.
+6. Store the client ID and secret in `config/paypal.json`.
