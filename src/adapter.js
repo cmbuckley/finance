@@ -56,7 +56,7 @@ function getConfigPath(file) {
 // load config but fail silently if a default value is provided
 function loadConfig(file, defaultConfig) {
     try {
-        return require(getConfigPath(file));
+        return require(file.includes('.json') ? file : getConfigPath(file));
     } catch (err) {
         if (defaultConfig) { return defaultConfig; }
         throw err;
