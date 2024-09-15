@@ -18,8 +18,12 @@ class Adapter {
     constructor(accountPath, config, logger) {
         this.accountPath = accountPath;
         this.config = config;
-        this.data = getConfig('data', {payees: [], transfers: []});
+        this.data = this.loadConfig('data', {payees: [], transfers: []});
         this.logger = logger;
+    }
+
+    loadConfig(file, defaultConfig) {
+        return loadConfig(file, defaultConfig);
     }
 
     async login(options) {
@@ -48,7 +52,8 @@ function getConfigPath(file) {
     return __dirname + '/../config/' + file + '.json';
 }
 
-function getConfig(file, defaultConfig) {
+// load config but fail silently if a default value is provided
+function loadConfig(file, defaultConfig) {
     try {
         return require(getConfigPath(file));
     } catch (err) {
@@ -59,7 +64,7 @@ function getConfig(file, defaultConfig) {
 
 function getAdapter(account, logger, options) {
     const accountPath = getConfigPath(account),
-        accountConfig = merge(accountSpec[account] || {}, require(accountPath)),
+        accountConfig = merge(accountSpec[account] || {}, loadConfig(accountPath, {})),
         adapterType   = accountConfig.type || account,
         adapterPath   = getConfigPath(adapterType),
         adapterConfig = require(adapterPath);
@@ -102,7 +107,7 @@ Adapter.getAll = function (accounts, logger, options) {
             if (adapter && !adapters.includes(adapter)) { adapters.push(adapter); }
         } catch (err) {
             if (err.code != 'MODULE_NOT_FOUND') { throw err; }
-            logger.error('Cannot find config for module ' + account, err);
+            logger.error('Cannot load account ' + account + ':', err);
         }
     });
 

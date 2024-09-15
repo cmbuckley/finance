@@ -99,6 +99,16 @@ describe('Adapter', () => {
     });
 
     describe('detectTransfers', () => {
+        const data = {transfers: {
+            '12-34-56 11111111': 'Current Account',
+            '12-34-56 22222222': 'Joint Account',
+            patterns: {
+                'Monzo Current': '^MONZO',
+                'Monzo Joint': '^JOINT MONZO',
+                'HSBC ISA': 'ISA TRANSFER',
+            },
+        }};
+
         it('should set time on transfers', () => {
             const transactions = [
                 new TruelayerTransaction('Joint Account', {
@@ -107,18 +117,16 @@ describe('Adapter', () => {
                     timestamp: '2022-09-14T00:00:00Z',
                     description: 'MONZO TEST',
                     transaction_type: 'DEBIT',
-                }),
+                }, {data}),
                 new MonzoTransaction('Monzo Current', {
                     created: '2022-09-14T05:45:34.000Z',
                     local_amount: 500,
                     local_currency: 'GBP',
                     counterparty: {
                        sort_code: '123456',
-                       account_number: '12345678',
+                       account_number: '22222222',
                     },
-                }, {data: {transfers: {
-                    '12-34-56 12345678': 'Joint Account',
-                }}})
+                }, {data}),
             ];
 
             assert.equal(transactions[0].getDate('YYYY-MM-DD HH:mm'), '2022-09-14');
@@ -138,18 +146,16 @@ describe('Adapter', () => {
                     timestamp: '2022-09-14T00:00:00Z',
                     description: 'MONZO TEST',
                     transaction_type: 'DEBIT',
-                }),
+                }, {data}),
                 new MonzoTransaction('Monzo Current', {
                     created: '2022-09-14T00:20:18.000+01:00',
                     local_amount: 500,
                     local_currency: 'GBP',
                     counterparty: {
                        sort_code: '123456',
-                       account_number: '12345678',
+                       account_number: '11111111',
                     },
-                }, {data: {transfers: {
-                    '12-34-56 12345678': 'Joint Account',
-                }}})
+                }, {data}),
             ];
 
             assert.equal(transactions[0].getDate('YYYY-MM-DD HH:mm'), '2022-09-14');
@@ -182,15 +188,9 @@ describe('Adapter', () => {
                     settled: true,
                     counterparty: {
                         sort_code: '123456',
-                        account_number: '12345678',
+                        account_number: '11111111',
                     },
-                }, {
-                    data: {
-                        transfers: {
-                            '12-34-56 12345678': 'Current Account'
-                        }
-                    }
-                }),
+                }, {data}),
             ];
 
             assert.equal(transactions[0].getTransfer(), undefined);
@@ -208,7 +208,7 @@ describe('Adapter', () => {
                     timestamp: '2022-09-14T00:00:00Z',
                     description: 'LYP ISA TRANSFER',
                     transaction_type: 'DEBIT',
-                }),
+                }, {data}),
                 new TruelayerTransaction('Current Account', {
                     amount: 100,
                     currency: 'GBP',
@@ -232,14 +232,14 @@ describe('Adapter', () => {
                     timestamp: '2024-07-09T00:00:00Z',
                     description: 'JOINT MONZO SHARED ACCOUNT',
                     transaction_type: 'DEBIT',
-                }),
+                }, {data}),
                 new TruelayerTransaction('Joint Account', {
                     amount: -200,
                     currency: 'GBP',
                     timestamp: '2024-07-11T00:00:00Z',
                     description: 'JOINT MONZO SHARED ACCOUNT',
                     transaction_type: 'DEBIT',
-                }),
+                }, {data}),
                 new MonzoTransaction('Monzo Joint', {
                     created: '2024-07-09T08:02:54.686Z',
                     local_amount: 20000,

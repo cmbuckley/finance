@@ -5,5 +5,5 @@
       "secret": ""
     }
   },
-  "redirect_uri": "https://example.com/truelayer/"
+  "redirect_uri": "http://localhost:3000"
 }

@@ -72,8 +72,16 @@ describe('TruelayerTransaction', () => {
         it('should use description', () => {
             const transaction = new TruelayerTransaction('Joint Account', {
                 amount: 1200,
-                description: 'BUCKLEY CM Bills',
+                description: 'CURR ACC Bills',
                 transaction_type: 'CREDIT',
+            }, {
+                data: {
+                    transfers: {
+                        patterns: {
+                            'Current Account': '^CURR ACC',
+                        }
+                    }
+                }
             });
 
             assert.equal(transaction.getTransfer(), 'Current Account');

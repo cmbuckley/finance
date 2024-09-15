@@ -13,7 +13,7 @@ function coerceDate(d) {
 
 function coerceFile(file) {
     if (fs.existsSync(file)) { return file; }
-    throw new Error('File does not exist: ' + file);
+    throw new Error(file + ': No such file');
 }
 
 const accountChoices = [
@@ -25,20 +25,24 @@ const accountChoices = [
     'kraken', 'pokerstars',
 ];
 
-const args = Yargs.options({
-        account:    {alias: 'a', type: 'array',   describe: 'Which account to load',          default: 'all', choices: accountChoices},
-        format:     {alias: 'o', type: 'string',  describe: 'Output format',                  default: 'csv', choices: ['qif', 'csv']},
-        from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', default: 0},
-        to:         {alias: 't', type: 'string',  describe: 'Latest date for transactions',   default: undefined},
-        login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login'},
-        dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file'},
-        load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file'},
-        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder'},
+const args = Yargs.alias('help', 'h').options({
+        account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: accountChoices},
+        format:     {alias: 'o', type: 'string',  describe: 'Output format',                  requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
+        from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', requiresArg: true, default: 0},
+        to:         {alias: 't', type: 'string',  describe: 'Latest date for transactions',   requiresArg: true, default: undefined},
+        login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login for selected accounts'},
+        dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file',    requiresArg: true},
+        load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file',        requiresArg: true},
+        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder', requiresArg: true},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
-        verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output'},
+        verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 
-        'pokerstars-source': {type: 'string', describe: 'Source file for PokerStars input', default: 'pokerstars.csv'},
-    }).coerce({
+        'pokerstars-source': {type: 'string', describe: 'Source file for PokerStars input', requiresArg: true},
+    })
+    .usage('Usage: npm run download -- [options...]')
+    .group(['account', 'from', 'to'], 'Filtering transactions:')
+    .group(['format', 'dump', 'load', 'store'], 'Storage/retrieval:')
+    .coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
                 // remove 'all' option and send the rest
@@ -56,8 +60,15 @@ const args = Yargs.options({
         from: coerceDate,
         to:   coerceDate,
         'pokerstars-source': coerceFile,
-    }).help().alias('help', 'h').argv;
-
+    }).conflicts({
+        dump: ['load', 'store'],
+        load: ['store'],
+    }).check(args => {
+        if (!args.pokerstarsSource) { args.pokerstarsSource = 'pokerstars.csv'; }
+        return true;
+    }).usageConfiguration({
+        'hide-types': true,
+    }).argv;
 
 const logger = winston.createLogger({
     transports: [

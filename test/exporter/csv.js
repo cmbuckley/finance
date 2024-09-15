@@ -58,7 +58,9 @@ describe('CSV exporter', () => {
             timestamp: '2022-01-01',
             amount: '100',
             description: 'CASH UK ATM 01JAN',
-        }, {}, {})];
+        }, {data: {transfers: {patterns: {
+            'Cash': '^CASH',
+        }}}}, {})];
 
         const csv = await fixture(transactions, {});
         const expected = [
