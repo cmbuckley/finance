@@ -40,7 +40,7 @@ const args = Yargs.alias('help', 'h').options({
         login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login for selected accounts'},
         dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file',    requiresArg: true},
         load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file',        requiresArg: true},
-        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder', requiresArg: true},
+        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder'},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 
