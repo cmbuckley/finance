@@ -22,7 +22,7 @@ Storage/retrieval:
 
 Options:
   -h, --help               Show help
-      --version            Show version number
+  -V, --version            Show version number
   -l, --login              Force OAuth re-login for selected accounts
   -q, --quiet              Suppress output
   -v, --verbose            Verbose output (multiple options increases verbosity)

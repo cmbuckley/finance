@@ -32,7 +32,7 @@ const accountChoices = {
     ],
 };
 
-const args = Yargs.alias('help', 'h').options({
+const args = Yargs.alias({help: 'h', version: 'V'}).options({
         account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: ['all'].concat(Object.values(accountChoices).flat())},
         format:     {alias: 'o', type: 'string',  describe: 'Output format',                  requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', requiresArg: true, default: 0},
