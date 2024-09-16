@@ -16,6 +16,9 @@ function coerceFile(file) {
     throw new Error(file + ': No such file');
 }
 
+// empty argument sets the default folder
+const coerceStore = store => (store === '' ? 'db' : store);
+
 const accountChoices = {
     TrueLayer: [
         'amex', 'fd', 'hsbc',
@@ -41,6 +44,7 @@ const args = Yargs.alias({help: 'h', version: 'V'}).options({
         dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file',    requiresArg: true},
         load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file',        requiresArg: true},
         store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder'},
+        retrieve:   {alias: 'r', type: 'string',  describe: 'Retrieve transactions from specified folder'},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 
@@ -49,7 +53,7 @@ const args = Yargs.alias({help: 'h', version: 'V'}).options({
     .usage('Usage: npm run download -- [options...]')
     .epilogue(Object.entries(accountChoices).reduce((acc, [type, accounts]) => acc + `\n  ${type}: ` + accounts.join(', '), 'Valid accounts:'))
     .group(['account', 'from', 'to'], 'Filtering transactions:')
-    .group(['format', 'dump', 'load', 'store', 'pokerstars-source'], 'Storage/retrieval:')
+    .group(['format', 'dump', 'load', 'store', 'retrieve', 'pokerstars-source'], 'Storage/retrieval:')
     .coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
@@ -59,11 +63,8 @@ const args = Yargs.alias({help: 'h', version: 'V'}).options({
 
             return account;
         },
-        store: function (store) {
-            // empty argument sets the default folder
-            if (store === '') { store = 'db'; }
-            return store;
-        },
+        store:    coerceStore,
+        retrieve: coerceStore,
         load: coerceFile,
         from: coerceDate,
         to:   coerceDate,
@@ -114,7 +115,7 @@ const logger = winston.createLogger({
         timezone: 'Europe/London',
     });
 
-    const adapters = Adapter.getAll(args.load || args.account, logger, args);
+    const adapters = Adapter.getAll(args.load || args.retrieve || args.account, logger, args);
 
     let transactions = [],
         format = 'YYYY-MM-DD HH:mm';

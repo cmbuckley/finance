@@ -37,6 +37,10 @@ class Adapter {
         return this.token;
     }
 
+    getName() {
+        return this.constructor.name.replace('Adapter', '').toLowerCase();
+    }
+
     getConfig() {
         return merge(this.getDefaultConfig(), this.config);
     }

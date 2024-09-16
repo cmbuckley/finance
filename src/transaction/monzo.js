@@ -140,8 +140,16 @@ class MonzoTransaction extends Transaction {
             return this._getTransfer(this.getCurrency());
         }
 
-        if (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots) {
-            return 'Monzo ' + this.adapter.pots[this.raw.metadata.pot_id].name;
+        if (this.raw.scheme == 'uk_retail_pot') {
+            if (this.adapter.pots?.[this.raw.metadata.pot_id]) {
+                return 'Monzo ' + this.adapter.pots[this.raw.metadata.pot_id].name;
+            }
+
+            this.logger.warn('Unknown pot', {
+                transaction: this.raw.id,
+                pot: this.raw.metadata.pot_id,
+                date: this.getDate('YYYY-MM-DD HH:mm'),
+            });
         }
 
         // legacy

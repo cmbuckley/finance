@@ -25,6 +25,17 @@ module.exports = async function store(transactions, options) {
         }
     }
 
+    // grab all unique adapters
+    const adapters = transactions.reduce((acc, curr) => {
+        const key = curr.adapter.getName();
+        if (!acc[key]) { acc[key] = curr.adapter; }
+        return acc;
+    }, {});
+
+    // write adapter config to file
+    const adapterContents = JSON.stringify(adapters, null, options.indent || 2);
+    await fs.writeFile(path.join(options.store, 'adapters.json'), adapterContents);
+
     for (const [module, data] of Object.entries(store)) {
         await fs.mkdir(path.join(options.store, module), {recursive: true});
 

@@ -19,14 +19,16 @@ Storage/retrieval:
   -d, --dump               Dump transactions to specified file
   -u, --load               Load from a specified dump file
   -s, --store              Store transactions in specified folder
+  -r, --retrieve           Retrieve transactions from specified folder
       --pokerstars-source  Source file for PokerStars input
 
 Options:
-  -h, --help     Show help
-  -V, --version  Show version number
-  -l, --login    Force OAuth re-login for selected accounts
-  -q, --quiet    Suppress output
-  -v, --verbose  Verbose output (multiple options increases verbosity)
+  -h, --help      Show help
+  -V, --version   Show version number
+  -l, --login     Force OAuth re-login for selected accounts
+  -r, --retrieve  Retrieve transactions from specified folder
+  -q, --quiet     Suppress output
+  -v, --verbose   Verbose output (multiple options increases verbosity)
 
 Valid accounts:
   TrueLayer: amex, fd, hsbc, revolut, starling
