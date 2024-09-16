@@ -37,14 +37,14 @@ const accountChoices = {
 
 const args = Yargs.alias({help: 'h', version: 'V'}).options({
         account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: ['all'].concat(Object.values(accountChoices).flat())},
-        format:     {alias: 'o', type: 'string',  describe: 'Output format',                  requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
+        format:     {alias: 'o', type: 'string',  describe: 'Output format (csv/qif)',        requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', requiresArg: true, default: 0},
         to:         {alias: 't', type: 'string',  describe: 'Latest date for transactions',   requiresArg: true, default: undefined},
         login:      {alias: 'l', type: 'boolean', describe: 'Force OAuth re-login for selected accounts'},
         dump:       {alias: 'd', type: 'string',  describe: 'Dump transactions to specified file',    requiresArg: true},
         load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file',        requiresArg: true},
-        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder'},
-        retrieve:   {alias: 'r', type: 'string',  describe: 'Retrieve transactions from specified folder'},
+        store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder (default "db")'},
+        retrieve:   {alias: 'r', type: 'string',  describe: 'Retrieve transactions from folder (default "db")'},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 

@@ -15,11 +15,11 @@ Filtering transactions:
   -t, --to       Latest date for transactions
 
 Storage/retrieval:
-  -o, --format             Output format
+  -o, --format             Output format (csv/qif)
   -d, --dump               Dump transactions to specified file
   -u, --load               Load from a specified dump file
-  -s, --store              Store transactions in specified folder
-  -r, --retrieve           Retrieve transactions from specified folder
+  -s, --store              Store transactions in specified folder (default "db")
+  -r, --retrieve           Retrieve transactions from folder (default "db")
       --pokerstars-source  Source file for PokerStars input
 
 Options:
