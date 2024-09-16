@@ -41,6 +41,10 @@ On the first use of a given account/adapter, you will need to log in using to yo
 
 The from/to dates should be specified in RFC 3339 format (yyyy-mm-dd). Certain providers place restrictions on the oldest transactions available, or on the size of the date range.
 
+## Export Formats
+
+The CSV format is the most versatile, able to export multiple accounts, currencies, and full date/times. The QIF format supports multiple accounts, but does not include currency or exchange rate, and does not include the time portion of dates.
+
 ## Export Configuration
 
 Payees are not always populated from transaction merchant information; they must be explicitly set in `config/data.json`. This allows for more accurate payee info.
