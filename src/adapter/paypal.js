@@ -8,7 +8,7 @@ function findConversionsAndPurchases(transactions) {
     const conversions = transactions.reduce((acc, curr) => {
         if (curr.raw.transaction_info?.transaction_event_code?.startsWith('T02')) {
             const ref = curr.raw.transaction_info.paypal_reference_id;
-            if (!acc[ref]) { acc[ref] = []; }
+            acc[ref] ??= [];
             acc[ref].push(curr.raw);
         }
 

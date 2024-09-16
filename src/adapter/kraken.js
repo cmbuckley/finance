@@ -30,10 +30,7 @@ class KrakenAdapter extends Adapter {
         // build a map of ids with matching refids (these are trades)
         values.forEach((transaction, key) => {
             if (['spend', 'receive', 'trade'].includes(transaction.type)) {
-                if (!trades[transaction.refid]) {
-                    trades[transaction.refid] = [];
-                }
-
+                trades[transaction.refid] ??= [];
                 trades[transaction.refid].push(ids[key]);
             }
         });
