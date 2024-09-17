@@ -47,6 +47,8 @@ The CSV format is the most versatile, able to export multiple accounts, currenci
 
 The dump file and the data store both use JSON to record the raw data retrieved from the providers. This is to maximise data portability while retaining all historic information about the transactions.
 
+Size of the raw transactions varies by provider, but even the largest Monzo transactions are around 3KB uncompressed. A store containing around 14,750 transactions over 7 years compresses down to under 4MB with gzip.
+
 ## Export Configuration
 
 Payees are not always populated from transaction merchant information; they must be explicitly set in `config/data.json`. This allows for more accurate payee info.
