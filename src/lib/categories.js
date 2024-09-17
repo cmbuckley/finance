@@ -13,6 +13,14 @@ function search(transaction) {
     }
 
     // truelayer
+    if (transaction.description) {
+        const category = Object.keys(truelayer.descriptions).find(function (match) {
+            return matchesPattern(transaction.description, truelayer.descriptions[match]);
+        });
+
+        if (category) return category;
+    }
+
     if (transaction.transaction_classification &&
         truelayer[transaction.transaction_classification[0]] &&
         truelayer[transaction.transaction_classification[0]][transaction.transaction_classification[1] || '']
@@ -22,12 +30,6 @@ function search(transaction) {
 
     if (transaction.transaction_category && truelayer[transaction.transaction_category]) {
         return truelayer[transaction.transaction_category];
-    }
-
-    if (transaction.description) {
-        return Object.keys(truelayer.descriptions).find(function (match) {
-            return matchesPattern(transaction.description, truelayer.descriptions[match]);
-        });
     }
 }
 
