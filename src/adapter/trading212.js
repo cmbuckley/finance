@@ -5,6 +5,12 @@ const pkg = require('../../package.json'),
     Transaction = require('../transaction/trading212');
 
 class Trading212Adapter extends Adapter {
+
+    constructor(accountConfigPath, adapterConfig, logger) {
+        super(accountConfigPath, adapterConfig, logger);
+        this.name = this.loadConfig(accountConfigPath, {}).name || '';
+    }
+
     async login(options) {
     }
 
@@ -26,7 +32,7 @@ class Trading212Adapter extends Adapter {
         });
 
         return response.data.data.map(raw => {
-            return new Transaction(this.config.name, raw, this, this.logger);
+            return new Transaction(this.name, raw, this, this.logger);
         });
     }
 }
