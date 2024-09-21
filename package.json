@@ -13,6 +13,11 @@
     "cov": "nyc -r html -r text mocha --recursive test",
     "download": "node src/download.js"
   },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 75
+  },
   "dependencies": {
     "axios": "^1.4.0",
     "csv-stringify": "^6.2.0",
