@@ -7,10 +7,12 @@ const getTransactionClass = className => require('../transaction/' + className);
 class LoadAdapter extends Adapter {
     #adapterConfig = {};
     #delegates = {};
+    #options = {};
 
-    constructor(file, logger) {
+    constructor(file, logger, options) {
         super(null, null, logger);
         this.file = file;
+        this.#options = options || {};
     }
 
     async login(options) {
@@ -33,10 +35,12 @@ class LoadAdapter extends Adapter {
 
     async _loadTransactions(from, to) {
         const stats = await fs.lstat(this.file);
+        const accounts = this.#options.account || [];
 
         // dump file
         if (stats.isFile()) {
-            return JSON.parse(await fs.readFile(this.file, 'utf-8'));
+            const {adapters, transactions} = JSON.parse(await fs.readFile(this.file, 'utf-8'));
+            return {adapters, transactions: transactions.filter(t => (!accounts.length || accounts.includes(t.module)))};
         }
 
         // store directory (<store>/<module>/<year>.json)
@@ -45,18 +49,20 @@ class LoadAdapter extends Adapter {
             let transactions = [];
 
             // loop through modules
-            for (let sub of await fs.readdir(this.file)) {
-                sub = path.join(this.file, sub);
+            for (let module of await fs.readdir(this.file)) {
+                const subdir = path.join(this.file, module);
 
-                if ((await fs.lstat(sub)).isDirectory()) {
-
+                if (
+                    (!accounts.length || accounts.includes(module))
+                    && (await fs.lstat(subdir)).isDirectory()
+                ) {
                     // loop through years
-                    for (const yearFile of await fs.readdir(sub)) {
+                    for (const yearFile of await fs.readdir(subdir)) {
                         const year = yearFile.split('.')[0];
 
                         // only load file if it's in the range we've asked for
                         if (year >= from.year() && year <= to.year()) {
-                            transactions = transactions.concat(Object.values(JSON.parse(await fs.readFile(path.join(sub, yearFile), 'utf-8'))));
+                            transactions = transactions.concat(Object.values(JSON.parse(await fs.readFile(path.join(subdir, yearFile), 'utf-8'))));
                         }
                     }
                 }

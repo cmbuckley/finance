@@ -112,6 +112,40 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions[0].getMemo(), 'TESTING 2');
             });
 
+            it('should filter transactions by account', async () => {
+                const adapter = new LoadAdapter('load.json', logger, {account: ['fd']});
+
+                fakeFile({
+                    adapters: {
+                        monzo: {pots: {}, user: 'user_123'}
+                    },
+                    transactions: [{
+                        type: 'monzo',
+                        account: 'Monzo Current',
+                        raw: {
+                            category: 'groceries',
+                            counterparty: {},
+                            created: '2022-01-02T07:56:11.987Z',
+                            local_currency: 'GBP',
+                            description: 'TESTING',
+                        },
+                        module: 'mc',
+                    }, {
+                        type: 'truelayer',
+                        account: 'Joint Account',
+                        raw: {
+                            timestamp: '2022-01-02T10:20:30Z',
+                            description: 'TEST 2',
+                        },
+                        module: 'fd',
+                    }]
+                });
+
+                const transactions = await adapter.getTransactions(moment('2022-01-02'), moment('2022-01-03'));
+                assert.equal(transactions.length, 1);
+                assert.equal(transactions[0].getAccount(), 'Joint Account');
+            });
+
             it('should use an inclusive date range', async () => {
                 const adapter = new LoadAdapter('load.json', logger);
 
@@ -170,6 +204,44 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions.length, 2);
                 assert.equal(transactions[0].getMemo(), 'TEST');
                 assert.equal(transactions[1].getMemo(), 'TEST 2');
+            });
+
+            it('should filter transactions by account', async () => {
+                const adapter = new LoadAdapter('db', logger, {account: ['fd']});
+
+                fakeStore({
+                    hsbc: {
+                        '2024.json': {
+                            'txn-12345': {
+                                type: 'truelayer',
+                                account: 'Credit Card',
+                                raw: {
+                                    timestamp: '2024-01-01T00:00:00Z',
+                                    description: 'TEST',
+                                },
+                                module: 'hsbc',
+                            },
+                        },
+                    },
+                    fd: {
+                        '2023.json': {
+                            'txn-12345': {
+                                type: 'truelayer',
+                                account: 'Joint Account',
+                                raw: {
+                                    timestamp: '2023-06-01T00:00:00Z',
+                                    description: 'TEST 2',
+                                },
+                                module: 'fd',
+                            },
+                        },
+                    },
+                });
+
+                const transactions = await adapter.getTransactions(moment('2023-01-01'), moment('2024-01-03'));
+
+                assert.equal(transactions.length, 1);
+                assert.equal(transactions[0].getMemo(), 'TEST 2');
             });
         });
     });

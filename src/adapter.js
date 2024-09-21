@@ -103,7 +103,7 @@ Adapter.getAll = function (accounts, logger, options) {
 
     if (!Array.isArray(accounts)) {
         const LoadAdapter = require('./adapter/load');
-        return [new LoadAdapter(accounts, logger)];
+        return [new LoadAdapter(accounts, logger, options)];
     }
 
     accounts.forEach(function (account) {
