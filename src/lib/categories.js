@@ -83,6 +83,7 @@ const patterns = {
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER/i,
+    pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
 };
 
 const monzo = {
@@ -191,7 +192,7 @@ const monzo = {
     }, lookup('description', {
         'Food:Alcohol': 'Veeno',
         'Gifts & Donations:Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS|Etsy/,
-        'Healthcare:Pregnancy': /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
+        'Healthcare:Pregnancy & Maternity': patterns.pregnancy,
         'House:Decorations': /FLORA POINT|PLANTS|Dunelm Soft/,
         'House:Improvement': patterns.houseImprovement,
         'Leisure:Toys & Games': /LH TRADING|NINTENDO/,
@@ -396,13 +397,14 @@ const truelayer = {
         'Gifts': 'Vestiaire Collecti',
         'Job Expenses': 'Answer Expenses',
         'Healthcare:Dental': 'DENTAL',
+        'Healthcare:Pregnancy & Maternity': patterns.pregnancy,
         'House:Council Tax': 'LEEDS CITY COUNCIL',
         'House:Garden': 'LANGLANDS GARDEN',
         'House:Improvement': patterns.houseImprovement,
         'House:Insurance': 'LV INSURANCE',
         'House:Security': 'ADT - OIN ACCOUNT',
         'Income:Rental Income': /PRESTON BAKER|LINLEY & SIMPSON/,
-        'Nights Out':  /HOS HEADINGLEY|MANAHATTA|EAST OF ARCADIA/,
+        'Nights Out':  /HOS HEADINGLEY|MANAHATTA|EAST OF ARCADIA|Terminus/,
         'Pet Care:Accommodation': 'KENNELS',
         'Pet Care:Vet': 'LEEDS KIRKSTALL VE',
         'Travel:Rail': patterns.rail,
