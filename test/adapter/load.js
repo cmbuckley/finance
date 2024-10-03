@@ -7,7 +7,9 @@ const origReadFile = fs.readFile;
 
 const LoadAdapter = require('../../src/adapter/load');
 const logger = {
-    child: () => {},
+    child: () => {
+        return {silly: () => {}}
+    },
 };
 
 // setup fs to read a fake single file

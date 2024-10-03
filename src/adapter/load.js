@@ -80,7 +80,9 @@ class LoadAdapter extends Adapter {
             if (!t.type) { throw new Error(`Unknown transaction type in ${t.module}:` + t); }
 
             const Transaction = getTransactionClass(t.type);
-            return new Transaction(t.account, t.raw, this.delegate(t.type), this.logger.child({module: t.module}));
+            const logger = this.logger.child({module: t.module});
+            logger.silly('Raw transaction', t.raw);
+            return new Transaction(t.account, t.raw, this.delegate(t.type), logger);
         }).filter(t => t.getDate().isBetween(from, to, null, '[]'));
     }
 }
