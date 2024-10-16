@@ -2,7 +2,7 @@ const merge = require('lodash.merge');
 const AuthClient = require('./lib/auth');
 
 const accountSpec = {
-    amex:     {type: 'truelayer', provider: 'uk-ob-amex'},
+    amex:     {type: 'truelayer', provider: 'uk-ob-amex', types: ['cards']},
     fd:       {type: 'truelayer', provider: 'uk-ob-first-direct'},
     hsbc:     {type: 'truelayer', provider: 'uk-ob-hsbc'},
     revolut:  {type: 'truelayer', provider: 'uk-ob-revolut'},
@@ -86,6 +86,7 @@ function getAdapter(account, logger, options) {
 
         case 'truelayer':
             adapterConfig.provider = accountConfig.provider;
+            adapterConfig.types = accountConfig.types;
 
         case 'kraken':
         case 'starling':

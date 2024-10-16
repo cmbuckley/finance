@@ -19,7 +19,7 @@ describe('TruelayerAdapter', () => {
                 3333: 'Credit Card',
             }
 
-            sinon.stub(DataAPIClient, 'getAccounts').resolves({
+            this.accountStub = sinon.stub(DataAPIClient, 'getAccounts').resolves({
                 results: [{
                     account_id: '1111',
                     account_type: 'TRANSACTION',
@@ -148,6 +148,17 @@ describe('TruelayerAdapter', () => {
 
             sinon.assert.notCalled(cardTransactionsStub);
             sinon.assert.notCalled(cardPendingTransactionsStub);
+        });
+
+        it('should only call specified APIs', async function () {
+            sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
+            sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
+
+            this.adapter.config.types = ['cards'];
+            const transactions = await this.adapter.getTransactions(moment(), moment());
+
+            assert(this.accountStub.notCalled);
+            assert(this.cardStub.calledOnce);
         });
     });
 });

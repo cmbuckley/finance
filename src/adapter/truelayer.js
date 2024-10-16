@@ -13,20 +13,25 @@ class TruelayerAdapter extends Adapter {
     async getTransactions(from, to) {
         let accountMap = this.accountMap,
             accessToken = this.getAccessToken(),
+            types = this.config.types || ['accounts', 'cards'],
             transactions = [],
             accounts = [],
             cards = [];
 
         try {
-            const accountsResponse = await DataAPIClient.getAccounts(accessToken);
-            accounts = accountsResponse.results;
+            if (types.includes('accounts')) {
+                const accountsResponse = await DataAPIClient.getAccounts(accessToken);
+                accounts = accountsResponse.results;
+            }
         } catch (err) {
             this.logger.warn('Error getting accounts: ' + err);
         }
 
         try {
-            const cardsResponse = await DataAPIClient.getCards(accessToken);
-            cards = cardsResponse.results;
+            if (types.includes('cards')) {
+                const cardsResponse = await DataAPIClient.getCards(accessToken);
+                cards = cardsResponse.results;
+            }
         } catch (err) {
             this.logger.warn('Error getting cards: ' + err);
         }
