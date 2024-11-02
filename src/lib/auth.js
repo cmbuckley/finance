@@ -17,12 +17,10 @@ class AuthClient {
         this.adapterConfig = adapterConfig;
         this.logger = logger;
 
-        if (!this.adapterConfig.credentials?.client) {
-            throw new Error('Must provide client credentials');
+        if (this.adapterConfig.credentials?.client) {
+            const Client = grantTypes[adapterConfig.grantType || 'authorization_code'];
+            this.client = new Client(adapterConfig.credentials);
         }
-
-        const Client = grantTypes[adapterConfig.grantType || 'authorization_code'];
-        this.client = new Client(adapterConfig.credentials);
     }
 
     /**
