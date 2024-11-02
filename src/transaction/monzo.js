@@ -21,12 +21,12 @@ class MonzoTransaction extends Transaction {
             return false;
         }
 
-        if (!this.isSettled() && this.isForeign()) {
-            this.logger.warn('UNSETTLED TRANSACTION, AMOUNT MAY CHANGE', {
+        if (this.raw.category == 'general') {
+            this.logger.warn('Transaction uses general category', {
+                notes: this.raw.notes,
+                description: this.raw.description,
                 date: this.getDate('YYYY-MM-DD HH:mm'),
                 transaction: this.raw.id,
-                merchant: this.raw.merchant ? this.raw.merchant.name || '' : '',
-                note: this.raw.notes || this.raw.description,
             });
         }
 
