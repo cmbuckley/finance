@@ -45,8 +45,8 @@ function getDisplayAmount(amount, asset) {
 }
 
 class KrakenTransaction extends Transaction {
-    constructor(raw, adapter) {
-        let account = getAccount(raw.asset);
+    constructor(account, raw, adapter) {
+        account ||= getAccount(raw.asset);
         super(account || raw.asset, raw, adapter);
 
         if (!account) {

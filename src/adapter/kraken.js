@@ -50,7 +50,7 @@ class KrakenAdapter extends Adapter {
                 transactions.push(new Transaction(Object.assign({}, raw, {type: 'fee'}), adapter));
             }
 
-            transactions.push(new Transaction(raw, adapter));
+            transactions.push(new Transaction('', raw, adapter));
             return transactions;
         }, []);
     }
