@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.21
+// @version      2.22
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://*.sage.hr/*
@@ -212,6 +212,7 @@
                     'Overtime':             'Salary:Overtime',
                     'Holiday Pay':          'Salary:Gross Pay',
                     'Holiday Sold':         'Salary:Gross Pay',
+                    'Holiday Purchase':     'Salary:Gross Pay',
                     'PAYE tax':             'Taxes:Income Tax',
                     'National Insurance':   'Insurance:NI',
                     'Employer pension':     'Retirement:Pension',
