@@ -129,13 +129,13 @@ class MonzoTransaction extends Transaction {
     }
 
     getTransfer() {
+        if (/^PAYPAL/.test(this.raw.description) || this.raw.merchant?.name == 'PayPal' || this.raw.counterparty?.name == 'PAYPAL') {
+            return this._checkPayPal('PayPal');
+        }
+
         const counterparty = this._getCounterParty();
         if (counterparty) {
             return this._checkPayPal(this._getTransfer(counterparty));
-        }
-
-        if (/^PAYPAL/.test(this.raw.description) || (this.raw.merchant && this.raw.merchant.name == 'PayPal')) {
-            return this._checkPayPal('PayPal');
         }
 
         if (this.isCashWithdrawal()) {
