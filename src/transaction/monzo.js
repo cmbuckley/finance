@@ -11,12 +11,14 @@ class MonzoTransaction extends Transaction {
     }
 
     isValid() {
+        const ignoredTriggers = ['coin_jar', 'savings_challenge'];
+
         if (
             this.raw.decline_reason // failed
             || !this.raw.amount // zero amount transaction
             || (this.raw.is_load && !this.raw.counterparty.user_id && this.raw.amount > 0) // ignore topups
-            || (this.raw.scheme == 'uk_retail_pot' && this.raw.metadata.trigger == 'coin_jar') // ignore round-up
-            || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots && this.adapter.pots[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up
+            || (this.raw.scheme == 'uk_retail_pot' && ignoredTriggers.includes(this.raw.metadata.trigger)) // ignore automatic transactions
+            || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots?.[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up
         ) {
             return false;
         }
