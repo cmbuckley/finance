@@ -74,7 +74,7 @@ function merchantCategory(matches, defaultValue) {
 
 // reusable patterns
 const patterns = {
-    accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB/i,
+    accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB|TRAVELODGE/i,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     carService:       /R H SIRRELL|ALBA TY(RES|LEEDS)|STEVE SIRRELL/,
     parking:          /NCP[. ]|CAR PARK|PARKING|Q-PARK|MANCHESTER AIRPORT|MAAS UPT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN|Manchester City Coun|North Yorkshire Coun|LEEDS BECKETT/i,
@@ -82,7 +82,7 @@ const patterns = {
     flights:          /RYANAIR/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
-    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER/i,
+    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars/i,
     clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|TED BAKER|NEXT /i,
     pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
     vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE/,
