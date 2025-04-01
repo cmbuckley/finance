@@ -32,6 +32,7 @@ describe('MonzoAdapter', () => {
                 }]
             });
 
+            sinon.stub(monzo, 'balance').resolves({balance: 100});
             sinon.stub(monzo, 'pots').resolves({pots: []});
 
             const raw = {
@@ -79,6 +80,7 @@ describe('MonzoAdapter', () => {
             sinon.stub(monzo, 'accounts').resolves({
                 accounts: [{type: 'uk_retail'}]
             });
+            sinon.stub(monzo, 'balance').resolves({balance: 100});
             sinon.stub(monzo, 'pots').resolves({pots: []});
 
             const transactionsStub = sinon.stub(monzo, 'transactions');
@@ -142,11 +144,13 @@ describe('MonzoAdapter', () => {
                 pot_123: {
                     name: 'Pot 123',
                     round_up: false,
+                    style: 'color_orange',
                     other_key: 'ignored',
                 },
                 pot_456: {
                     name: 'Round Up',
                     round_up: true,
+                    style: '',
                     other_key: 'Irrelevant',
                 },
             };
@@ -157,10 +161,12 @@ describe('MonzoAdapter', () => {
                     pot_123: {
                         name: 'Pot 123',
                         round_up: false,
+                        style: 'color_orange',
                     },
                     pot_456: {
                         name: 'Round Up',
                         round_up: true,
+                        style: '',
                     },
                 },
             });

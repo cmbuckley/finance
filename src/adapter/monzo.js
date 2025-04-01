@@ -43,23 +43,31 @@ class MonzoAdapter extends Adapter {
 
         for (const account of accounts) {
             const accountLogger = this.logger.child({module: accountMap[account.type].module}),
+                accountBalance = await monzo.balance(account.id, accessToken),
                 potsResponse = await monzo.pots(account.id, accessToken),
                 limit = 100;
+
+            let hiddenBalances = 0;
 
             potsResponse.pots.map(async pot => {
                 this.pots[pot.id] = pot;
 
-                if (!pot.deleted && pot.round_up) {
-                    let accountBalance = await monzo.balance(account.id, accessToken);
+                if (!pot.deleted && (pot.round_up || pot.style == 'penny_savings_challenge')) {
+                    hiddenBalances += pot.balance;
 
-                    accountLogger.info('Your Monzo balance includes a pot', {
+                    accountLogger.verbose('Your Monzo balance includes a pot', {
                         pot: pot.name,
                         amount: helpers.numberFormat(pot.balance, pot.currency),
-                        total: helpers.numberFormat(pot.balance + accountBalance.balance, accountBalance.currency),
                         currency: pot.currency,
                     });
                 }
             });
+
+            if (hiddenBalances > 0) {
+                accountLogger.info('Your Monzo balance includes hidden pots', {
+                    total: helpers.numberFormat(hiddenBalances + accountBalance.balance, account.currency),
+                });
+            }
 
             let since = from.toISOString(),
                 transactionsResponse;
@@ -118,7 +126,7 @@ class MonzoAdapter extends Adapter {
 
     toJSON() {
         // pick only specific fields from each pot
-        const pots = Object.fromEntries(Object.entries(this.pots).map(([i, p]) => [i, helpers.pick(p, 'name', 'round_up')]));
+        const pots = Object.fromEntries(Object.entries(this.pots).map(([i, p]) => [i, helpers.pick(p, 'name', 'round_up', 'style')]));
         return {pots, user: this.config.token.user_id};
     }
 }
