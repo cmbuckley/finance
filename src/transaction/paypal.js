@@ -53,10 +53,13 @@ module.exports = class PayPalTransaction extends Transaction {
     }
 
     getMemo() {
-        let memo = this.raw.transaction_info.transaction_note;
+        const ignores = ['Discount', 'Shipping'];
+        let memo = this.raw.transaction_info?.transaction_note;
 
-        if (!memo && this.raw.cart_info?.item_details?.length == 1) {
-            memo = this.raw.cart_info.item_details[0].item_name;
+        if (!memo) {
+            let names = (this.raw.cart_info?.item_details || []).map(i => i.item_name);
+            names = names.filter(n => n && !ignores.includes(n));
+            if (names.length == 1) { memo = names[0]; }
         }
 
         return memo || this.raw.transaction_info.transaction_subject;

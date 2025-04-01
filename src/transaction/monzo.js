@@ -19,6 +19,7 @@ class MonzoTransaction extends Transaction {
             || (this.raw.is_load && !this.raw.counterparty.user_id && this.raw.amount > 0) // ignore topups
             || (this.raw.scheme == 'uk_retail_pot' && ignoredTriggers.includes(this.raw.metadata.trigger)) // ignore automatic transactions
             || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots?.[this.raw.metadata.pot_id].round_up) // ignore withdraw from round-up
+            || (this.raw.scheme == 'uk_retail_pot' && this.adapter.pots?.[this.raw.metadata.pot_id].style == 'penny_savings_challenge') // ignore savings challenge
         ) {
             return false;
         }

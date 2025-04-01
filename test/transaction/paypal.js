@@ -77,6 +77,23 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getMemo(), 'Cart item');
         });
 
+        it('should use filter out common items', () => {
+            const transaction = new PayPalTransaction('PayPal', {
+                cart_info: {
+                    item_details: [{
+                        item_name: 'Cart item',
+                    }, {
+                        item_name: 'Discount',
+                    }],
+                },
+                transaction_info: {
+                    transaction_subject: 'Transaction subject',
+                },
+            });
+
+            assert.equal(transaction.getMemo(), 'Cart item');
+        });
+
         it('should include fees in amount', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
