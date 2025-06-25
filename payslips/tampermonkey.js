@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.22
+// @version      2.23
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://*.sage.hr/*
@@ -14,6 +14,7 @@
 
 (function() {
     'use strict';
+    const company = 'SmartSearch';
     const oldXHR = window.XMLHttpRequest;
 
     window.XMLHttpRequest = function newXHR() {
@@ -76,7 +77,7 @@
                 },
                 qif: function (rows) {
                     const transfers = {
-                        'Salary sacrifice': 'Pentelow Pension',
+                        'Salary sacrifice': company + ' Pension',
                     };
 
                     // get unique account names
@@ -205,10 +206,8 @@
 
             function getCategory(text) {
                 return {
-                    'Salary1':              'Salary:Gross Pay',
+                    'Salary':               'Salary:Gross Pay',
                     'Monthly Salary':       'Salary:Gross Pay',
-                    'Answer Paternity Pay': 'Salary:Gross Pay',
-                    'EOT Bonus':            'Salary:Bonus',
                     'Overtime':             'Salary:Overtime',
                     'Holiday Pay':          'Salary:Gross Pay',
                     'Holiday Sold':         'Salary:Gross Pay',
@@ -223,12 +222,12 @@
                 return {
                     'PAYE tax':           'HMRC',
                     'National Insurance': 'HMRC',
-                }[text] || 'Answer Digital';
+                }[text] || company;
             }
 
             function getAccount(text) {
                 return {
-                    'Employer pension': 'Pentelow Pension',
+                    'Employer pension': company + ' Pension',
                 }[text] || 'Payslips';
             }
 
