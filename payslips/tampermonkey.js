@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Payslip QIF
 // @namespace    https://cmbuckley.co.uk/
-// @version      2.23
+// @version      2.24
 // @description  add button to download payslip as QIF
 // @author       chris@cmbuckley.co.uk
 // @match        https://*.sage.hr/*
@@ -50,14 +50,14 @@
 
     function getPayDate(dateString) {
         let date = new Date(dateString + ' 00:00:00+00:00'),
-            lastFridayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            payday = new Date(date.getFullYear(), date.getMonth(), 28);
 
-        if (lastFridayOfMonth.getDay() < 5) {
-            lastFridayOfMonth.setDate(lastFridayOfMonth.getDate() - 7);
+        // previous working day if it's a weekend
+        if (payday.getDay() % 6 === 0) {
+            payday.setDate(payday.getDate() + (payday.getDay() % 5) - 2);
         }
 
-        lastFridayOfMonth.setDate(lastFridayOfMonth.getDate() - (lastFridayOfMonth.getDay() - 5));
-        return lastFridayOfMonth;
+        return payday;
     }
 
     function download(type) {

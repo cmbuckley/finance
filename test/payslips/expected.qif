@@ -3,49 +3,49 @@ NPayslips
 TBank
 ^
 !Type:Bank
-D2022-06-24
+D2022-06-28
 T1234.56
 MMonthly Salary
 LSalary:Gross Pay
 PSmartSearch
 ^
-D2022-06-24
+D2022-06-28
 T392.84
 MMonthly Salary (7/22d)
 LSalary:Gross Pay
 PSmartSearch
 ^
-D2022-06-24
+D2022-06-28
 T187.50
 MOvertime (0.5d)
 LSalary:Overtime
 PSmartSearch
 ^
-D2022-06-24
+D2022-06-28
 T-123.00
 MHoliday Pay (1d)
 LSalary:Gross Pay
 PSmartSearch
 ^
-D2022-06-24
+D2022-06-28
 T246.00
 MHoliday Sold (2d)
 LSalary:Gross Pay
 PSmartSearch
 ^
-D2022-06-24
+D2022-06-28
 T-345.00
 MSalary sacrifice
 L[SmartSearch Pension]
 P
 ^
-D2022-06-24
+D2022-06-28
 T-876.54
 MPAYE tax
 LTaxes:Income Tax
 PHMRC
 ^
-D2022-06-24
+D2022-06-28
 T-234.56
 MNational Insurance
 LInsurance:NI
@@ -56,7 +56,7 @@ NSmartSearch Pension
 TBank
 ^
 !Type:Bank
-D2022-06-24
+D2022-06-28
 T355.00
 MEmployer pension
 LRetirement:Pension
