@@ -25,16 +25,19 @@ module.exports = async function store(transactions, options) {
         }
     }
 
-    // grab all unique adapters
-    const adapters = transactions.reduce((acc, curr) => {
-        const key = curr.adapter.getName();
-        if (!acc[key]) { acc[key] = curr.adapter; }
-        return acc;
-    }, {});
+    // load existing adapters to append to
+    const adaptersFile = 'adapters.json';
+    const adapters = JSON.parse(await fs.readFile(path.join(options.store, adaptersFile), 'utf-8'));
+
+    // append any new adapters
+    transactions.forEach(transaction => {
+        const key = transaction.adapter.getName();
+        if (!adapters[key]) { adapters[key] = transaction.adapter; }
+    });
 
     // write adapter config to file
     const adapterContents = JSON.stringify(adapters, null, options.indent || 2);
-    await fs.writeFile(path.join(options.store, 'adapters.json'), adapterContents);
+    await fs.writeFile(path.join(options.store, adaptersFile), adapterContents);
 
     for (const [module, data] of Object.entries(store)) {
         await fs.mkdir(path.join(options.store, module), {recursive: true});
