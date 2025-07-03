@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "mocha --recursive",
-    "cov": "nyc -r html -r text mocha --recursive test --reporter dot",
+    "cov": "nyc -r html -r text mocha --recursive test --reporter min",
     "download": "node src/download.js"
   },
   "nyc": {
