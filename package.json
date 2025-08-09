@@ -5,7 +5,7 @@
   "private": true,
   "author": "Chris Buckley <chris@cmbuckley.co.uk>",
   "engines": {
-    "node": "^18.17.0 || >=20.0.0",
+    "node": "^22 || >=24",
     "npm": ">=9.0.0"
   },
   "scripts": {
