@@ -2,7 +2,7 @@ const fs = require('fs').promises,
     { once } = require('events'),
     http = require('http'),
     readline = require('readline'),
-    url = require('url'),
+    { URL } = require('url'),
     nonce = require('nonce')(),
     { AuthorizationCode, ClientCredentials } = require('simple-oauth2');
 
@@ -128,12 +128,13 @@ class AuthClient {
      * @param reqponse HTTP response
      */
     async oauthCallback(request, response) {
-        const authUrl = url.parse(request.url, true);
+        const authUrl = new URL(request.url),
+            queryParams = authUrl.searchParams;
         let accessToken;
 
-        this.logger.info('Received OAuth callback', authUrl.query);
+        this.logger.info('Received OAuth callback', Object.fromEntries(queryParams));
 
-        if (authUrl.query.state != this.config.state) {
+        if (queryParams.get('state') != this.config.state) {
             response.statusCode = 400;
             response.end('State does not match requested state');
             return await this.closeServer('State does not match requested state');
@@ -142,15 +143,15 @@ class AuthClient {
         response.end('Thanks, you may close this window');
         this.logger.verbose('Closing HTTP server');
 
-        if (authUrl.query.error) {
-            return await this.closeServer(authUrl.query.error);
+        if (queryParams.get('error')) {
+            return await this.closeServer(queryParams.get('error'));
         }
 
         await this.closeServer();
         this.logger.verbose('Retrieving access token');
 
         accessToken = await this.client.getToken({
-            code: authUrl.query.code,
+            code: queryParams.get('code'),
             redirect_uri: this.adapterConfig.redirect_uri
         });
 
