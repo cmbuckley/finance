@@ -62,7 +62,7 @@ describe('Payslips', () => {
             ['30/06/2025', '2025-06-27'], // 28th is a Sat
             ['30/09/2025', '2025-09-26'], // 28th is a Sun
         ].forEach(([date, payday]) => {
-            it('should create file with correct payday', async () => {
+            it(`should create file with correct payday (${payday})`, async () => {
 
                 this.dom.window.document.querySelector('.date tbody td:nth-of-type(2)').innerHTML = date;
                 clickDownload(this);
