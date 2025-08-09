@@ -19,4 +19,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm test
-      - run: npm run cov | tee $GITHUB_STEP_SUMMARY
+      - name: Run coverage report
+        run: |
+          # remove the first and last table lines
+          npm run cov -- --no-color | sed '0,/^---/{//d}; $ d' | tee $GITHUB_STEP_SUMMARY
