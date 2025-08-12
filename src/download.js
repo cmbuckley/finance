@@ -128,7 +128,7 @@ const logger = winston.createLogger({
             await adapter.login({forceLogin: args.login});
         } catch (err) {
             adapter.logger.error('Error logging in:', {message: err.message || err});
-            throw err;
+            continue;
         }
 
         adapter.logger.info('Retrieving transactions', {from: args.from.format(format), to: args.to.format(format)});

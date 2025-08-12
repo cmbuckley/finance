@@ -75,10 +75,11 @@ describe('auth', () => {
 
                 // check we sent the URL to the logger/console
                 assert(this.logger.info.calledWithMatch(/^https:\/\/ahost\/auth\?response_type=code&/));
+                const url = new URL(this.logger.info.secondCall.args[0]);
 
                 // mimic the OAuth callback
                 this.server.emit('request', {
-                    url: this.logger.info.secondCall.args[0], // this is the outbound url, but it has the state
+                    url: '/' + url.search,
                 }, responseStub);
 
                 setImmediate(() => {
