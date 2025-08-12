@@ -128,7 +128,7 @@ class AuthClient {
      * @param reqponse HTTP response
      */
     async oauthCallback(request, response) {
-        const authUrl = new URL(request.url),
+        const authUrl = new URL(request.url, 'http://localhost'),
             queryParams = authUrl.searchParams;
         let accessToken;
 
