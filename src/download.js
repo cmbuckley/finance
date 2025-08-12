@@ -1,6 +1,7 @@
 const fs = require('fs'),
     moment = require('moment-timezone'),
-    Yargs = require('yargs'),
+    yargs = require('yargs'),
+    { hideBin } = require('yargs/helpers'),
     winston = require('winston'),
     Adapter = require('./adapter'),
     Exporter = require('./exporter');
@@ -35,7 +36,9 @@ const accountChoices = {
     ],
 };
 
-const args = Yargs.alias({help: 'h', version: 'V'}).options({
+const args = yargs(hideBin(process.argv))
+    .alias({help: 'h', version: 'V'})
+    .options({
         account:    {alias: 'a', type: 'array',   describe: 'Which account(s) to load',       requiresArg: true, default: 'all', choices: ['all'].concat(Object.values(accountChoices).flat())},
         format:     {alias: 'o', type: 'string',  describe: 'Output format (csv/qif)',        requiresArg: true, default: 'csv', choices: ['qif', 'csv']},
         from:       {alias: 'f', type: 'string',  describe: 'Earliest date for transactions', requiresArg: true, default: 0},
@@ -77,7 +80,7 @@ const args = Yargs.alias({help: 'h', version: 'V'}).options({
         return true;
     }).usageConfiguration({
         'hide-types': true,
-    }).argv;
+    }).parse();
 
 const logger = winston.createLogger({
     transports: [
