@@ -60,8 +60,8 @@ const args = yargs(hideBin(process.argv))
     .coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
-                // remove 'all' option and send the rest
-                return Yargs.getOptions().choices.account.slice(1);
+                // send all options
+                return Object.values(accountChoices).flat();
             }
 
             return account;
