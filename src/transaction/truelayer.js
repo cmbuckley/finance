@@ -1,6 +1,7 @@
 const Transaction = require('../transaction');
 
 class TruelayerTransaction extends Transaction {
+    #pending = false
 
     #getLocal() {
         const matches = this.raw.description.match(/ ([A-Z]{3}) (\d+\.\d{2}) @ \d+\.\d+/);
@@ -21,6 +22,10 @@ class TruelayerTransaction extends Transaction {
 
     constructor(account, raw, adapter, logger) {
         super(account, raw, adapter, logger);
+    }
+
+    setPending(p = true) {
+        this.#pending = p;
     }
 
     isValid() {
@@ -114,6 +119,10 @@ class TruelayerTransaction extends Transaction {
 
     getPayee() {
         return this.raw.merchant_name || '';
+    }
+
+    toJSON() {
+        return Object.assign(super.toJSON(), {pending: this.#pending});
     }
 }
 

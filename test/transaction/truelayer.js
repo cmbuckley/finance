@@ -101,6 +101,29 @@ describe('TruelayerTransaction', () => {
                 account: 'Current Account',
                 raw: {amount: 1234},
                 module: 'hsbc',
+                pending: false,
+            });
+        });
+
+        it('should set pending', () => {
+            const transaction = new TruelayerTransaction('Current Account', {
+                amount: 1234,
+                description: 'pending transaction',
+            }, {
+                getConfig: () => ({module: 'hsbc'})
+            });
+
+            transaction.setPending();
+
+            assert.deepEqual(transaction.toJSON(), {
+                type: 'truelayer',
+                account: 'Current Account',
+                raw: {
+                    amount: 1234,
+                    description: 'pending transaction',
+                },
+                module: 'hsbc',
+                pending: true,
             });
         });
     });

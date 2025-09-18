@@ -51,7 +51,9 @@ class TruelayerAdapter extends Adapter {
 
                 transactions = transactions.concat(transactionsResponse.results.map(raw => {
                     this.logger.silly('Raw transaction', raw);
-                    return new Transaction(accountMap[account.account_id] || account.display_name, raw, this, this.logger);
+                    const t = new Transaction(accountMap[account.account_id] || account.display_name, raw, this, this.logger);
+                    if (type == 'PendingTransactions') { t.setPending(); }
+                    return t;
                 }));
             }
         }
