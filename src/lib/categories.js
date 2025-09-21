@@ -197,7 +197,7 @@ const monzo = {
         'Computing:Electronics': 'APPLE STORE',
         'Entertainment:Music': /VINYL|HMV UK/i,
         'Food:Alcohol': 'Veeno',
-        'Gifts & Donations:Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS|Etsy|MOONPIG/,
+        'Gifts & Donations:Gifts': /W\.KRUK|WARNER BROS STUDIOS|CAVENDISH JEWELLERS|Etsy|MOONPIG|CARD FACTORY/,
         'Healthcare:Pregnancy & Maternity': patterns.pregnancy,
         'House:Decorations': /FLORA POINT|PLANTS|Dunelm Soft/,
         'House:Improvement': patterns.houseImprovement,
