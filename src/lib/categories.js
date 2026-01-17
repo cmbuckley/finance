@@ -83,8 +83,8 @@ const patterns = {
     musicEvents:      /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
-    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars/i,
-    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|TED BAKER|NEXT |LOUNGEUNDERWEAR/i,
+    taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars|VEEZU/i,
+    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR/i,
     pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
     vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE/,
 };
@@ -243,6 +243,7 @@ const monzo = {
     }, lookup('description', {
         'House:Garden': /LANGLANDS|GARDEN CENTRE/,
         'House:Improvement': patterns.houseImprovement,
+        'Kids:Kids Activities': /BABYBEATS/,
         'Pet Care': 'PETS AT HOME',
         'Pet Care:Accommodation': /MANSTON PET HOTEL|PAWSHAKE/,
         'Pet Care:Food': /ZooPlus/i,
@@ -391,7 +392,7 @@ const truelayer = {
     'INTEREST': 'Bank Charges:Interest',
 
     descriptions: {
-        'Bank Charges:Service Charge': 'Transaction Fee',
+        'Bank Charges:Service Charge': /Transaction Fee|INTEREST CHARGE/,
         'Bills:Sky': 'SKY DIGITAL',
         'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': /AA MEMBERSHIP|RAC\.CO\.UK/,
@@ -402,8 +403,8 @@ const truelayer = {
         'Computing:Hardware': 'EBUYER',
         'Education:Fees': 'Pluralsight',
         'Food:Takeaway': patterns.takeaway,
-        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA/,
-        'Gifts': /Vestiaire Collecti|CAVENDISH JEWELLERS/,
+        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA|ZUCCO/,
+        'Gifts & Donations:Gifts': /Vestiaire Collecti|CAVENDISH JEWELLERS/,
         'Job Expenses': /Answer.+ Expenses/i,
         'Healthcare:Dental': 'DENTAL',
         'Healthcare:Fitness': 'PHYSIOFIT',
