@@ -47,7 +47,7 @@ class KrakenAdapter extends Adapter {
 
             if (raw.fee > 0) {
                 // use a separate transaction to track the fee
-                transactions.push(new Transaction(Object.assign({}, raw, {type: 'fee'}), adapter));
+                transactions.push(new Transaction('', Object.assign({}, raw, {type: 'fee'}), adapter));
             }
 
             transactions.push(new Transaction('', raw, adapter));
