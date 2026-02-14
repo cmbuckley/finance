@@ -48,6 +48,7 @@ const args = yargs(hideBin(process.argv))
         load:       {alias: 'u', type: 'string',  describe: 'Load from a specified dump file',        requiresArg: true},
         store:      {alias: 's', type: 'string',  describe: 'Store transactions in specified folder (default "db")'},
         retrieve:   {alias: 'r', type: 'string',  describe: 'Retrieve transactions from folder (default "db")'},
+        sync:       {alias: 'y', type: 'boolean', describe: 'Sync the store from the most recent download (implies -s)'},
         quiet:      {alias: 'q', type: 'boolean', describe: 'Suppress output'},
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 
@@ -56,7 +57,7 @@ const args = yargs(hideBin(process.argv))
     .usage('Usage: npm run download -- [options...]')
     .epilogue(Object.entries(accountChoices).reduce((acc, [type, accounts]) => acc + `\n  ${type}: ` + accounts.join(', '), 'Valid accounts:'))
     .group(['account', 'from', 'to'], 'Filtering transactions:')
-    .group(['format', 'dump', 'load', 'store', 'retrieve', 'pokerstars-source'], 'Storage/retrieval:')
+    .group(['format', 'dump', 'load', 'store', 'retrieve', 'sync', 'pokerstars-source'], 'Storage/retrieval:')
     .coerce({
         account: function (account) {
             if (account.length == 1 && account[0] == 'all') {
@@ -73,9 +74,12 @@ const args = yargs(hideBin(process.argv))
         to:   coerceDate,
         'pokerstars-source': coerceFile,
     }).conflicts({
-        dump: ['load', 'store'],
-        load: ['store'],
+        dump:  ['load', 'store', 'retrieve'],
+        load:  ['store', 'retrieve'],
+        store: ['retrieve'],
+        sync:  ['dump', 'load', 'retrieve'],
     }).check(args => {
+        if (args.sync) { args.store = coerceStore(args.store || ''); }
         if (!args.pokerstarsSource) { args.pokerstarsSource = 'pokerstars.csv'; }
         return true;
     }).usageConfiguration({
@@ -118,10 +122,18 @@ const logger = winston.createLogger({
         timezone: 'Europe/London',
     });
 
-    const adapters = Adapter.getAll(args.load || args.retrieve || args.account, logger, args);
+    const adapters = Adapter.getAll(args.load || args.retrieve || args.account, logger, args),
+        syncFile = `${args.store}/sync.json`;
 
     let transactions = [],
         format = 'YYYY-MM-DD HH:mm';
+        syncOptions = {};
+
+    if (args.sync && await fs.existsSync(syncFile)) {
+        syncOptions = JSON.parse(await fs.promises.readFile(syncFile, 'utf-8'));
+        logger.debug('loaded sync options', syncOptions);
+        args.from = coerceDate(args.from.unix() ? args.from : syncOptions.last_date);
+    }
 
     for (const adapter of adapters) {
         try {
@@ -139,6 +151,12 @@ const logger = winston.createLogger({
             adapter.logger.error('Error retrieving transactions:', {message: err.message || err});
             adapter.logger.debug(err.stack || err);
         }
+    }
+
+    if (args.sync) {
+        syncOptions.last_date = args.to.format(format);
+        await fs.promises.writeFile(syncFile, JSON.stringify(syncOptions, null, 2), 'utf-8');
+        logger.debug('saved sync options', syncOptions);
     }
 
     await exporter.write(Adapter.detectTransfers(transactions, exporter.options.timezone));

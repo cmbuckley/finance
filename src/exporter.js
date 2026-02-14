@@ -9,9 +9,7 @@ module.exports = function exporter(options) {
     if (options.dump) {
         options.file = options.dump;
         options.format = 'json';
-    }
-
-    if (options.store) {
+    } else if (options.store) {
         options.file = options.store;
         options.format = 'store';
     }
