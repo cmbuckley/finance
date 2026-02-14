@@ -149,7 +149,7 @@ const logger = winston.createLogger({
             transactions = transactions.concat(await adapter.getTransactions(args.from, args.to));
         } catch (err) {
             adapter.logger.error('Error retrieving transactions:', {message: err.message || err});
-            adapter.logger.debug(err.stack || err);
+            adapter.logger.debug(err.stack || err, {cause: err.cause});
         }
     }
 

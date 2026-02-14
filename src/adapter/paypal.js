@@ -71,11 +71,11 @@ class PayPalAdapter extends Adapter {
                     message = err.response.data.details[0].issue;
                 }
 
-                throw new Error(message);
+                throw new Error(message, {cause: err});
             }
 
             if (!response.data.transaction_details) {
-                throw new Error('No transactions found', {cause: response.data});
+                response.data.transaction_details = [];
             }
 
             start = end.clone().add(1, 'seconds');

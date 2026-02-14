@@ -66,6 +66,18 @@ describe('PayPalAdapter', () => {
             });
         });
 
+        it('should not error for zero transactions', async () => {
+            const adapter = new PayPalAdapter('', {}, util.logger());
+
+            const apiStub = sinon.stub().resolves({
+                data: {total_items: 0},
+            });
+            sinon.stub(axios, 'create').returns({get: apiStub});
+
+            const transactions = await adapter.getTransactions(moment(), moment());
+            assert.equal(transactions.length, 0);
+        });
+
         it('should collate conversions', async () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
