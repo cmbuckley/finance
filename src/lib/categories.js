@@ -80,11 +80,11 @@ const patterns = {
     parking:          /NCP[. ]|CAR PARK|PARKING|Q-PARK|MANCHESTER AIRPORT|MAAS UPT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN|Manchester City Coun|North Yorkshire Coun|LEEDS BECKETT/i,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA|HARDWAR/,
     flights:          /RYANAIR|WIZZ AIR|KIWI\.COM/,
-    musicEvents:      /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU/,
+    musicEvents:      /RECORDS|TICKETMASTER|SHEFFIELDSTUDENTSU|KABOODLE/,
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars|VEEZU/i,
-    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR/i,
+    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR|Vinted/i,
     pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
     vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE/,
 };
@@ -392,7 +392,8 @@ const truelayer = {
     'INTEREST': 'Bank Charges:Interest',
 
     descriptions: {
-        'Bank Charges:Service Charge': /Transaction Fee|INTEREST CHARGE/,
+        'Bank Charges:Interest': 'INTEREST CHARGE',
+        'Bank Charges:Service Charge': 'Transaction Fee',
         'Bills:Sky': 'SKY DIGITAL',
         'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': /AA MEMBERSHIP|RAC\.CO\.UK/,
@@ -403,7 +404,7 @@ const truelayer = {
         'Computing:Hardware': 'EBUYER',
         'Education:Fees': 'Pluralsight',
         'Food:Takeaway': patterns.takeaway,
-        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA|ZUCCO/,
+        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA|ZUCCO|Sushi Nakamura|SAN CARLO/,
         'Gifts & Donations:Gifts': /Vestiaire Collecti|CAVENDISH JEWELLERS/,
         'Job Expenses': /Answer.+ Expenses/i,
         'Healthcare:Dental': 'DENTAL',
