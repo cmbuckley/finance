@@ -1,7 +1,13 @@
+# default store
+db
+
+# download files
+*.qif
+*.csv
+*.log
+
+# supporting files
 node_modules
 .nyc_output
 coverage
 package-lock.json
-*.qif
-*.csv
-*.log
