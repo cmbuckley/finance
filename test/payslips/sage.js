@@ -10,7 +10,7 @@ describe('Payslips', () => {
         vc.on('jsdomError', e => console.error('error:', e.detail || e));
         vc.on('log', debug); // to output: DEBUG=test:logs npm test
 
-        JSDOM.fromFile(__dirname + '/test.html', {
+        JSDOM.fromFile(__dirname + '/sage.html', {
             runScripts: 'dangerously',
             resources: 'usable',
             virtualConsole: vc,
@@ -39,7 +39,7 @@ describe('Payslips', () => {
             this.defaultDate = this.dateElement.innerHTML;
 
             const xhr = new this.dom.window.XMLHttpRequest;
-            xhr.open('GET', 'test.html?fake=directory/12345/payslips/abcde');
+            xhr.open('GET', 'sage.html?fake=directory/12345/payslips/abcde');
             xhr.send();
             setTimeout(done, 250); // @todo improve
         });
