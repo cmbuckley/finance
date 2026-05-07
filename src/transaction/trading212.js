@@ -46,7 +46,7 @@ module.exports = class Trading212Transaction extends Transaction {
 
     _getCategory() {
         return {
-            'history.interest-on-cash.heading': 'Bank Charges:Interest',
+            'history.interest-on-cash.heading': 'Income:Interest',
         }[this.raw.heading.key] || '';
     }
 

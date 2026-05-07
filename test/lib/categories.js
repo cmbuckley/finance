@@ -62,7 +62,7 @@ describe('Categories search', () => {
             const raw = {
                 transaction_category: 'INTEREST',
             };
-            assert.equal(search(raw), 'Bank Charges:Interest');
+            assert.equal(search(raw), 'Income:Interest');
         });
 
         it('should lookup using description', () => {

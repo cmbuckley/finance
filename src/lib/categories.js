@@ -389,7 +389,7 @@ const truelayer = {
         'Health insurance': ''
     },
 
-    'INTEREST': 'Bank Charges:Interest',
+    'INTEREST': 'Income:Interest',
 
     descriptions: {
         'Bank Charges:Interest': 'INTEREST CHARGE',
