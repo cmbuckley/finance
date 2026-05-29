@@ -213,7 +213,7 @@
                     'Holiday Sold':         'Salary:Gross Pay',
                     'Holiday Purchase':     'Salary:Gross Pay',
                     'PAYE tax':             'Taxes:Income Tax',
-                    'National Insurance':   'Insurance:NI',
+                    'National Insurance':   'Taxes:National Insurance',
                     'Employer pension':     'Retirement:Pension',
                 }[text] || '';
             }
