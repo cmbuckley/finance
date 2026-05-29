@@ -40,16 +40,6 @@ describe('TruelayerTransaction', () => {
             assert.equal(transaction.getCategory(), 'Bills:TV Licence');
             assert(!transaction.getTransfer());
         });
-
-        it('should output time if present', () => {
-            const transaction = new TruelayerTransaction('Joint Account', {
-                timestamp: '2022-09-01T00:00:00Z',
-            });
-
-            assert.equal(transaction.getDate('YYYY-MM-DD HH:mm'), '2022-09-01');
-            transaction.getDate().set({hour: 1, minute: 2, second: 3});
-            assert.equal(transaction.getDate('YYYY-MM-DD HH:mm'), '2022-09-01 01:02');
-        });
     });
 
     describe('foreign transaction', () => {

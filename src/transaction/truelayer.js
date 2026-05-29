@@ -48,19 +48,6 @@ class TruelayerTransaction extends Transaction {
         return this.getCurrency() !== 'GBP';
     }
 
-    getDate(format, timezone) {
-        if (format) {
-            const date = super.getDate();
-
-            // check if there's a time component (unlikely unless fixed by a transfer)
-            if (!date.diff(date.clone().startOf('day'))) {
-                format = format.replace(' HH:mm', '');
-            }
-        }
-
-        return super.getDate(format, timezone);
-    }
-
     _getDate() {
         return this.raw.timestamp;
     }

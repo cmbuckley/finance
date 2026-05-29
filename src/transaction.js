@@ -20,6 +20,11 @@ class Transaction {
 
     getDate(format, timezone) {
         let date = this.#date || this._parseDate();
+
+        if (format && date.isSame(date.clone().startOf('day'))) {
+            format = format.replace(' HH:mm', '');
+        }
+
         if (timezone) { date = date.tz(timezone); }
         return (format ? date.format(format) : date);
     }
