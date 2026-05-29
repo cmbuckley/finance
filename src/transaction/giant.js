@@ -7,7 +7,7 @@ class GiantTransaction extends Transaction {
     }
 
     isDebit() {
-        return (this.getLocalAmount() < 0);
+        return (this.raw.mode == 'deductions');
     }
 
     getCurrency() {
@@ -26,7 +26,7 @@ class GiantTransaction extends Transaction {
     _getDate() {
         return {
             value: this.raw.date,
-            format: 'YYYY/MM/DD',
+            format: 'DD/MM/YYYY',
         };
     }
 
@@ -47,7 +47,11 @@ class GiantTransaction extends Transaction {
     }
 
     isTransfer() {
-        return false;
+        return !!this.raw.transfer;
+    }
+
+    getTransfer() {
+        return this.raw.transfer;
     }
 }
 

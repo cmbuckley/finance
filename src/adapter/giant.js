@@ -25,6 +25,8 @@ class GiantAdapter extends Adapter {
             category = 'Gross Pay';
 
         this.#lines.some(line => {
+            let transfer = ''; // reset each line
+
             if (!date && line.match(/\d{2}\/\d{2}\/\d{4}/)) {
                 date = line;
                 return;
@@ -64,6 +66,7 @@ class GiantAdapter extends Adapter {
                             return;
 
                         // ignore subtotal lines
+                        case 'Total Taxable Billable Expenses':
                         case 'Assignment Income':
                         case 'Total Income':
                         case 'Total Pay':
@@ -71,13 +74,22 @@ class GiantAdapter extends Adapter {
                         case 'Net Pay':
                             return;
 
+                        case 'Employers Pension Contributions':
+                            transfer = 'Pentelow Pension';
+                            break;
+
                         case 'Employees Tax':
                             category = 'Taxes:Income Tax';
                             break;
 
                         case 'Employee NIC':
-                            category = 'Insurance:NI';
+                            category = 'Taxes:National Insurance';
                             break;
+
+                        default:
+                            if (memo.includes('B/EXP')) {
+                                category = 'Job Expenses';
+                            }
                     }
 
                     switch (poundSplit.length - 1) {
@@ -85,10 +97,12 @@ class GiantAdapter extends Adapter {
                         case 1: break;
 
                         case 2:
-                            const sp = poundSplit[0].lastIndexOf(' '),
-                                units = poundSplit[0].substr(sp + 1);
+                            const sp = memo.lastIndexOf(' '),
+                                units = memo.substr(sp + 1),
+                                suffix = ' (' + parseInt(units.trim(), 10) + 'd)';
 
-                            memo = poundSplit[0].substring(0, sp) + ' (' + parseInt(units.trim(), 10) + 'd)';
+                            // don't add units to expenses line
+                            memo = memo.substring(0, sp) + (category == 'Job Expenses' ? '' : suffix);
                             break;
                     }
 
@@ -97,6 +111,7 @@ class GiantAdapter extends Adapter {
                             date,
                             payee,
                             amount,
+                            transfer,
                             category,
                             memo,
                             mode,
