@@ -16,7 +16,7 @@ class GiantTransaction extends Transaction {
 
     getLocalAmount() {
         if (!this.raw.mode) return 0;
-        return (parseFloat(this.raw.amount.replace(',', ''), 10) * (this.raw.mode == 'income' ? 1 : -1)).toFixed(2);
+        return (this.raw.amount * (this.raw.mode == 'income' ? 1 : -1)).toFixed(2);
     }
 
     getExchangeRate() {

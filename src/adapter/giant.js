@@ -44,11 +44,17 @@ class GiantAdapter extends Adapter {
                     category = 'Salary:Umbrella Costs';
                     break;
 
-                default:
-                    const poundSplit = line.split(/£/g).map(s => s.trim()),
-                        amount = poundSplit[poundSplit.length - 1];
+                case 'Add Billable Expenses (Non-Taxable)':
+                    mode = 'income';
+                    payee = 'DWP';
+                    category = 'Job Expenses';
+                    break;
 
-                    let memo = poundSplit[0];
+                default:
+                    const poundSplit = line.split(/£/g).map(s => s.trim());
+
+                    let amount = parseFloat(poundSplit[poundSplit.length - 1].replace(/,/g, ''), 10),
+                        memo = poundSplit[0].replace(/ +-$/, '');
 
                     switch (memo) {
                         // exit loop at the end of the table
@@ -72,6 +78,7 @@ class GiantAdapter extends Adapter {
                         case 'Total Pay':
                         case 'Total Deductions':
                         case 'Net Pay':
+                        case 'Total Billable Expenses (Non-Taxable)':
                             return;
 
                         case 'Employers Pension Contributions':
@@ -100,6 +107,10 @@ class GiantAdapter extends Adapter {
                             const sp = memo.lastIndexOf(' '),
                                 units = memo.substr(sp + 1),
                                 suffix = ' (' + parseInt(units.trim(), 10) + 'd)';
+
+                            if (category == 'Job Expenses' && units < 0) {
+                                amount *= units;
+                            }
 
                             // don't add units to expenses line
                             memo = memo.substring(0, sp) + (category == 'Job Expenses' ? '' : suffix);
