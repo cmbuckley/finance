@@ -28,6 +28,7 @@
     "monzo-bank": "github:cmbuckley/monzo-bank#pots",
     "neat-csv": "^7.0.0",
     "nonce": "^1.0.4",
+    "pdf-parse": "^2.4.5",
     "simple-oauth2": "^5.0.0",
     "truelayer-client": "^1.3.2",
     "winston": "^3.3.3",

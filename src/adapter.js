@@ -82,7 +82,8 @@ function getAdapter(account, logger, options) {
             return monzoAdapter;
 
         case 'pokerstars':
-            adapterConfig.source = options.pokerstarsSource;
+        case 'giant':
+            adapterConfig.source = options[adapterType + 'Source'];
 
         case 'truelayer':
             adapterConfig.provider = accountConfig.provider;

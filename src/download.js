@@ -32,7 +32,7 @@ const accountChoices = {
         'paypal',
     ],
     Experimental: [
-        't212', 'kraken', 'pokerstars',
+        't212', 'kraken', 'pokerstars', 'giant',
     ],
 };
 
@@ -53,6 +53,7 @@ const args = yargs(hideBin(process.argv))
         verbose:    {alias: 'v', type: 'count',   describe: 'Verbose output (multiple options increases verbosity)'},
 
         'pokerstars-source': {type: 'string', describe: 'Source file for PokerStars input', requiresArg: true},
+        'giant-source': {type: 'string', describe: 'Source file for Giant input', requiresArg: true},
     })
     .usage('Usage: npm run download -- [options...]')
     .epilogue(Object.entries(accountChoices).reduce((acc, [type, accounts]) => acc + `\n  ${type}: ` + accounts.join(', '), 'Valid accounts:'))
@@ -73,6 +74,7 @@ const args = yargs(hideBin(process.argv))
         from: coerceDate,
         to:   coerceDate,
         'pokerstars-source': coerceFile,
+        'giant-source': coerceFile,
     }).conflicts({
         dump:  ['load', 'store', 'retrieve'],
         load:  ['store', 'retrieve'],
@@ -81,6 +83,7 @@ const args = yargs(hideBin(process.argv))
     }).check(args => {
         if (args.sync) { args.store = coerceStore(args.store || ''); }
         if (!args.pokerstarsSource) { args.pokerstarsSource = 'pokerstars.csv'; }
+        if (!args.giantSource) { args.giantSource = 'payslip.pdf'; }
         return true;
     }).usageConfiguration({
         'hide-types': true,
