@@ -9,13 +9,13 @@ let transactions,
     account = 'Payslips';
 
 class GiantAdapter extends Adapter {
-    #lines = [];
+    lines = [];
 
     async login(options) {
         const file = await readFile(this.config.source);
         const parser = new PDFParse({data: file});
         const result = await parser.getText();
-        this.#lines = result.text.split('\n');
+        this.lines = result.text.split('\n');
     }
 
     async getTransactions(from, to) {
@@ -24,7 +24,7 @@ class GiantAdapter extends Adapter {
             date = '',
             category = 'Gross Pay';
 
-        this.#lines.some(line => {
+        this.lines.some(line => {
             let transfer = ''; // reset each line
 
             if (!date && line.match(/\d{2}\/\d{2}\/\d{4}/)) {
