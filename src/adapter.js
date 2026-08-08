@@ -122,12 +122,17 @@ Adapter.getAll = function (accounts, logger, options) {
 };
 
 Adapter.detectTransfers = function (transactions, timezone) {
-    let transfers = transactions.filter(t => t.isTransfer() && t.isValid());
+    let transfers = transactions.filter(t => t.isTransfer() && t.isValid()),
+        processed = [];
+
     transfers.forEach(t => {
         // try find the opposite transaction
         const counterpart = transactions.find(ct => {
             return ct !== t
+                && !processed.includes(t)
+                && !processed.includes(ct)
                 && ct.getAccount() == t.getTransfer()
+                && (!ct.isTransfer() || (ct.getTransfer() == t.getAccount()))
                 && ct.getCurrency() == t.getCurrency()
                 && ct.getLocalAmount() == -t.getLocalAmount()
                 && ct.getDate().clone().tz(timezone || 'UTC').isSame(t.getDate(), 'day')
@@ -136,6 +141,8 @@ Adapter.detectTransfers = function (transactions, timezone) {
         if (counterpart) {
             const counterpartDate = counterpart.getDate(),
                 counterpartMidnight = counterpartDate.clone().startOf('day');
+
+            processed.push(t, counterpart);
 
             if (!counterpart.isTransfer()) {
                 counterpart.setTransfer(t);

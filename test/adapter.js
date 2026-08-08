@@ -102,6 +102,8 @@ describe('Adapter', () => {
         const data = {transfers: {
             '12-34-56 11111111': 'Current Account',
             '12-34-56 22222222': 'Joint Account',
+            acc_11111: 'Monzo Current',
+            acc_22222: 'Monzo Joint',
             patterns: {
                 'Monzo Current': '^MONZO',
                 'Monzo Joint': '^JOINT MONZO',
@@ -138,7 +140,7 @@ describe('Adapter', () => {
             assert.equal(fixedTransactions[1], transactions[1]);
         });
 
-        it('should deal with date boundaries', () => {
+        it('deals with date boundaries', () => {
             const transactions = [
                 new TruelayerTransaction('Joint Account', {
                     amount: -5,
@@ -153,7 +155,7 @@ describe('Adapter', () => {
                     local_currency: 'GBP',
                     counterparty: {
                        sort_code: '123456',
-                       account_number: '11111111',
+                       account_number: '22222222',
                     },
                 }, {data}),
             ];
@@ -200,7 +202,7 @@ describe('Adapter', () => {
             assert.equal(fixedTransactions[1].getTransfer(), 'Current Account');
         });
 
-        it('should not transfer to the wrong account', () => {
+        it('checks source and destination accounts', () => {
             const transactions = [
                 new TruelayerTransaction('Current Account', {
                     amount: -100,
@@ -224,7 +226,36 @@ describe('Adapter', () => {
             assert.equal(fixedTransactions[1].getTransfer(), undefined);
         });
 
-        it('should find the right transfer', () => {
+        it('checks counterpart accounts match', () => {
+            const transactions = [
+                new MonzoTransaction('Monzo Current', {
+                    created: '2026-07-09T17:48:54.686Z',
+                    amount: -20000,
+                    local_amount: -20000,
+                    local_currency: 'GBP',
+                    counterparty: {
+                        account_id: 'acc_22222',
+                    },
+                }, {data}),
+                new MonzoTransaction('Monzo Joint', {
+                    created: '2026-07-09T11:15:36.763Z',
+                    amount: 20000,
+                    local_amount: 20000,
+                    local_currency: 'GBP',
+                    counterparty: {
+                       sort_code: '123456',
+                       account_number: '22222222',
+                    },
+                }, {data}),
+            ];
+
+            const timezone = 'Europe/London';
+            const fixedTransactions = Adapter.detectTransfers(transactions, timezone);
+
+            assert.equal(fixedTransactions[0].getDate('YYYY-MM-DD HH:mm', timezone), '2026-07-09 18:48');
+        });
+
+        it('finds the right transfer', () => {
             const transactions = [
                 new TruelayerTransaction('Joint Account', {
                     amount: -200,
