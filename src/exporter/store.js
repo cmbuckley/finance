@@ -30,7 +30,7 @@ module.exports = async function store(transactions, options) {
     const adapters = JSON.parse(await fs.readFile(path.join(options.store, adaptersFile), 'utf-8'));
     const newAdapters = [];
 
-    // append any new adapters
+    // append any new adapters & update existing
     transactions.forEach(transaction => {
         const key = transaction.adapter.getName();
         if (!newAdapters.includes(key)) {
