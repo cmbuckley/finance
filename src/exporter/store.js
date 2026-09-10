@@ -28,11 +28,15 @@ module.exports = async function store(transactions, options) {
     // load existing adapters to append to
     const adaptersFile = 'adapters.json';
     const adapters = JSON.parse(await fs.readFile(path.join(options.store, adaptersFile), 'utf-8'));
+    const newAdapters = [];
 
     // append any new adapters
     transactions.forEach(transaction => {
         const key = transaction.adapter.getName();
-        if (!adapters[key]) { adapters[key] = transaction.adapter; }
+        if (!newAdapters.includes(key)) {
+            adapters[key] = transaction.adapter;
+            newAdapters.push(key);
+        }
     });
 
     // write adapter config to file
