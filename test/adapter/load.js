@@ -43,7 +43,7 @@ describe('LoadAdapter', () => {
 
     describe('#getTransactions', () => {
         describe('from dump file', () => {
-            it('should set up the transactions', async () => {
+            it('sets up transactions', async () => {
                 sinon.spy(logger, 'child');
 
                 const adapter = new LoadAdapter('load.json', logger);
@@ -77,7 +77,7 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions[0].getMemo(), 'TESTING');
             });
 
-            it('should filter transactions by date', async () => {
+            it('filters transactions by date', async () => {
                 const adapter = new LoadAdapter('load.json', logger);
 
                 fakeFile({
@@ -114,7 +114,7 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions[0].getMemo(), 'TESTING 2');
             });
 
-            it('should filter transactions by account', async () => {
+            it('filters transactions by account', async () => {
                 const adapter = new LoadAdapter('load.json', logger, {account: ['fd']});
 
                 fakeFile({
@@ -148,7 +148,7 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions[0].getAccount(), 'Joint Account');
             });
 
-            it('should use an inclusive date range', async () => {
+            it('uses an inclusive date range', async () => {
                 const adapter = new LoadAdapter('load.json', logger);
 
                 fakeFile({
@@ -169,7 +169,7 @@ describe('LoadAdapter', () => {
         });
 
         describe('from store directory', () => {
-            it('should set up the transactions', async () => {
+            it('sets up transactions', async () => {
                 const adapter = new LoadAdapter('db', logger);
 
                 fakeStore({
@@ -208,7 +208,7 @@ describe('LoadAdapter', () => {
                 assert.equal(transactions[1].getMemo(), 'TEST 2');
             });
 
-            it('should filter transactions by account', async () => {
+            it('filters transactions by account', async () => {
                 const adapter = new LoadAdapter('db', logger, {account: ['fd']});
 
                 fakeStore({
@@ -249,7 +249,7 @@ describe('LoadAdapter', () => {
     });
 
     describe('#delegate', () => {
-        it('should mimic a Monzo adapter', async () => {
+        it('mimics a Monzo adapter', async () => {
             const adapter = new LoadAdapter('load.json', {
                 child: sinon.stub(),
             });
