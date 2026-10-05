@@ -57,7 +57,7 @@ describe('Adapter', () => {
     });
 
     describe('getAll', () => {
-        it('should create requested adapters', async function () {
+        it('creates requested adapters', async function () {
             const ProxyAdapter = getProxyAdapter({
                 mc:   {type: 'monzo'},
                 hsbc: {type: 'truelayer'},
@@ -77,7 +77,7 @@ describe('Adapter', () => {
             assert.equal(adapters[1].getConfig().redirect_uri, 'https://callback/truelayer');
         });
 
-        it('should create a load adapter', () => {
+        it('creates a load adapter', () => {
             const adapters = Adapter.getAll('dump.json');
 
             assert.equal(adapters.length, 1);
@@ -85,7 +85,7 @@ describe('Adapter', () => {
             assert.equal(adapters[0].file, 'dump.json');
         });
 
-        it('should create separate config objects', () => {
+        it('creates separate config objects', () => {
             const ProxyAdapter = getProxyAdapter({
                 hsbc: {type: 'truelayer'},
                 fd:   {type: 'truelayer'},
@@ -111,7 +111,7 @@ describe('Adapter', () => {
             },
         }};
 
-        it('should set time on transfers', () => {
+        it('sets time on transfers', () => {
             const transactions = [
                 new TruelayerTransaction('Joint Account', {
                     amount: -5,
@@ -170,7 +170,7 @@ describe('Adapter', () => {
             assert.equal(fixedTransactions[1], transactions[1]);
         });
 
-        it('should detect a transfer', () => {
+        it('detects a transfer', () => {
             const transactions = [
                 new TruelayerTransaction('Current Account', {
                     amount: 100,

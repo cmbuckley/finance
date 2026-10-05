@@ -16,20 +16,20 @@ describe('Utils', () => {
         });
     });
 
-    it('should exist', () => {
+    it('exists', () => {
         assert.ok(this.App.utils);
     });
 
     describe('#titleCase', () => {
-        it('should upper case first character', () => {
+        it('upper cases first character', () => {
             assert.equal(this.App.utils.titleCase('title case'), 'Title Case');
         });
 
-        it('should not alter already upper-case characters', () => {
+        it('preserved already upper-case characters', () => {
             assert.equal(this.App.utils.titleCase('Title Case'), 'Title Case');
         });
 
-        it('should not lower case other letters', () => {
+        it('preserves case of other letters', () => {
             assert.equal(this.App.utils.titleCase('mIxEd cASe'), 'MIxEd CASe')
         });
     });

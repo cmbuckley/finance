@@ -4,7 +4,7 @@ const MonzoTransaction = require('../../src/transaction/monzo');
 
 describe('MonzoTransaction', () => {
     describe('domestic transaction', () => {
-        it('should parse raw data', () => {
+        it('parses raw data', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 account_id: 'acc_12345',
                 amount: -2381,
@@ -55,7 +55,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getPayee(), 'Waitrose Meanwood');
         });
 
-        it('should ignore declined transactions', () => {
+        it('ignores declined transactions', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 decline_reason: 'INSUFFICIENT_FUNDS',
             });
@@ -65,7 +65,7 @@ describe('MonzoTransaction', () => {
     });
 
     describe('foreign transaction', () => {
-        it('should get the exchange rate', () => {
+        it('gets the exchange rate', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 amount: -1223,
                 local_amount: -1409,
@@ -81,7 +81,7 @@ describe('MonzoTransaction', () => {
          ['EUR', 12345, '123.45'],
          ['JPY', 12345, '12345'],
         ].forEach(([currency, amount, expected]) => {
-            it(`should properly output ${currency} amount`, () => {
+            it(`outputs ${currency} amount`, () => {
                 const transaction = new MonzoTransaction('Monzo Current', {
                     local_amount: amount,
                     local_currency: currency,
@@ -93,7 +93,7 @@ describe('MonzoTransaction', () => {
     });
 
     describe('#getPayee', () => {
-        it('should use user_id', () => {
+        it('uses user_id', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 counterparty: {
                     user_id: 'user_1234'
@@ -109,7 +109,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getPayee(), 'Monzo Payee');
         });
 
-        it('should use bank account details', () => {
+        it('uses bank account details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 counterparty: {
                     user_id: 'anon_1234',
@@ -127,7 +127,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getPayee(), 'Bank Payee');
         });
 
-        it('should use merchant details', () => {
+        it('uses merchant details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 merchant: {
                     id: 'merch_1234',
@@ -143,7 +143,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getPayee(), 'Waitrose');
         });
 
-        it('should use merchant group details', () => {
+        it('uses merchant group details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 merchant: {
                     id: 'merch_1234',
@@ -160,7 +160,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getPayee(), 'Boots');
         });
 
-        it('should return empty for a PayPal transfer', () => {
+        it('returns empty for a PayPal transfer', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 user_id: 'user_1234',
                 merchant: {
@@ -181,7 +181,7 @@ describe('MonzoTransaction', () => {
     });
 
     describe('#getTransfer', () => {
-        it('should use bank account details', () => {
+        it('uses bank account details', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 counterparty: {
                     sort_code: '123456',
@@ -198,7 +198,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'Current Account');
         });
 
-        it('should use account ID', () => {
+        it('uses account ID', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 counterparty: {
                     account_id: 'acc_12345',
@@ -214,7 +214,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'Monzo Joint');
         });
 
-        it('should use merchant group ID', () => {
+        it('uses merchant group ID', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 merchant: {
                     group_id: 'grp_12345',
@@ -232,7 +232,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'PayPal');
         });
 
-        it('should not denote a transaction by another user as a PayPal transfer', () => {
+        it('ignores PayPal transactions by another user', () => {
             const transaction = new MonzoTransaction('Monzo Joint', {
                 merchant: {
                     group_id: 'grp_12345',
@@ -251,7 +251,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), '');
         });
 
-        it('should use cash withdrawal', () => {
+        it('uses cash withdrawal', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 local_currency: 'GBP',
                 merchant: {
@@ -268,7 +268,7 @@ describe('MonzoTransaction', () => {
             assert.equal(transaction.getTransfer(), 'Cash');
         });
 
-        it('should use pots', () => {
+        it('uses pots', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 metadata: { pot_id: 'pot_123' },
                 scheme: 'uk_retail_pot',
@@ -284,7 +284,7 @@ describe('MonzoTransaction', () => {
     });
 
     describe('#getMemo', () => {
-        it('should label pot withdrawals', () => {
+        it('labels pot withdrawals', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 metadata: { pot_id: 'pot_123' },
                 scheme: 'uk_retail_pot',
@@ -300,7 +300,7 @@ describe('MonzoTransaction', () => {
     });
 
     describe('#toJSON', () => {
-        it('should return name and module', () => {
+        it('returns name and module', () => {
             const transaction = new MonzoTransaction('Monzo Current', {
                 amount: 1234,
             }, {}, {}, {module: 'mc'});

@@ -5,7 +5,7 @@ const TruelayerTransaction = require('../../src/transaction/truelayer');
 const fixture = require('../../src/exporter/csv');
 
 describe('CSV exporter', () => {
-    it('should export transactions', async () => {
+    it('exports transactions', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
             normalised_provider_transaction_id: 'txn-12345',
             transaction_type: 'DEBIT',
@@ -25,7 +25,7 @@ describe('CSV exporter', () => {
         assert.equal(csv, expected);
     });
 
-    it('should export times', async () => {
+    it('exports times', async () => {
         const transactions = [new MonzoTransaction('Monzo Current', {
             category: 'groceries',
             counterparty: {},
@@ -49,7 +49,7 @@ describe('CSV exporter', () => {
         assert.equal(csv, expected);
     });
 
-    it('should export transfers', async () => {
+    it('exports transfers', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
             normalised_provider_transaction_id: 'txn-12345',
             transaction_type: 'DEBIT',

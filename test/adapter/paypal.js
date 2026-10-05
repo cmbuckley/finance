@@ -11,7 +11,7 @@ describe('PayPalAdapter', () => {
     describe('#getTransactions', () => {
         afterEach(sinon.restore);
 
-        it('should query PayPal for transactions', async () => {
+        it('queries PayPal for transactions', async () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
             const raw = {
@@ -41,7 +41,7 @@ describe('PayPalAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should make multiple queries for a large date range', async () => {
+        it('makes multiple queries for a large date range', async () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().resolves({
@@ -66,7 +66,7 @@ describe('PayPalAdapter', () => {
             });
         });
 
-        it('should not error for zero transactions', async () => {
+        it('succeeds with zero transactions', async () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().resolves({
@@ -78,7 +78,7 @@ describe('PayPalAdapter', () => {
             assert.equal(transactions.length, 0);
         });
 
-        it('should collate conversions', async () => {
+        it('collates conversions', async () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().resolves({
@@ -125,7 +125,7 @@ describe('PayPalAdapter', () => {
             assert.equal(transactions[0].getExchangeRate(), 0.85);
         });
 
-        it('should throw the error from the API', () => {
+        it('throws the error from the API', () => {
             const adapter = new PayPalAdapter('', {}, util.logger());
 
             const apiStub = sinon.stub().rejects({

@@ -41,7 +41,7 @@ describe('TruelayerAdapter', () => {
 
         afterEach(sinon.restore);
 
-        it('should query Truelayer for accounts and cards', async function () {
+        it('queries Truelayer for accounts and cards', async function () {
             const transactionsStub = sinon.stub(DataAPIClient, 'getTransactions').resolves({results: []});
             const pendingTransactionsStub = sinon.stub(DataAPIClient, 'getPendingTransactions').resolves({results: []});
             const cardTransactionsStub = sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
@@ -66,7 +66,7 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactions.length, 0);
         });
 
-        it('should get account transactions', async function () {
+        it('gets account transactions', async function () {
             const raw = {
                 description: 'TEST',
                 transaction_type: 'DEBIT',
@@ -89,7 +89,7 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should get card transactions', async function () {
+        it('gets card transactions', async function () {
             const raw = {
                 description: 'DIRECT DEBIT PAYMENT',
                 transaction_type: 'CREDIT',
@@ -111,7 +111,7 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should get pending card transactions', async function () {
+        it('gets pending card transactions', async function () {
             const raw = {
                 description: 'DIRECT DEBIT PAYMENT',
                 transaction_type: 'CREDIT',
@@ -133,7 +133,7 @@ describe('TruelayerAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should handle a card error', async function () {
+        it('handles a card error', async function () {
             // should fail silently
             this.cardStub.rejects('nope');
 
@@ -150,7 +150,7 @@ describe('TruelayerAdapter', () => {
             sinon.assert.notCalled(cardPendingTransactionsStub);
         });
 
-        it('should only call specified APIs', async function () {
+        it('only calls specified APIs', async function () {
             sinon.stub(DataAPIClient, 'getCardTransactions').resolves({results: []});
             sinon.stub(DataAPIClient, 'getCardPendingTransactions').resolves({results: []});
 

@@ -6,7 +6,7 @@ const MonzoTransaction = require('../../src/transaction/monzo');
 const fixture = require('../../src/exporter/json');
 
 describe('JSON exporter', () => {
-    it('should export monzo adapter config', async () => {
+    it('exports monzo adapter config', async () => {
         const monzoAdapter = new MonzoAdapter('', {
             token: {user_id: 'user_123'},
         });
