@@ -73,10 +73,14 @@ function merchantCategory(matches, defaultValue) {
 }
 
 // reusable patterns
+// TODO support smarter logic
+// e.g. /LEEDS CITY COUNCIL/ could be parking when transport category
+// is known from Monzo, but should not apply in description-only match
 const patterns = {
     accommodation:    /MOXY |HOTEL|Booking\.com|AIRBNB|TRAVELODGE/i,
     betting:          /Betbull|SKYBET|SKY BETTING|PP ONLINE|VIRAL INTERACTIVE|PAYPAL \*BV/,
     carService:       /SIRRELL|ALBA TY(RES|LEEDS)/,
+    fuel:             /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP |WELCOME BREAK|JET RETAIL/,
     parking:          /NCP[. ]|CAR PARK|PARKING|Q-PARK|MANCHESTER AIRPORT|MAAS UPT|DONCASTER SHEFFIEL|LeedsCityCouncil|CITY OF YORK|CITIPARK|PARKMOBILE|WWW.YORK.GOV.UK|Q PARK|PAYBYPHONE|HARROGATE BOROUGH COUN|Manchester City Coun|North Yorkshire Coun|LEEDS BECKETT/i,
     houseImprovement: /B & Q|BARGAIN TOOLS LIMITED|SCREWFIX|WICKES|IKEA|HARDWAR/,
     flights:          /RYANAIR|WIZZ AIR|KIWI\.COM/,
@@ -84,7 +88,7 @@ const patterns = {
     rail:             /GVB|Trainline|TFL.gov|E\/TUNNEL|VIRGINTRAINS|LNER|NORTHERN TRAINS|CROSSCOUNTRY/i,
     takeaway:         /JUST[ -]EAT|DOMINO'S PIZZA|SUBWAY|DELIVEROO|GREGGS|UBER|MCDONALDS/i,
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars|VEEZU/i,
-    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T K MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR|Vinted/i,
+    clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T ?K ?MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR|Vinted/i,
     pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
     vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE/,
 };
@@ -222,7 +226,7 @@ const monzo = {
         'Train Station': 'Travel:Rail',
     }, lookup('description', {
         'Car': /HMCOURTS/,
-        'Car:Fuel': /EG HOLLINWOOD|MFG +PHOENIX|LOTOS|TESCO PFS|ADEL SF|PAY AT PUMP|PETROL|MALTHURST LIMITED|ESSO|BP |WELCOME BREAK/,
+        'Car:Fuel': patterns.fuel,
         'Car:Parking': patterns.parking,
         'Car:Repair': 'AUTOGLASS',
         'Car:Service & MOT': patterns.carService,
@@ -397,15 +401,16 @@ const truelayer = {
         'Bills:Sky': 'SKY DIGITAL',
         'Bills:TV Licence': 'TV LICENCE',
         'Car:Breakdown': /AA MEMBERSHIP|RAC\.CO\.UK/,
+        'Car:Fuel': patterns.fuel,
         'Car:Insurance': /(MOTOR|ADMIRAL|TESCO) INSURANCE/,
         'Car:Service & MOT': patterns.carService,
-        'Car:Tax': 'DVLA-',
+        'Car:Tax': /DVLA[- ]/,
         'Car:Toll': /DART-CHARGE|TOLL|^PPO/,
         'Computing:Hardware': 'EBUYER',
         'Education:Fees': 'Pluralsight',
         'Food:Groceries': 'SYRENKA',
         'Food:Takeaway': patterns.takeaway,
-        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA|ZUCCO|Sushi Nakamura|SAN CARLO/,
+        'Food:Eating Out': /Culto|THE OWL|LITTLE ATHENS|DARUMA|ZUCCO|Sushi Nakamura|SAN CARLO|Ego - Shadwell/,
         'Gifts & Donations:Gifts': /Vestiaire Collecti|CAVENDISH JEWELLERS/,
         'Job Expenses': /Answer.+ Expenses/i,
         'Healthcare:Dental': 'DENTAL',
@@ -418,6 +423,7 @@ const truelayer = {
         'House:Improvement': patterns.houseImprovement,
         'House:Insurance': 'LV INSURANCE',
         'House:Security': 'ADT - OIN ACCOUNT',
+        'Income:Interest': /^INTEREST$/,
         'Income:Rental Income': /PRESTON BAKER|LINLEY & SIMPSON|Linley and Simpson/,
         'Leisure:Music Events': patterns.musicEvents,
         'Nights Out':  /HOS HEADINGLEY|MANAHATTA|EAST OF ARCADIA|Terminus/,
