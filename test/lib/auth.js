@@ -47,7 +47,7 @@ describe('auth', () => {
     afterEach(sinon.restore);
 
     describe('with no previous state', () => {
-        it('should log in successfully', (done) => {
+        it('logs in successfully', (done) => {
             const token = {access_token: 'access token'};
 
             sinon.stub(AuthorizationCode.prototype, 'getToken').returns({token});
@@ -90,7 +90,7 @@ describe('auth', () => {
     });
 
     describe('with state set', () => {
-        it('should not set a new state', async () => {
+        it('preserves state by default', async () => {
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
             fixture.config = {state: '123456789'};
 
@@ -98,7 +98,7 @@ describe('auth', () => {
             assert.match(url, /&state=123456789&/);
         });
 
-        it('should set a new state when forceLogin is true', async () => {
+        it('sets a new state when forceLogin is true', async () => {
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
             fixture.config = {state: '123456789'};
 
@@ -107,7 +107,7 @@ describe('auth', () => {
             assert.doesNotMatch(url, /&state=123456789&/);
         });
 
-        it('should error when the state does not match', async () => {
+        it('errors when the state does not match', async () => {
             const fixture = new AuthClient(this.configPath, this.adapterConfig, this.logger);
             fixture.config = {state: '123456789'};
             fixture.server = this.server;
@@ -121,7 +121,7 @@ describe('auth', () => {
     });
 
     describe('With a valid token', () => {
-        it('should log in successfully', async () => {
+        it('logs in successfully', async () => {
             // date in the future
             const expiry = new Date();
             expiry.setDate(expiry.getDate() + 7);
@@ -141,7 +141,7 @@ describe('auth', () => {
     });
 
     describe('With an expired access token', () => {
-        it('should refresh the token', async () => {
+        it('refreshes the token', async () => {
             // date in the past
             const expiry = new Date();
             expiry.setDate(expiry.getDate() - 7);
@@ -167,7 +167,7 @@ describe('auth', () => {
     });
 
     describe('With an expired refresh token', () => {
-        it('should require new login', (done) => {
+        it('requires new login', (done) => {
             // fake expired tokens
             sinon.stub(AuthorizationCode.prototype, 'createToken').returns({
                 expired: sinon.stub().resolves(true),

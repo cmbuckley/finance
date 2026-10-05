@@ -4,7 +4,7 @@ const TruelayerTransaction = require('../../src/transaction/truelayer');
 
 describe('TruelayerTransaction', () => {
     describe('domestic transaction', () => {
-        it('should parse raw data', () => {
+        it('parses raw data', () => {
             const transaction = new TruelayerTransaction('Joint Account', {
                 amount: -13.37,
                 currency: 'GBP',
@@ -43,7 +43,7 @@ describe('TruelayerTransaction', () => {
     });
 
     describe('foreign transaction', () => {
-        it('should detect foreign currencies in descriptions', () => {
+        it('detects foreign currencies in descriptions', () => {
             const transaction = new TruelayerTransaction('Joint Account', {
                 amount: -68.94,
                 currency: 'GBP',
@@ -59,7 +59,7 @@ describe('TruelayerTransaction', () => {
     });
 
     describe('#getTransfer', () => {
-        it('should use description', () => {
+        it('uses description', () => {
             const transaction = new TruelayerTransaction('Joint Account', {
                 amount: 1200,
                 description: 'CURR ACC Bills',
@@ -79,7 +79,7 @@ describe('TruelayerTransaction', () => {
     });
 
     describe('#toJSON', () => {
-        it('should return name and module', () => {
+        it('returns name and module', () => {
             const transaction = new TruelayerTransaction('Current Account', {
                 amount: 1234,
             }, {
@@ -95,7 +95,7 @@ describe('TruelayerTransaction', () => {
             });
         });
 
-        it('should set pending', () => {
+        it('sets pending', () => {
             const transaction = new TruelayerTransaction('Current Account', {
                 amount: 1234,
                 description: 'pending transaction',

@@ -4,7 +4,7 @@ const TruelayerTransaction = require('../../src/transaction/truelayer');
 const fixture = require('../../src/exporter/qif');
 
 describe('QIF exporter', () => {
-    it('should export transactions', async () => {
+    it('exports transactions', async () => {
         const transactions = [new TruelayerTransaction('HSBC', {
             normalised_provider_transaction_id: 'txn-12345',
             transaction_type: 'DEBIT',
@@ -35,7 +35,7 @@ describe('QIF exporter', () => {
     });
     0
 
-    it('should export transfers', async () => {
+    it('exports transfers', async () => {
         const data = {transfers: {patterns: {
             'Current Account': 'CURR ACC',
             'Joint Account': 'JOINT ACC',

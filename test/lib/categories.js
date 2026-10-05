@@ -4,12 +4,12 @@ const {search} = require('../../src/lib/categories');
 
 describe('Categories search', () => {
     describe('Monzo transaction', () => {
-        it('should lookup simple category', () => {
+        it('looks up simple category', () => {
             const raw = {category: 'groceries'};
             assert.equal(search(raw), 'Food:Groceries');
         });
 
-        it('should lookup using merchant Foursquare category', () => {
+        it('looks up using merchant Foursquare category', () => {
             const raw = {
                 category: 'entertainment',
                 merchant: {metadata: {foursquare_category: 'Zoo'}},
@@ -17,7 +17,7 @@ describe('Categories search', () => {
             assert.equal(search(raw), 'Leisure:Activities');
         });
 
-        it('should lookup using merchant category', () => {
+        it('looks up using merchant category', () => {
             const raw = {
                 category: 'eating_out',
                 merchant: {category: 'Fast Food Restaurant'},
@@ -25,7 +25,7 @@ describe('Categories search', () => {
             assert.equal(search(raw), 'Food:Takeaway');
         });
 
-        it('should lookup using description', () => {
+        it('looks up using description', () => {
             const raw = {
                 category: 'personal_care',
                 description: 'CONTACT LENSES',
@@ -33,7 +33,7 @@ describe('Categories search', () => {
             assert.equal(search(raw), 'Healthcare:Eyecare');
         });
 
-        it('should support nested lookups and string default', () => {
+        it('supports nested lookups and string default', () => {
             const raw = {
                 category: 'personal_care',
                 description: 'NOTHING MATCHES',
@@ -41,7 +41,7 @@ describe('Categories search', () => {
             assert.equal(search(raw), 'Personal Care');
         });
 
-        it('should lookup using nested keys', () => {
+        it('looks up using nested keys', () => {
             const raw = {
                 category: 'personal_care',
                 counterparty: {name: 'Mental Health Services'},
@@ -51,21 +51,21 @@ describe('Categories search', () => {
     });
 
     describe('Truelayer transaction', () => {
-        it('should lookup using classification', () => {
+        it('looks up using classification', () => {
             const raw = {
                 transaction_classification: ['Personal Care', 'Hair'],
             };
             assert.equal(search(raw), 'Personal Care:Hair');
         });
 
-        it('should lookup using category', () => {
+        it('looks up using category', () => {
             const raw = {
                 transaction_category: 'INTEREST',
             };
             assert.equal(search(raw), 'Income:Interest');
         });
 
-        it('should lookup using description', () => {
+        it('looks up using description', () => {
             const raw = {
                 description: 'TV LICENCE',
             };

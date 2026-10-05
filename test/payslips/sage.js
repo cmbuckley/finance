@@ -20,7 +20,7 @@ describe('Payslips', () => {
         });
     });
 
-    it('should overwrite XHR', () => {
+    it('overwrites XHR', () => {
         assert.ok(this.dom.window.XMLHttpRequest.tampered);
     });
 
@@ -50,7 +50,7 @@ describe('Payslips', () => {
             sinon.restore();
         });
 
-        it('should insert a download button', () => {
+        it('inserts a download button', () => {
             const btn = this.dom.window.document.querySelector('.buttons .btn');
             assert.equal(btn.textContent, 'Download QIF');
         });
@@ -62,7 +62,7 @@ describe('Payslips', () => {
             ['30/06/2025', '2025-06-27'], // 28th is a Sat
             ['30/09/2025', '2025-09-26'], // 28th is a Sun
         ].forEach(([date, payday]) => {
-            it(`should create file with correct payday (${payday})`, async () => {
+            it(`creates file with correct payday (${payday})`, async () => {
 
                 this.dom.window.document.querySelector('.date tbody td:nth-of-type(2)').innerHTML = date;
                 clickDownload(this);
@@ -73,7 +73,7 @@ describe('Payslips', () => {
             });
         });
 
-        it('should download a QIF', async () => {
+        it('downloads a QIF', async () => {
             clickDownload(this);
 
             const download = this.dom.window.document.querySelector('a[download]');

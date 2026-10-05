@@ -32,7 +32,7 @@ function csv(rows, filename) {
 describe('PokerStars adapter', () => {
     afterEach(sinon.restore);
 
-    it('should parse the CSV', async () => {
+    it('parses the CSV', async () => {
         csv([[
             '2020/12/16 6:36 AM',
             'Tournament Registration',
@@ -67,7 +67,7 @@ describe('PokerStars adapter', () => {
         assert.equal(noTransactions.length, 0);
     });
 
-    it('should handle inter account transfers', async () => {
+    it('handles inter account transfers', async () => {
         csv([[
             '2024/01/26 2:32 PM',
             'Inter Account Transfer',

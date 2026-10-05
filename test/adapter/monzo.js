@@ -10,7 +10,7 @@ describe('MonzoAdapter', () => {
     describe('#getTransactions', () => {
         afterEach(sinon.restore);
 
-        it('should query monzo for transactions', async () => {
+        it('queries monzo for transactions', async () => {
             const adapter = new MonzoAdapter('', {}, util.logger());
 
             adapter.token = 'test_token'; // fake login
@@ -68,7 +68,7 @@ describe('MonzoAdapter', () => {
             assert.equal(transactions[0].raw, raw);
         });
 
-        it('should make multiple calls when exceeding the limit', async () => {
+        it('makes multiple calls when exceeding the limit', async () => {
             const adapter = new MonzoAdapter('', {}, util.logger());
 
             adapter.addConfig({
@@ -99,13 +99,13 @@ describe('MonzoAdapter', () => {
             assert(transactionsStub.secondCall.calledWithMatch({since: 'tx_100'}));
         });
 
-        it('should throw accounts error', async () => {
+        it('throws accounts error', async () => {
             const adapter = new MonzoAdapter();
             const accountsStub = sinon.stub(monzo, 'accounts').rejects({error: {code: 'nope'}});
             assert.rejects(adapter.getTransactions(), {code: 'nope'});
         });
 
-        it('should throw verification required transactions error', async () => {
+        it('throws verification required transactions error', async () => {
             const adapter = new MonzoAdapter();
 
             sinon.stub(monzo, 'accounts').resolves({
@@ -119,7 +119,7 @@ describe('MonzoAdapter', () => {
             assert.rejects(adapter.getTransactions(), 'Cannot query older transactions - please refresh permissions in the Monzo app');
         });
 
-        it('should throw transactions error', async () => {
+        it('throws transactions error', async () => {
             const adapter = new MonzoAdapter();
 
             sinon.stub(monzo, 'accounts').resolves({
@@ -135,7 +135,7 @@ describe('MonzoAdapter', () => {
     });
 
     describe('#toJSON', () => {
-        it('should return user and pots', () => {
+        it('returns user and pots', () => {
             const adapter = new MonzoAdapter('', {
                 token: {user_id: 'user_123'},
             }, {});

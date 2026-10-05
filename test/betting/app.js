@@ -19,11 +19,11 @@ describe('Betting app', () => {
     });
 
     describe('interface', () => {
-        it('should be exported', () => {
+        it('is exported', () => {
             assert.ok(this.App);
         });
 
-        it('should complain for invalid handler', () => {
+        it('complains for invalid handler', () => {
             assert.throws(() => {
                 new this.App('missing');
             }, /Invalid handler/);
@@ -36,7 +36,7 @@ describe('Betting app', () => {
         });
 
         provider.forEach((example) => {
-            it('should handle ' + example.name, () => {
+            it('handles ' + example.name, () => {
                 assert.deepEqual(example.transaction, this.fixture.getTransaction(example.data));
             });
         });

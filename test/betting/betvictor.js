@@ -18,11 +18,11 @@ describe('BetVictor', () => {
     });
 
     describe('handler', () => {
-        it('should load', () => {
+        it('loads', () => {
             assert.ok(new this.App('betvictor'));
         });
 
-        it('should return [] transactions with no html', (done) => {
+        it('returns empty transactions with no html', (done) => {
             var app = new this.App('betvictor');
             app.getTransactions((transactions) => {
                 assert.deepEqual([], transactions);

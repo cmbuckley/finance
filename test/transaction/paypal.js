@@ -4,7 +4,7 @@ const PayPalTransaction = require('../../src/transaction/paypal');
 
 describe('PayPalTransaction', () => {
     describe('transaction', () => {
-        it('should parse raw data', () => {
+        it('parses raw data', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 payer_info: {
                     account_id: 'U123456789',
@@ -41,7 +41,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getPayee(), 'Test Payee');
         });
 
-        it('should ignore invalid transactions', () => {
+        it('ignores invalid transactions', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
                     transaction_status: 'D',
@@ -51,7 +51,7 @@ describe('PayPalTransaction', () => {
             assert(!transaction.isValid());
         });
 
-        it('should use transaction note', () => {
+        it('uses transaction note', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
                     transaction_note: 'Transaction note',
@@ -62,7 +62,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getMemo(), 'Transaction note');
         });
 
-        it('should use description of single cart item', () => {
+        it('uses description of single cart item', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 cart_info: {
                     item_details: [{
@@ -77,7 +77,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getMemo(), 'Cart item');
         });
 
-        it('should use filter out common items', () => {
+        it('uses filter out common items', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 cart_info: {
                     item_details: [{
@@ -94,7 +94,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getMemo(), 'Cart item');
         });
 
-        it('should include fees in amount', () => {
+        it('includes fees in amount', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
                     transaction_amount: {
@@ -111,7 +111,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getLocalAmount(), '8.40');
         });
 
-        it('should include properly round when there’s a fee', () => {
+        it('includes properly round when there’s a fee', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
                     transaction_amount: {
@@ -130,7 +130,7 @@ describe('PayPalTransaction', () => {
     });
 
     describe('#getExchangeRate', () => {
-        it('should parse conversion transactions', () => {
+        it('parses conversion transactions', () => {
             const transaction = new PayPalTransaction('PayPal', {
                 transaction_info: {
                     transaction_amount: {
@@ -161,7 +161,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getExchangeRate(), 0.85);
         });
 
-        it('should use rate of a known transfer', () => {
+        it('uses rate of a known transfer', () => {
             const transaction = new PayPalTransaction('PayPal');
 
             transaction.setTransfer({
@@ -171,7 +171,7 @@ describe('PayPalTransaction', () => {
             assert.equal(transaction.getExchangeRate(), 0.8);
         });
 
-        it('should use rate from the linked deposit', () => {
+        it('uses rate from the linked deposit', () => {
             const purchase = new PayPalTransaction('PayPal');
             const deposit = new PayPalTransaction('PayPal');
 
@@ -185,7 +185,7 @@ describe('PayPalTransaction', () => {
     });
 
     describe('#getTransfer', () => {
-        it('should use account of a known transfer', () => {
+        it('uses account of a known transfer', () => {
             const transaction = new PayPalTransaction('PayPal');
 
             transaction.setTransfer({
