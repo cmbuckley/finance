@@ -90,7 +90,7 @@ const patterns = {
     taxi:             /UBER|bolt\.eu|AMBER|STREAMLINE|WWW.OTS-UK.CO.UK|taxi|ROADRUNNER|Action Cars|VEEZU/i,
     clothing:         /ASOS\.?COM|MULBERRY|SELFRIDGES|HARRODS|JCHOOLIM|LPP|Polo Factory Store|HARVEY NICHOLS|INTIMISSIMI|J\.CHOO|VICTORIAS SECRET|PRIMARK|KLARNA|NEXT RETAIL|TEEPUBLIC|THE OUTNET|MOSS YORK|ZARA|T ?K ?MAXX|SHOES|Hennes Mauritz|H \& M|TED BAKER|NEXT |LOUNGEUNDERWEAR|Vinted/i,
     pregnancy:        /SERAPHINE|MAMAS & PAPAS|MIRACLE INSIDE/,
-    vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE/,
+    vets:             /VETERINARY|VETS4P|LEEDS KIRKSTALL VE|ANIMAL HEALTH CARE/,
 };
 
 const monzo = {
@@ -403,6 +403,7 @@ const truelayer = {
         'Car:Breakdown': /AA MEMBERSHIP|RAC\.CO\.UK/,
         'Car:Fuel': patterns.fuel,
         'Car:Insurance': /(MOTOR|ADMIRAL|TESCO) INSURANCE/,
+        'Car:Purchase': 'VWFS UK LIMITED',
         'Car:Service & MOT': patterns.carService,
         'Car:Tax': /DVLA[- ]/,
         'Car:Toll': /DART-CHARGE|TOLL|^PPO/,
