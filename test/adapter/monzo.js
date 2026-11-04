@@ -1,7 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
 
-const monzo = require('monzo-bank');
 const util = require('../util');
 
 const MonzoAdapter = require('../../src/adapter/monzo');
@@ -20,20 +19,18 @@ describe('MonzoAdapter', () => {
                 module: 'mc',
             });
 
-            const accountsStub = sinon.stub(monzo, 'accounts').resolves({
-                accounts: [{
-                    id: 'acc_123',
-                    type: 'uk_retail',
-                    display_name: 'Current',
-                }, {
-                    id: 'acc_456',
-                    type: 'uk_prepaid',
-                    description: 'Prepaid',
-                }]
-            });
+            const accountsStub = sinon.stub(adapter.client.accounts, 'list').resolves([{
+                id: 'acc_123',
+                type: 'uk_retail',
+                display_name: 'Current',
+            }, {
+                id: 'acc_456',
+                type: 'uk_prepaid',
+                description: 'Prepaid',
+            }]);
 
-            sinon.stub(monzo, 'balance').resolves({balance: 100});
-            sinon.stub(monzo, 'pots').resolves({pots: []});
+            sinon.stub(adapter.client.balance, 'read').resolves({balance: 100});
+            sinon.stub(adapter.client.pots, 'list').resolves([]);
 
             const raw = {
                 account_id: 'acc_123',
@@ -50,17 +47,14 @@ describe('MonzoAdapter', () => {
                 updated: '2022-09-05T02:13:26.436Z',
             };
 
-            const transactionsStub = sinon.stub(monzo, 'transactions').resolves({
-                transactions: [raw]
-            });
-
+            const transactionsStub = sinon.stub(adapter.client.transactions, 'list').resolves([raw]);
             const transactions = await adapter.getTransactions(new Date(), new Date());
 
             assert(accountsStub.calledOnce);
             assert(transactionsStub.calledOnce);
             assert(transactionsStub.calledWith(sinon.match({
                 account_id: 'acc_123',
-            }), 'test_token'));
+            })));
 
             assert.equal(transactions.length, 1);
             assert.equal(transactions[0].constructor.name, 'MonzoTransaction');
@@ -77,21 +71,15 @@ describe('MonzoAdapter', () => {
                 module: 'mc',
             });
 
-            sinon.stub(monzo, 'accounts').resolves({
-                accounts: [{type: 'uk_retail'}]
-            });
-            sinon.stub(monzo, 'balance').resolves({balance: 100});
-            sinon.stub(monzo, 'pots').resolves({pots: []});
+            sinon.stub(adapter.client.accounts, 'list').resolves([{type: 'uk_retail'}]);
+            sinon.stub(adapter.client.balance, 'read').resolves({balance: 100});
+            sinon.stub(adapter.client.pots, 'list').resolves([]);
 
-            const transactionsStub = sinon.stub(monzo, 'transactions');
-            transactionsStub.onFirstCall().resolves({
-                transactions: Array.from({length: 100}, (x, i) => ({
-                    id: 'tx_' + (i + 1)
-                })),
-            });
-            transactionsStub.onSecondCall().resolves({
-                transactions: Array.from({length: 5}, () => ({})),
-            });
+            const transactionsStub = sinon.stub(adapter.client.transactions, 'list');
+            transactionsStub.onFirstCall().resolves(Array.from({length: 100}, (x, i) => ({
+                id: 'tx_' + (i + 1)
+            })));
+            transactionsStub.onSecondCall().resolves(Array.from({length: 5}, () => ({})));
 
             const transactions = await adapter.getTransactions(new Date(), new Date());
 
@@ -101,18 +89,16 @@ describe('MonzoAdapter', () => {
 
         it('throws accounts error', async () => {
             const adapter = new MonzoAdapter();
-            const accountsStub = sinon.stub(monzo, 'accounts').rejects({error: {code: 'nope'}});
+            const accountsStub = sinon.stub(adapter.client.accounts, 'list').rejects({error: {code: 'nope'}});
             assert.rejects(adapter.getTransactions(), {code: 'nope'});
         });
 
         it('throws verification required transactions error', async () => {
             const adapter = new MonzoAdapter();
 
-            sinon.stub(monzo, 'accounts').resolves({
-                accounts: [{type: 'uk_retail'}]
-            });
-            sinon.stub(monzo, 'pots').resolves({pots: []});
-            sinon.stub(monzo, 'transactions').rejects({error: {
+            sinon.stub(adapter.client.accounts, 'list').resolves([{type: 'uk_retail'}]);
+            sinon.stub(adapter.client.pots, 'list').resolves([]);
+            sinon.stub(adapter.client.transactions, 'list').rejects({error: {
                 code: 'forbidden.verification_required',
             }});
 
@@ -122,11 +108,9 @@ describe('MonzoAdapter', () => {
         it('throws transactions error', async () => {
             const adapter = new MonzoAdapter();
 
-            sinon.stub(monzo, 'accounts').resolves({
-                accounts: [{type: 'uk_retail'}]
-            });
-            sinon.stub(monzo, 'pots').resolves({pots: []});
-            sinon.stub(monzo, 'transactions').rejects({error: {
+            sinon.stub(adapter.client.accounts, 'list').resolves([{type: 'uk_retail'}]);
+            sinon.stub(adapter.client.pots, 'list').resolves([]);
+            sinon.stub(adapter.client.transactions, 'list').rejects({error: {
                 code: 'something_else',
             }});
 

@@ -18,7 +18,6 @@ function getProxyAdapter(stubs) {
         return acc;
     }, {
         './lib/auth': {},
-        'monzo-bank': {},
         'truelayer-client': {},
     });
 
