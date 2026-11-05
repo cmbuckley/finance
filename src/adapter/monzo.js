@@ -1,4 +1,4 @@
-const monzo = require('monzo-bank'),
+const {MonzoClient} = require('monzo-sdk'),
     Adapter = require('../adapter'),
     Transaction = require('../transaction/monzo');
 
@@ -19,6 +19,7 @@ class MonzoAdapter extends Adapter {
         super(accountPath, config, logger);
         this.accountMap = {};
         this.pots = {};
+        this.client = new MonzoClient();
     }
 
     addConfig(accountConfig) {
@@ -34,22 +35,24 @@ class MonzoAdapter extends Adapter {
             accountMap = this.accountMap,
             accounts, transactions = [];
 
+        this.client.setTokens({accessToken});
+
         try {
-            let accountsResponse = await monzo.accounts(accessToken);
-            accounts = accountsResponse.accounts.filter(a => Object.keys(accountMap).includes(a.type));
+            let accountsResponse = await this.client.accounts.list();
+            accounts = accountsResponse.filter(a => Object.keys(accountMap).includes(a.type));
         } catch (err) {
             throw err.error || err;
         }
 
         for (const account of accounts) {
             const accountLogger = this.logger.child({module: accountMap[account.type].module}),
-                accountBalance = await monzo.balance(account.id, accessToken),
-                potsResponse = await monzo.pots(account.id, accessToken),
+                accountBalance = await this.client.balance.read({account_id: account.id}),
+                potsResponse = await this.client.pots.list({current_account_id: account.id}),
                 limit = 100;
 
             let hiddenBalances = 0;
 
-            potsResponse.pots.map(async pot => {
+            potsResponse.map(async pot => {
                 this.pots[pot.id] = pot;
 
                 if (!pot.deleted && (pot.round_up || pot.style == 'penny_savings_challenge')) {
@@ -78,17 +81,17 @@ class MonzoAdapter extends Adapter {
                 }
 
                 try {
-                    transactionsResponse = await monzo.transactions({
+                    transactionsResponse = await this.client.transactions.list({
                       account_id: account.id,
                       expand:     'merchant',
                       since:      since,
                       before:     to.toISOString(),
                       limit:      limit,
-                    }, accessToken);
+                    });
 
-                    if (transactionsResponse.transactions.length) { since = transactionsResponse.transactions.at(-1).id; }
+                    if (transactionsResponse.length) { since = transactionsResponse.at(-1).id; }
 
-                    transactions = transactions.concat(transactionsResponse.transactions.map(raw => {
+                    transactions = transactions.concat(transactionsResponse.map(raw => {
 
                         accountLogger.silly('Raw transaction', raw);
                         return new Transaction(accountMap[account.type].name || account.display_name, raw, this, accountLogger, accountMap[account.type]);
@@ -100,7 +103,7 @@ class MonzoAdapter extends Adapter {
 
                     throw err.error || err;
                 }
-            } while (transactionsResponse.transactions && transactionsResponse.transactions.length == limit);
+            } while (transactionsResponse && transactionsResponse.length == limit);
         }
 
         this.logger.verbose(`Retrieved ${transactions.length} transactions`);
