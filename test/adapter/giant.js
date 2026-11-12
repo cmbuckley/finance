@@ -66,7 +66,7 @@ describe('GiantAdapter', () => {
             assert.equal(transactions[6].getMemo(), 'Giant margin - Umbrella Premium');
 
             assert.equal(transactions[9].getLocalAmount(), -1000);
-            assert.equal(transactions[9].getMemo(), 'Employers Pension Contributions');
+            assert.equal(transactions[9].getMemo(), 'Employers Pension Contributions (Jul)');
 
             assert.equal(transactions[13].getPayee(), 'HMRC');
             assert.equal(transactions[13].getCategory(), 'Taxes:Income Tax');

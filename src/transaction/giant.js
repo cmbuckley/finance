@@ -39,6 +39,10 @@ class GiantTransaction extends Transaction {
     }
 
     getMemo() {
+        if (this.raw.memo == 'Employers Pension Contributions') {
+            this.raw.memo += ' (' + this.getDate('MMM') + ')';
+        }
+
         return this.raw.memo;
     }
 
