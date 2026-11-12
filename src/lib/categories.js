@@ -423,7 +423,7 @@ const truelayer = {
         'House:Garden': 'GARDEN',
         'House:Improvement': patterns.houseImprovement,
         'House:Insurance': 'LV INSURANCE',
-        'House:Security': 'ADT - OIN ACCOUNT',
+        'House:Security': /ADT (- OIN ACCOUNT|UK)/,
         'Income:Interest': /^INTEREST$/,
         'Income:Rental Income': /PRESTON BAKER|LINLEY & SIMPSON|Linley and Simpson/,
         'Leisure:Music Events': patterns.musicEvents,
